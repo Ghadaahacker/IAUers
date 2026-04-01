@@ -1,1 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU'ers Login</title>
 
+  <link rel="stylesheet" href="../../Shared/CSS/main.css" />
+  <link rel="stylesheet" href="../CSS/login.css" />
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-box">IAU</div>
+        <h1>IAU'ers App</h1>
+        <p>Sign in to access your portal</p>
+      </div>
+
+      <form id="loginForm" class="login-form" novalidate>
+        <div class="form-group">
+          <label for="email">University Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="example@iau.edu.sa"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <button type="submit" class="login-btn">Sign In</button>
+      </form>
+
+      <div class="login-footer">
+        <p>Use your official IAU email to continue</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../Shared/JS/main.js"></script>
+  <script src="../JS/login.js"></script>
+</body>
+</html>
