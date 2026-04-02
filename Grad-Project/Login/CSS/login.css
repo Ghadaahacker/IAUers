@@ -279,26 +279,7 @@ body {
 }
 
 .join-box {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.avatars {
-  display: flex;
-  align-items: center;
-}
-
-.avatars img {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 2px solid var(--white);
-  margin-left: -10px;
-}
-
-.avatars img:first-child {
-  margin-left: 0;
+  margin-top: 6px;
 }
 
 .join-box span {
@@ -306,7 +287,6 @@ body {
   font-weight: 700;
   color: var(--primary-navy);
 }
-
 .footer {
   background: var(--primary-dark);
   color: var(--white);
