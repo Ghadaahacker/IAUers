@@ -1,1 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academic Profile</title>
+  <link rel="stylesheet" href="../CSS/profile.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">IAU’ers App</div>
+
+      <div class="user-box">
+        <img
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe-rvdnsezd8Z7YCFeGBY75LomxyMAOuMqVT2jFDOKSZG2IAxRvnOLNaLbJlFH7bTeiFbDiej1If843DXrePs5FpATVcyRM8n5FwXp2wHglbwMCJENjJWtmj_0Q2zT0luYbzNV2wf5k3F8Dp1ssJgmKbOxgUPE82X31bZE1Q1Ble6ReWAJxodhaMA544qRW1Py1q9dKx2DqPUKJfQTd82auAgnHMOuRA7-LALqGMRYOcnpy7j095hkqLbs4hnyEu2nPbNmWBv7lhI"
+          alt="User Avatar"
+          class="user-avatar"
+        />
+        <h3>Ahmed</h3>
+        <p>Computer Science</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="#"><i class="fa-regular fa-calendar"></i><span>Schedule</span></a>
+        <a href="#"><i class="fa-regular fa-ticket"></i><span>My Tickets</span></a>
+        <a href="#"><i class="fa-regular fa-map"></i><span>My Journey</span></a>
+        <a href="#" class="active"><i class="fa-regular fa-user"></i><span>My Profile</span></a>
+      </nav>
+
+      <a href="#" class="logout-link">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>Logout</span>
+      </a>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <!-- Top bar -->
+      <header class="topbar">
+        <nav class="top-links">
+          <a href="#">Home</a>
+          <a href="#">Schedule</a>
+          <a href="#" class="active-link">My Profile</a>
+        </nav>
+
+        <div class="top-actions">
+          <button class="icon-btn">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <img
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe-rvdnsezd8Z7YCFeGBY75LomxyMAOuMqVT2jFDOKSZG2IAxRvnOLNaLbJlFH7bTeiFbDiej1If843DXrePs5FpATVcyRM8n5FwXp2wHglbwMCJENjJWtmj_0Q2zT0luYbzNV2wf5k3F8Dp1ssJgmKbOxgUPE82X31bZE1Q1Ble6ReWAJxodhaMA544qRW1Py1q9dKx2DqPUKJfQTd82auAgnHMOuRA7-LALqGMRYOcnpy7j095hkqLbs4hnyEu2nPbNmWBv7lhI"
+            alt="Small Avatar"
+            class="top-avatar"
+          />
+        </div>
+      </header>
+
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <h1>Academic Profile</h1>
+          <div class="hero-meta">
+            <span>Ahmed</span>
+            <span class="dot"></span>
+            <span>Computer Science</span>
+          </div>
+        </div>
+
+        <div class="hero-buttons">
+          <button class="btn btn-light" id="editProfileBtn">Edit Profile</button>
+          <button class="btn btn-dark">Academic Record</button>
+        </div>
+      </section>
+
+      <!-- Dashboard content -->
+      <section class="profile-grid">
+        <!-- Left profile card -->
+        <div class="card profile-card">
+          <div class="student-illustration">
+            <img
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuARgF2X4kMKPws53xv6vKGEgv4XzV5fULq38z9PrD2loAHrC_t5X_ydac6_yIXn7d4kA5DAzwHTU6cXSiX60kaDV2ax0az005cWBuPgBxyxOP3uK_mvg8lI04dMCGx0F7-s0IFCjjTQj19ceMn03pQoggLF5ffdyXV-OxlSOA57-M4TQ03UnyJemi9Tx8fkAjXDy6aAfmiRxR6ViW1RfOwLU4mPriXkkwMSzG_HaGFP9-cJWaynthUGvrLgX4LJK547eA4iVFJQnCg"
+              alt="Student"
+            />
+            <div class="student-id">ID: 2230002023</div>
+          </div>
+
+          <div class="info-block">
+            <span class="label">FULL NAME</span>
+            <h3>Ahmed Al-Sayed</h3>
+          </div>
+
+          <div class="info-block">
+            <span class="label">IAU EMAIL</span>
+            <p>a.alsayed@iau.edu.sa</p>
+          </div>
+
+          <div class="info-block">
+            <span class="label">DEPARTMENT</span>
+            <p>College of Business Administration</p>
+          </div>
+
+          <div class="card-icons">
+            <button><i class="fa-brands fa-instagram"></i></button>
+            <button><i class="fa-solid fa-phone"></i></button>
+            <button><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+
+        <!-- Right content -->
+        <div class="right-panel">
+          <div class="stats-row">
+            <div class="card stat-card">
+              <div class="stat-top">
+                <span>Cumulative GPA</span>
+                <small>Current</small>
+              </div>
+              <div class="stat-value">4.62 <span>/5.00</span></div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 92.4%;"></div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-top">
+                <span>Credits Earned</span>
+                <small>Progress</small>
+              </div>
+              <div class="stat-value">102 <span>/132</span></div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 77.2%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card courses-card">
+            <div class="courses-header">
+              <h3>Enrolled Courses</h3>
+              <span>Semester 2, 2024</span>
+            </div>
+
+            <div class="courses-list">
+              <div class="course-item">
+                <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
+                <div>
+                  <h4>CS301: Advanced Algorithms</h4>
+                  <p>Section 1 - 3 Credit</p>
+                </div>
+              </div>
+
+              <div class="course-item">
+                <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
+                <div>
+                  <h4>CS312: Database Systems</h4>
+                  <p>Section 2 - 3 Credit</p>
+                </div>
+              </div>
+
+              <div class="course-item">
+                <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
+                <div>
+                  <h4>CS450: Cyber Security</h4>
+                  <p>Section 4 - 3 Credit</p>
+                </div>
+              </div>
+
+              <div class="course-item">
+                <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
+                <div>
+                  <h4>CS208: Networking</h4>
+                  <p>Section 2 - 3 Credit</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../JS/profile.js"></script>
+</body>
+</html>
 
