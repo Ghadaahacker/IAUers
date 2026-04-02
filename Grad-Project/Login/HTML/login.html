@@ -3,55 +3,124 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IAU'ers Login</title>
-
-  <link rel="stylesheet" href="../../Shared/CSS/main.css" />
+  <title>IAU’ers Login</title>
   <link rel="stylesheet" href="../CSS/login.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
 </head>
 <body>
-  <div class="login-page">
-    <div class="login-card">
-      <div class="login-header">
-        <div class="logo-box">IAU</div>
-        <h1>IAU'ers App</h1>
-        <p>Sign in to access your portal</p>
-      </div>
+  <div class="page-wrapper">
+    <div class="page-shell">
 
-      <form id="loginForm" class="login-form" novalidate>
-        <div class="form-group">
-          <label for="email">University Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="example@iau.edu.sa"
-            required
-          />
+      <!-- Top Header -->
+      <header class="top-header">
+        <h1>IAU’ers</h1>
+      </header>
+
+      <!-- Main Section -->
+      <main class="login-section">
+        <div class="login-card">
+
+          <!-- Left Side -->
+          <div class="login-left">
+            <h2>Welcome to IAU’ers</h2>
+
+            <form id="loginForm">
+              <div class="form-group">
+                <label for="email">University Email</label>
+                <div class="input-box">
+                  <i class="fa-solid fa-user"></i>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="e.g. name@iau.edu.sa"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-box">
+                  <i class="fa-solid fa-lock"></i>
+                  <input
+                    type="password"
+                    id="password"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="forgot-row">
+                <a href="#">Forgot Password?</a>
+              </div>
+
+              <div class="form-group">
+                <label>Login as:</label>
+                <div class="role-toggle">
+                  <button type="button" class="role-btn active" data-role="student">
+                    Student
+                  </button>
+                  <button type="button" class="role-btn" data-role="admin">
+                    Admin
+                  </button>
+                </div>
+              </div>
+
+              <p id="errorMessage" class="error-message"></p>
+
+              <button type="submit" class="sign-in-btn">Sign In</button>
+            </form>
+
+            <div class="bottom-help">
+              <span>Trouble logging in?</span>
+              <a href="#">Contact Support <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+
+          <!-- Right Side -->
+          <div class="login-right">
+            <img
+              src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop"
+              alt="University Building"
+            />
+
+            <div class="overlay-box">
+              <h3>Empowering Your University Experience</h3>
+              <p>
+                Discover events, stay updated with announcements, track your
+                participation, and manage your university journey — all in one place.
+              </p>
+
+              <div class="join-box">
+                <div class="avatars">
+                  <img src="https://i.pravatar.cc/40?img=12" alt="user" />
+                  <img src="https://i.pravatar.cc/40?img=32" alt="user" />
+                  <img src="https://i.pravatar.cc/40?img=15" alt="user" />
+                </div>
+                <span>Join IAU’ers today</span>
+              </div>
+            </div>
+          </div>
+
         </div>
+      </main>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter your password"
-            required
-          />
-        </div>
+      <!-- Footer -->
+      <footer class="footer">
+        <h3>IAU’ers</h3>
+        <p>
+          © 2026 Imam Abdulrahman Bin Faisal University. IAU’ers Platform –
+          Graduation Project.
+        </p>
+      </footer>
 
-        <div id="errorMessage" class="error-message"></div>
-
-        <button type="submit" class="login-btn">Sign In</button>
-      </form>
-
-      <div class="login-footer">
-        <p>Use your official IAU email to continue</p>
-      </div>
     </div>
   </div>
 
-  <script src="../../Shared/JS/main.js"></script>
   <script src="../JS/login.js"></script>
 </body>
 </html>
