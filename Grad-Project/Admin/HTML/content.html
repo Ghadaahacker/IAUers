@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Management</title>
+
+  <link rel="stylesheet" href="../CSS/content.css" />
+
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+  />
+</head>
+<body>
+  <div class="dashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-icon">
+            <span class="material-symbols-outlined">shield</span>
+          </div>
+          <div class="brand-text">
+            <h2>IAU’ers Admin</h2>
+            <p>Academic Portal</p>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="home.html" class="menu-item">
+            <span class="material-symbols-outlined">home</span>
+            <span>Home</span>
+          </a>
+
+          <a href="content.html" class="menu-item active">
+            <span class="material-symbols-outlined">description</span>
+            <span>Content</span>
+          </a>
+
+          <a href="analytics.html" class="menu-item">
+            <span class="material-symbols-outlined">bar_chart</span>
+            <span>Analytics</span>
+          </a>
+
+          <a href="users.html" class="menu-item">
+            <span class="material-symbols-outlined">group</span>
+            <span>Users</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="menu-item bottom-item">
+          <span class="material-symbols-outlined">settings</span>
+          <span>Settings</span>
+        </a>
+
+        <a href="../../Login/HTML/login.html" class="menu-item bottom-item">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="search-top">
+          <span class="material-symbols-outlined">search</span>
+          <input type="text" placeholder="Search resources, content, or files..." />
+        </div>
+
+        <div class="topbar-right">
+          <span class="material-symbols-outlined top-icon">person</span>
+        </div>
+      </header>
+
+      <section class="page-content">
+        <div class="page-header">
+          <h1>Content Management</h1>
+          <p>Manage announcements and events</p>
+        </div>
+
+        <!-- Stats -->
+        <section class="stats-grid">
+          <div class="stat-card">
+            <h4>TOTAL CONTENT</h4>
+            <h2>1,284</h2>
+            <p class="stat-note success">↗ +12% from last month</p>
+          </div>
+
+          <div class="stat-card">
+            <h4>ACTIVE EVENTS</h4>
+            <h2>42</h2>
+            <p class="stat-note neutral">
+              <span class="material-symbols-outlined stat-inline-icon">calendar_month</span>
+              12 upcoming this week
+            </p>
+          </div>
+
+          <div class="stat-card">
+            <h4>PENDING DRAFTS</h4>
+            <h2>18</h2>
+            <p class="stat-note warning">⚑ Requires review</p>
+          </div>
+        </section>
+
+        <!-- Buttons -->
+        <section class="actions-row">
+            <button class="action-btn primary" type="button">
+              <span class="material-symbols-outlined">add_circle</span>
+              Add Event
+            </button>
+          
+            <button class="action-btn secondary" type="button">
+              <span class="material-symbols-outlined">campaign</span>
+              Add Announcement
+            </button>
+          </section>
+
+        <!-- Filters -->
+        <section class="filters-row">
+            <div class="filter-search">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" placeholder="Filter by title or keywords..." />
+            </div>
+          
+            <div class="select-wrap">
+              <span class="material-symbols-outlined select-icon">folder_open</span>
+              <select>
+                <option>All Content</option>
+                <option>Events</option>
+                <option>Announcements</option>
+              </select>
+            </div>
+          
+            <div class="select-wrap">
+              <span class="material-symbols-outlined select-icon">swap_vert</span>
+              <select>
+                <option>Newest First</option>
+                <option>Oldest First</option>
+                <option>Most Viewed</option>
+              </select>
+            </div>
+          </section>
+
+        <!-- Content Cards -->
+        <section class="content-list">
+          <article class="content-card">
+            <div class="content-info">
+              <div class="badges">
+                <span class="badge type event">EVENT</span>
+                <span class="badge status published">PUBLISHED</span>
+              </div>
+
+              <h3>Annual International Research Symposium 2024</h3>
+              <p>
+                A flagship event bringing together scholars from across 15 countries
+                to discuss the future of digital ethics in higher education.
+              </p>
+
+              <div class="meta">
+                <span>
+                  <span class="material-symbols-outlined small">calendar_month</span>
+                  Oct 14, 2024
+                </span>
+                <span>
+                  <span class="material-symbols-outlined small">visibility</span>
+                  4.2k views
+                </span>
+              </div>
+            </div>
+
+            <div class="content-actions">
+              <button class="icon-btn" title="Edit" type="button">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button class="icon-btn" title="Analytics" type="button">
+                <span class="material-symbols-outlined">bar_chart</span>
+              </button>
+              <button class="icon-btn" title="Delete" type="button">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="content-card">
+            <div class="content-info">
+              <div class="badges">
+                <span class="badge type announcement">ANNOUNCEMENT</span>
+                <span class="badge status draft">DRAFT</span>
+              </div>
+
+              <h3>Update to Faculty Compensation Framework</h3>
+              <p>
+                Internal memo regarding the revised compensation and benefits structure
+                for the 2025 academic year.
+              </p>
+
+              <div class="meta">
+                <span>
+                  <span class="material-symbols-outlined small">calendar_month</span>
+                  Sep 28, 2024
+                </span>
+                <span>
+                  <span class="material-symbols-outlined small">visibility</span>
+                  -- views
+                </span>
+              </div>
+            </div>
+
+            <div class="content-actions">
+              <button class="icon-btn" title="Edit" type="button">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button class="icon-btn" title="Analytics" type="button">
+                <span class="material-symbols-outlined">bar_chart</span>
+              </button>
+              <button class="icon-btn" title="Delete" type="button">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="content-card">
+            <div class="content-info">
+              <div class="badges">
+                <span class="badge type event">EVENT</span>
+                <span class="badge status published">PUBLISHED</span>
+              </div>
+
+              <h3>Homecoming Weekend: Alumni Networking Night</h3>
+              <p>
+                A night of professional networking and nostalgia for IAU graduates
+                from the classes of 1990–2020.
+              </p>
+
+              <div class="meta">
+                <span>
+                  <span class="material-symbols-outlined small">calendar_month</span>
+                  Oct 22, 2024
+                </span>
+                <span>
+                  <span class="material-symbols-outlined small">visibility</span>
+                  892 views
+                </span>
+              </div>
+            </div>
+
+            <div class="content-actions">
+              <button class="icon-btn" title="Edit" type="button">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button class="icon-btn" title="Analytics" type="button">
+                <span class="material-symbols-outlined">bar_chart</span>
+              </button>
+              <button class="icon-btn" title="Delete" type="button">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </article>
+        </section>
+
+        <!-- Footer -->
+        <footer class="page-footer">
+          <p>IAU PLATFORM © 2024</p>
+
+          <div class="pagination">
+            <button class="page-btn" type="button">‹</button>
+            <button class="page-btn active" type="button">1</button>
+            <button class="page-btn" type="button">2</button>
+            <button class="page-btn" type="button">3</button>
+            <button class="page-btn" type="button">›</button>
+          </div>
+
+          <a href="#" class="support-link">Support</a>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <script src="../JS/content.js"></script>
+</body>
+</html>
