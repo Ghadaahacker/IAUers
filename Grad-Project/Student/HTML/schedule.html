@@ -1,1 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU’ers Student - Schedule</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+  <link rel="stylesheet" href="../CSS/schedule.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="brand-text">
+            <h2>IAU’ers<br>Student</h2>
+            <p>Academic Portal</p>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="home.html" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+          </a>
+
+          <a href="schedule.html" class="nav-item active">
+            <i class="fa-regular fa-calendar"></i>
+            <span>Schedule</span>
+          </a>
+
+          <a href="tickets.html" class="nav-item">
+            <i class="fa-solid fa-ticket"></i>
+            <span>My Tickets</span>
+          </a>
+
+          <a href="journey.html" class="nav-item">
+            <i class="fa-regular fa-compass"></i>
+            <span>My Journey</span>
+          </a>
+
+          <a href="profile.html" class="nav-item">
+            <i class="fa-regular fa-user"></i>
+            <span>My Profile</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="nav-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+
+        <a href="../login/login.html" class="nav-item">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search resources..." />
+        </div>
+
+        <button class="icon-btn" type="button" aria-label="Profile">
+          <i class="fa-regular fa-user"></i>
+        </button>
+      </header>
+
+      <section class="page-header-bar">
+        <div>
+          <h1>Event Calendar</h1>
+          <p>View your approved events and academic schedule in one place.</p>
+        </div>
+      </section>
+
+      <section class="schedule-layout">
+        <section class="left-column">
+          <div class="calendar-card">
+            <div class="calendar-toolbar">
+              <button id="prevBtn" class="toolbar-btn" type="button" aria-label="Previous month">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+
+              <h2 id="monthYearLabel"></h2>
+
+              <button id="nextBtn" class="toolbar-btn" type="button" aria-label="Next month">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+
+            <div class="view-tabs">
+              <button class="view-tab" data-view="day" type="button">Day</button>
+              <button class="view-tab" data-view="week" type="button">Week</button>
+              <button class="view-tab active" data-view="month" type="button">Month</button>
+            </div>
+
+            <div id="weekdayRow" class="weekday-row"></div>
+            <div id="calendarGrid" class="days-grid"></div>
+          </div>
+
+          <div class="split-panels">
+            <div class="panel-card">
+              <div class="panel-head">
+                <h3>My Events</h3>
+                <span id="eventsCounter">0 items</span>
+              </div>
+              <div id="myEventsList" class="panel-list"></div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-head">
+                <h3>My Tasks</h3>
+                <span id="tasksCounter">0 items</span>
+              </div>
+              <div id="myTasksList" class="panel-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="right-column">
+          <div class="summary-card">
+            <div class="summary-top">
+              <div>
+                <h3 id="selectedDayNumber">--</h3>
+                <p id="selectedDayText">Select a day</p>
+                <span id="selectedDayMeta">No date selected</span>
+              </div>
+
+              <div class="summary-actions">
+                <button id="todayBtn" class="summary-btn" type="button" title="Go to today">
+                  <i class="fa-regular fa-calendar-check"></i>
+                </button>
+
+                <button id="clearSelectionBtn" class="summary-btn" type="button" title="Clear details">
+                  <i class="fa-regular fa-rectangle-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <p id="dayStatusText" class="summary-text">
+              Select any day to view your events and academic tasks timeline.
+            </p>
+          </div>
+
+          <div class="timeline-card">
+            <div class="timeline-head">
+              <h3>Daily Timeline</h3>
+              <span id="timelineCount">0 items</span>
+            </div>
+            <div id="timelineList" class="timeline-list"></div>
+          </div>
+
+          <div class="details-card">
+            <div class="details-head">
+              <h3>Item Details</h3>
+            </div>
+
+            <div id="detailsEmpty" class="details-empty">
+              <div class="details-empty-icon">
+                <i class="fa-regular fa-calendar"></i>
+              </div>
+              <p>Select an event or task to see its details.</p>
+            </div>
+
+            <div id="detailsBox" class="details-box hidden">
+              <span id="detailsTag" class="details-tag"></span>
+              <h4 id="detailsTitle"></h4>
+
+              <div class="detail-row">
+                <i class="fa-regular fa-calendar"></i>
+                <span id="detailsDate"></span>
+              </div>
+
+              <div class="detail-row">
+                <i class="fa-regular fa-clock"></i>
+                <span id="detailsTime"></span>
+              </div>
+
+              <div class="detail-row">
+                <i class="fa-solid fa-location-dot"></i>
+                <span id="detailsLocation"></span>
+              </div>
+
+              <p id="detailsDescription" class="details-description"></p>
+
+              <button id="detailsActionBtn" class="details-action-btn" type="button">Open Item</button>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script src="schedule.js?v=3"></script>
+</body>
+</html>
