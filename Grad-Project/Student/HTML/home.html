@@ -3,221 +3,252 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Dashboard</title>
+  <title>IAU’ers Student - Home</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
 
-  <link rel="stylesheet" href="../CSS/home.css" 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+
+  <link rel="stylesheet" href="../CSS/home.css" />
 </head>
 <body>
-  <div class="dashboard">
+  <div class="layout">
 
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-top">
-        <div class="profile-card">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAndem0I4Rrl05AGoEphJbj2AsPfwh8UObSg&s" alt="Profile" class="profile-img" />
-          <div>
-            <h3 id="sidebarName">Wala</h3>
-            <p>Information Systems and Business Analytics</p>
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="brand-text">
+            <h2>IAU’ers<br>Student</h2>
+            <p>Academic Portal</p>
           </div>
         </div>
 
-        <nav class="menu">
-          <a href="home.html" class="menu-item active">
+        <nav class="nav-menu">
+          <a href="home.html" class="nav-item active">
             <i class="fa-solid fa-house"></i>
             <span>Home</span>
           </a>
-          <a href="schedule.html" class="menu-item">
+
+          <a href="schedule.html" class="nav-item">
             <i class="fa-regular fa-calendar"></i>
             <span>Schedule</span>
           </a>
-          <a href="tickets.html" class="menu-item">
+
+          <a href="tickets.html" class="nav-item">
             <i class="fa-solid fa-ticket"></i>
             <span>My Tickets</span>
           </a>
-          <a href="journey.html" class="menu-item">
+
+          <a href="journey.html" class="nav-item">
             <i class="fa-regular fa-compass"></i>
             <span>My Journey</span>
           </a>
-          <a href="profile.html" class="menu-item">
+
+          <a href="profile.html" class="nav-item">
             <i class="fa-regular fa-user"></i>
             <span>My Profile</span>
           </a>
         </nav>
       </div>
 
-   <a href="../Login/login.html" class="logout">
-  <i class="fa-solid fa-arrow-right-from-bracket"></i>
-  <span>Logout</span>
-</a>
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="nav-item bottom-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+
+        <a href="../login/login.html" class="nav-item bottom-item">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
     </aside>
 
     <!-- Main -->
     <main class="main-content">
 
-      <!-- Header -->
-      <section class="top-header">
-        <div>
-          <h1 id="greetingText">Good evening, Walaa</h1>
-          <p>Ready to continue your academic journey?</p>
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search resources..." />
         </div>
 
-        <div class="top-actions">
-          <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search events, tickets..." />
-          </div>
-
-          <button class="notif-btn">
-            <i class="fa-solid fa-bell"></i>
-            <span class="dot"></span>
+        <div class="topbar-right">
+          <button class="icon-btn" aria-label="Profile">
+            <i class="fa-regular fa-user"></i>
           </button>
         </div>
-      </section>
+      </header>
 
-      <div class="content-grid">
+      <!-- Page content -->
+      <section class="page-content">
+        <div class="content-left">
+          <div class="welcome-block">
+            <h1 id="greetingText">Welcome Student</h1>
+            <p>Manage your university life from your personal dashboard.</p>
+          </div>
 
-        <!-- Left content -->
-        <section class="left-column">
+          <!-- Summary Cards -->
+          <section class="stats-grid">
+            <div class="stat-card">
+              <div class="card-top">
+                <div class="card-icon light-blue">
+                  <i class="fa-regular fa-calendar"></i>
+                </div>
+                <span class="status-badge badge-gold">2 today</span>
+              </div>
+              <h2>05</h2>
+              <p>My Schedule</p>
+            </div>
 
-          <div class="hero-and-stats">
-            <div class="spotlight-card">
-              <span class="tag">WEEKLY SPOTLIGHT</span>
-              <h2>Entrepreneurship Workshop</h2>
-              <p class="event-time">
+            <div class="stat-card">
+              <div class="card-top">
+                <div class="card-icon light-blue">
+                  <i class="fa-solid fa-ticket"></i>
+                </div>
+                <span class="status-badge badge-blue">3 active</span>
+              </div>
+              <h2>03</h2>
+              <p>My Tickets</p>
+            </div>
+
+            <div class="stat-card">
+              <div class="card-top">
+                <div class="card-icon light-gray">
+                  <i class="fa-solid fa-tag"></i>
+                </div>
+                <span class="status-badge badge-pink">4 available</span>
+              </div>
+              <h2>04</h2>
+              <p>My Benefits</p>
+            </div>
+          </section>
+
+          <!-- Quick Actions -->
+          <section class="quick-actions">
+            <div class="section-title">
+              <span class="title-line"></span>
+              <h2>Quick Actions</h2>
+            </div>
+
+            <div class="action-buttons">
+              <a href="tickets.html" class="action-btn primary-action">
+                <i class="fa-solid fa-plus"></i>
+                <span>My Tickets</span>
+              </a>
+
+              <a href="schedule.html" class="action-btn secondary-action">
                 <i class="fa-regular fa-calendar"></i>
-                Sun, Apr 14 • 6:00 PM
-              </p>
-              <button class="primary-btn">Register Now</button>
+                <span>View Schedule</span>
+              </a>
             </div>
 
-            <div class="stats-column">
-              <div class="mini-stat">
-                <h3>03</h3>
-                <p>Events<br>Attended</p>
-                <div class="mini-line blue"></div>
-              </div>
-
-              <div class="mini-stat">
-                <h3 class="gold">02</h3>
-                <p>Benefits Used</p>
-                <div class="mini-line gold-line"></div>
-              </div>
-            </div>
-          </div>
-
-          <section class="interests">
-            <h3>Filter by Interests</h3>
-            <div class="chips">
-              <button class="chip active">Sports</button>
-              <button class="chip">Career</button>
-              <button class="chip">Tech</button>
-              <button class="chip">Clubs</button>
-              <button class="chip">Discounts</button>
-            </div>
+            <a href="profile.html" class="edit-link">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>Open My Profile</span>
+            </a>
           </section>
 
-          <section class="feed-card">
-            <div class="feed-header">
-              <h2>Your Feed</h2>
-              <div class="feed-tabs">
-                <button class="tab active">Announcements</button>
-                <button class="tab">Events</button>
-              </div>
+          <!-- Feed / Student Content -->
+          <section class="feed-section">
+            <div class="section-title">
+              <span class="title-line"></span>
+              <h2>Student Feed</h2>
             </div>
 
-            <div class="feed-item">
-              <div class="feed-icon blue-bg">
-                <i class="fa-solid fa-graduation-cap"></i>
-              </div>
-              <div class="feed-text">
-                <div class="feed-title-row">
-                  <h4>Registration for Spring 2026 Semester Opens</h4>
-                  <span class="feed-date">Feb 5,<br>2026</span>
+            <div class="feed-card">
+              <div class="feed-item">
+                <div class="feed-dot dark-dot"></div>
+                <div class="feed-text">
+                  <p>New event <strong>"Entrepreneurship Workshop"</strong> is now open for registration.</p>
+                  <span>2 hours ago</span>
                 </div>
-                <p>Don't miss the deadline for early registration. Ensure you've cleared all holds on your account before the portal opens at 8:00 AM.</p>
               </div>
-            </div>
 
-            <div class="feed-item">
-              <div class="feed-icon yellow-bg">
-                <i class="fa-solid fa-book-open"></i>
-              </div>
-              <div class="feed-text">
-                <div class="feed-title-row">
-                  <h4>Library Extended Hours During Exams</h4>
-                  <span class="feed-date">Feb 8,<br>2026</span>
+              <div class="feed-item">
+                <div class="feed-dot soft-dot"></div>
+                <div class="feed-text">
+                  <p>You received a new student benefit: <strong>"20% Café Discount"</strong>.</p>
+                  <span>Yesterday, 4:15 PM</span>
                 </div>
-                <p>The main campus library will be open 24/7 starting next Monday to support your study sessions. Coffee will be provided in the lobby.</p>
               </div>
-            </div>
 
-            <div class="feed-item no-border">
-              <div class="feed-icon green-bg">
-                <i class="fa-solid fa-table-cells-large"></i>
-              </div>
-              <div class="feed-text">
-                <div class="feed-title-row">
-                  <h4>New Student Services Portal Launched</h4>
-                  <span class="feed-date">Feb 10,<br>2026</span>
+              <div class="feed-item">
+                <div class="feed-dot soft-dot"></div>
+                <div class="feed-text">
+                  <p>Your ticket for <strong>"Career Fair 2026"</strong> has been confirmed.</p>
+                  <span>3 days ago</span>
                 </div>
-                <p>Explore the updated IAU'ers portal with new features for ticket tracking and personalized course journeys.</p>
+              </div>
+
+              <div class="feed-item no-border">
+                <div class="feed-dot soft-dot"></div>
+                <div class="feed-text">
+                  <p>Reminder: your next class in <strong>Building 12</strong> starts at 10:00 AM.</p>
+                  <span>Monday, 9:30 AM</span>
+                </div>
               </div>
             </div>
           </section>
-        </section>
+        </div>
 
-        <!-- Right content -->
-        <aside class="right-column">
-          <h2 class="quick-title">Quick Access</h2>
+        <!-- Right Panel -->
+        <aside class="activity-panel">
+          <h2>Recent Activity</h2>
 
-          <div class="quick-card blue-card">
-            <div class="quick-top">
-              <div class="quick-icon"><i class="fa-regular fa-calendar"></i></div>
-              <span class="quick-badge">1 ITEM</span>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot dark-dot"></div>
+              <div class="activity-info">
+                <p>You registered for <strong>"Hackathon Bootcamp"</strong>.</p>
+                <span>2 hours ago</span>
+              </div>
             </div>
-            <h3>Upcoming Schedule</h3>
-            <p>View your full calendar and classroom locations.</p>
-            <a href="#">VIEW CALENDAR <i class="fa-solid fa-arrow-right"></i></a>
-          </div>
 
-          <div class="quick-card purple-card">
-            <div class="quick-top">
-              <div class="quick-icon"><i class="fa-solid fa-ticket"></i></div>
-              <span class="quick-badge">2 ITEMS</span>
+            <div class="activity-item">
+              <div class="activity-dot soft-dot"></div>
+              <div class="activity-info">
+                <p>You updated your <strong>student profile</strong>.</p>
+                <span>Yesterday, 4:15 PM</span>
+              </div>
             </div>
-            <h3>My Tickets</h3>
-            <p>Check status of your registered event tickets.</p>
-            <a href="#">ACCESS TICKETS <i class="fa-solid fa-arrow-right"></i></a>
-          </div>
 
-          <div class="quick-card green-card">
-            <div class="quick-top">
-              <div class="quick-icon"><i class="fa-regular fa-money-bill-1"></i></div>
-              <span class="quick-badge">5 ITEMS</span>
+            <div class="activity-item">
+              <div class="activity-dot soft-dot"></div>
+              <div class="activity-info">
+                <p>Your ticket for <strong>"BIS Gathering"</strong> was generated.</p>
+                <span>3 days ago</span>
+              </div>
             </div>
-            <h3>My Vouchers</h3>
-            <p>Redeem your exclusive student discounts.</p>
-            <a href="#">REDEEM NOW <i class="fa-solid fa-arrow-right"></i></a>
+
+            <div class="activity-item">
+              <div class="activity-dot soft-dot"></div>
+              <div class="activity-info">
+                <p>You received feedback updates for <strong>"Faculty Workshop"</strong>.</p>
+                <span>Monday, 9:30 AM</span>
+              </div>
+            </div>
           </div>
 
-          <div class="map-card">
-            <button class="floating-plus">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=900&q=80" alt="Map" />
-            <p>Current Location: Building 12</p>
-          </div>
+          <a href="journey.html" class="view-log-link">View Full Activity Log</a>
         </aside>
-
-      </div>
+      </section>
     </main>
   </div>
 
-  <script src="../JS/home.js"></script>
+  <script src="home.js"></script>
 </body>
 </html>
