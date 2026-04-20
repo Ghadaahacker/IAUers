@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IAU’ers Admin - Users</title>
+
   <link rel="stylesheet" href="../CSS/users.css" />
+  <link rel="stylesheet" href="../../Shared/CSS/admin-sidebar.css" />
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -12,72 +14,25 @@
 </head>
 <body>
   <div class="dashboard-container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="brand">
-          <div class="brand-logo">
-            <i class="fa-solid fa-shield-halved"></i>
-          </div>
-          <div>
-            <h2>IAU’ers<br>Admin</h2>
-            <p>Academic Portal</p>
-          </div>
-        </div>
-
-        <nav class="sidebar-nav">
-          <a href="home.html" class="nav-item">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-          </a>
-
-          <a href="content.html" class="nav-item">
-            <i class="fa-solid fa-rectangle-list"></i>
-            <span>Content</span>
-          </a>
-
-          <a href="analytics.html" class="nav-item">
-            <i class="fa-solid fa-chart-simple"></i>
-            <span>Analytics</span>
-          </a>
-
-          <a href="users.html" class="nav-item active">
-            <i class="fa-solid fa-users"></i>
-            <span>Users</span>
-          </a>
-        </nav>
-      </div>
-
-      <div class="sidebar-bottom">
-        <a href="settings.html" class="nav-item">
-          <i class="fa-solid fa-gear"></i>
-          <span>Settings</span>
-        </a>
-
-        <a href="../../Login/HTML/login.html" class="nav-item logout">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span>Logout</span>
-        </a>
-      </div>
-    </aside>
+    <!-- Shared Sidebar -->
+    <div id="admin-sidebar"></div>
 
     <!-- Main -->
     <main class="main-content">
-        
       <!-- Topbar -->
-     <header class="topbar simple-topbar">
-  <div></div>
-  <div class="topbar-icons">
-    <button class="icon-btn">
-      <i class="fa-regular fa-user"></i>
-    </button>
-  </div>
-</header>
+      <header class="topbar simple-topbar">
+        <div></div>
+        <div class="topbar-icons">
+          <button class="icon-btn" type="button">
+            <i class="fa-regular fa-user"></i>
+          </button>
+        </div>
+      </header>
 
       <!-- Page Header -->
       <section class="page-intro">
-          <h1>User Management</h1>
-          <p>Manage students</p>
+        <h1>User Management</h1>
+        <p>Manage students</p>
       </section>
 
       <!-- Stats -->
@@ -126,6 +81,7 @@
     </main>
   </div>
 
+  <script src="../../Shared/JS/admin-sidebar.js"></script>
   <script src="../JS/users.js"></script>
 </body>
 </html>

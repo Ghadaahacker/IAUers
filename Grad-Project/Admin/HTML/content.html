@@ -6,63 +6,21 @@
   <title>Content Management</title>
 
   <link rel="stylesheet" href="../CSS/content.css" />
+  <link rel="stylesheet" href="../../Shared/CSS/admin-sidebar.css" />
 
   <link
     rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
   />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
 </head>
 <body>
   <div class="dashboard">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="brand">
-          <div class="brand-icon">
-            <span class="material-symbols-outlined">shield</span>
-          </div>
-          <div class="brand-text">
-            <h2>IAU’ers Admin</h2>
-            <p>Academic Portal</p>
-          </div>
-        </div>
-
-        <nav class="sidebar-menu">
-          <a href="home.html" class="menu-item">
-            <span class="material-symbols-outlined">home</span>
-            <span>Home</span>
-          </a>
-
-          <a href="content.html" class="menu-item active">
-            <span class="material-symbols-outlined">description</span>
-            <span>Content</span>
-          </a>
-
-          <a href="analytics.html" class="menu-item">
-            <span class="material-symbols-outlined">bar_chart</span>
-            <span>Analytics</span>
-          </a>
-
-          <a href="users.html" class="menu-item">
-            <span class="material-symbols-outlined">group</span>
-            <span>Users</span>
-          </a>
-        </nav>
-      </div>
-
-      <div class="sidebar-bottom">
-        <a href="settings.html" class="menu-item bottom-item">
-          <span class="material-symbols-outlined">settings</span>
-          <span>Settings</span>
-        </a>
-
-        <a href="../../Login/HTML/login.html" class="menu-item bottom-item">
-          <span class="material-symbols-outlined">logout</span>
-          <span>Logout</span>
-        </a>
-      </div>
-    </aside>
+    <!-- Shared Sidebar -->
+    <div id="admin-sidebar"></div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -83,7 +41,6 @@
           <p>Manage announcements and events</p>
         </div>
 
-        <!-- Stats -->
         <section class="stats-grid">
           <div class="stat-card">
             <h4>TOTAL CONTENT</h4>
@@ -107,46 +64,43 @@
           </div>
         </section>
 
-        <!-- Buttons -->
         <section class="actions-row">
-            <button class="action-btn primary" type="button">
-              <span class="material-symbols-outlined">add_circle</span>
-              Add Event
-            </button>
-          
-            <button class="action-btn secondary" type="button">
-              <span class="material-symbols-outlined">campaign</span>
-              Add Announcement
-            </button>
-          </section>
+          <button class="action-btn primary" type="button">
+            <span class="material-symbols-outlined">add_circle</span>
+            Add Event
+          </button>
 
-        <!-- Filters -->
+          <button class="action-btn secondary" type="button">
+            <span class="material-symbols-outlined">campaign</span>
+            Add Announcement
+          </button>
+        </section>
+
         <section class="filters-row">
-            <div class="filter-search">
-              <span class="material-symbols-outlined">search</span>
-              <input type="text" placeholder="Filter by title or keywords..." />
-            </div>
-          
-            <div class="select-wrap">
-              <span class="material-symbols-outlined select-icon">folder_open</span>
-              <select>
-                <option>All Content</option>
-                <option>Events</option>
-                <option>Announcements</option>
-              </select>
-            </div>
-          
-            <div class="select-wrap">
-              <span class="material-symbols-outlined select-icon">swap_vert</span>
-              <select>
-                <option>Newest First</option>
-                <option>Oldest First</option>
-                <option>Most Viewed</option>
-              </select>
-            </div>
-          </section>
+          <div class="filter-search">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" placeholder="Filter by title or keywords..." />
+          </div>
 
-        <!-- Content Cards -->
+          <div class="select-wrap">
+            <span class="material-symbols-outlined select-icon">folder_open</span>
+            <select>
+              <option>All Content</option>
+              <option>Events</option>
+              <option>Announcements</option>
+            </select>
+          </div>
+
+          <div class="select-wrap">
+            <span class="material-symbols-outlined select-icon">swap_vert</span>
+            <select>
+              <option>Newest First</option>
+              <option>Oldest First</option>
+              <option>Most Viewed</option>
+            </select>
+          </div>
+        </section>
+
         <section class="content-list">
           <article class="content-card">
             <div class="content-info">
@@ -263,7 +217,6 @@
           </article>
         </section>
 
-        <!-- Footer -->
         <footer class="page-footer">
           <p>IAU PLATFORM © 2024</p>
 
@@ -281,6 +234,7 @@
     </main>
   </div>
 
+  <script src="../../Shared/JS/admin-sidebar.js"></script>
   <script src="../JS/content.js"></script>
 </body>
 </html>

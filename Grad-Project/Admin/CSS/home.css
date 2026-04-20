@@ -33,97 +33,13 @@ body {
 }
 
 .dashboard-container {
-  max-width: 1400px;
-  height: calc(100vh - 36px);
-  margin: 0 auto;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
   background: var(--bg);
-  border-radius: 20px;
   overflow: hidden;
   display: grid;
   grid-template-columns: 220px 1fr;
-  box-shadow: var(--shadow);
-}
-
-/* Sidebar */
-.sidebar {
-  background: #eef2f6;
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 18px;
-  height: 100%; 
-}
-
-.sidebar-top {
-  overflow-y: auto;      
-}
-
-.main-content {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow-y: auto;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.brand-logo {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--navy-dark), var(--blue));
-  color: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
-.brand h2 {
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.brand p {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-.sidebar-nav,
-.sidebar-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.nav-item {
-  text-decoration: none;
-  color: var(--navy);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 14px;
-  border-radius: 12px;
-  font-size: 15px;
-  transition: 0.2s ease;
-}
-
-.nav-item:hover {
-  background: #e6edf5;
-}
-
-.nav-item.active {
-  background: var(--white);
-  color: var(--blue);
-  font-weight: 700;
-  box-shadow: inset 4px 0 0 var(--blue);
 }
 
 /* Main */
@@ -437,11 +353,6 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .sidebar {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-
   .topbar,
   .welcome-section,
   .dashboard-grid,
@@ -454,12 +365,3 @@ body {
     width: 220px;
   }
 }
-.sidebar {
-  background: #eef2f6;
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* مهم */
-  padding: 24px 18px;
-}
-
