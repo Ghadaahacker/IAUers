@@ -28,6 +28,8 @@
     flex-direction: column;
     padding: 24px 18px;
     min-height: 100vh;
+    position: sticky;
+    top: 0;
   }
   
   .sidebar-top {

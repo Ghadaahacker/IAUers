@@ -11,6 +11,11 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
+  <link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+/>
+
 </head>
 <body>
   <div class="dashboard-container">
@@ -19,20 +24,7 @@
 
     <!-- Main -->
     <main class="main-content">
-      <!-- Topbar -->
-      <header class="topbar">
-        <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Search resources..." />
-        </div>
-
-        <div class="topbar-icons">
-          <button class="icon-btn">
-            <i class="fa-regular fa-user"></i>
-          </button>
-        </div>
-      </header>
-
+     
       <!-- Welcome -->
       <section class="welcome-section">
         <h1>Welcome Admin</h1>
@@ -81,12 +73,12 @@
 
           <div class="quick-actions">
             <button class="action-btn primary" id="addEventBtn">
-              <i class="fa-solid fa-circle-plus"></i>
+              <span class="material-symbols-outlined">add_circle</span>
               <span>Add Event</span>
             </button>
-
+          
             <button class="action-btn secondary" id="addAnnouncementBtn">
-              <i class="fa-solid fa-note-sticky"></i>
+              <span class="material-symbols-outlined">campaign</span>
               <span>Add Announcement</span>
             </button>
           </div>

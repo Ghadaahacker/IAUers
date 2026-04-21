@@ -47,39 +47,9 @@ body {
   overflow-y: auto;
 }
 
-/* Topbar without search */
-.topbar {
-  height: 64px;
-  background: transparent;
-  padding: 0 28px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.simple-topbar {
-  border-bottom: none;
-}
-
-.topbar-icons {
-  display: flex;
-  align-items: center;
-}
-
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: transparent;
-  color: var(--navy);
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 18px;
-}
-
 /* Page intro like home */
 .page-intro {
-  padding: 12px 18px 22px;
+  padding: 34px 36px 18px;
 }
 
 .page-intro h1 {

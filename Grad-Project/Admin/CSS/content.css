@@ -54,7 +54,6 @@
   .dashboard {
     display: grid;
     grid-template-columns: 220px 1fr;
-    min-height: 100vh;
     background: var(--bg);
   }
   
@@ -63,55 +62,6 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    overflow-y: auto;
-  }
-  
-  .topbar {
-    height: 82px;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    padding: 0 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .search-top {
-    width: 360px;
-    max-width: 100%;
-    height: 42px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 14px;
-  }
-  
-  .search-top .material-symbols-outlined {
-    color: #7c8798;
-    font-size: 20px;
-  }
-  
-  .search-top input {
-    width: 100%;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 14px;
-    color: var(--text);
-  }
-  
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  
-  .top-icon {
-    font-size: 30px !important;
-    color: var(--navy);
   }
   
   /* Page content */
@@ -119,7 +69,6 @@
     padding: 34px 36px 22px;
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 82px);
   }
   
   .page-header h1 {
@@ -425,15 +374,9 @@
   .page-footer {
     margin-top: auto;
     padding: 20px 0 0;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    color: var(--muted);
-    font-size: 13px;
-  }
-  
-  .page-footer p {
-    color: var(--muted);
   }
   
   .pagination {
@@ -459,14 +402,6 @@
     border-color: var(--navy-dark);
   }
   
-  .support-link {
-    justify-self: end;
-    text-decoration: none;
-    color: var(--navy-dark);
-    font-weight: 700;
-    font-size: 14px;
-  }
-  
   /* Responsive */
   @media (max-width: 1200px) {
     .stats-grid {
@@ -480,16 +415,11 @@
       grid-template-columns: 1fr;
     }
   
-    .topbar,
     .page-content {
       padding-left: 20px;
       padding-right: 20px;
     }
-  
-    .search-top {
-      width: 220px;
-    }
-  
+
     .content-card {
       flex-direction: column;
       align-items: flex-start;
@@ -534,3 +464,131 @@
       font-size: 28px;
     }
   }
+
+  /* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  width: 520px;
+  background: white;
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.close-btn {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-body input,
+.modal-body textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.modal-body textarea {
+  height: 90px;
+  resize: none;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.toggle-label {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+
+.field-note {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: -4px;
+}
+
+.toggle-row input[type="checkbox"] {
+  width: 52px;
+  height: 28px;
+  appearance: none;
+  background: #d9dee7;
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.toggle-row input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.toggle-row input[type="checkbox"]:checked {
+  background: #3a5a96;
+}
+
+.toggle-row input[type="checkbox"]:checked::before {
+  left: 26px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  flex: 1;
+  margin-right: 10px;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: #eee;
+}
+
+.publish-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: #2f6fed;
+  color: white;
+  font-weight: bold;
+}

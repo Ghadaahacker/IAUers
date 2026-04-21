@@ -24,17 +24,6 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <header class="topbar">
-        <div class="search-top">
-          <span class="material-symbols-outlined">search</span>
-          <input type="text" placeholder="Search resources, content, or files..." />
-        </div>
-
-        <div class="topbar-right">
-          <span class="material-symbols-outlined top-icon">person</span>
-        </div>
-      </header>
-
       <section class="page-content">
         <div class="page-header">
           <h1>Content Management</h1>
@@ -65,7 +54,7 @@
         </section>
 
         <section class="actions-row">
-          <button class="action-btn primary" type="button">
+          <button class="action-btn primary" type="button" id="openModalBtn">
             <span class="material-symbols-outlined">add_circle</span>
             Add Event
           </button>
@@ -218,8 +207,6 @@
         </section>
 
         <footer class="page-footer">
-          <p>IAU PLATFORM © 2024</p>
-
           <div class="pagination">
             <button class="page-btn" type="button">‹</button>
             <button class="page-btn active" type="button">1</button>
@@ -227,12 +214,57 @@
             <button class="page-btn" type="button">3</button>
             <button class="page-btn" type="button">›</button>
           </div>
-
-          <a href="#" class="support-link">Support</a>
         </footer>
       </section>
     </main>
   </div>
+
+  <!-- Event Modal -->
+<div id="eventModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Create Event</h2>
+      <span class="close-btn" id="closeModal">&times;</span>
+    </div>
+
+    <div class="modal-body">
+      <label>Title</label>
+      <input type="text" placeholder="Enter event title" />
+
+      <label>Description</label>
+      <textarea placeholder="Enter event description"></textarea>
+
+      <label>Date & Time</label>
+      <input type="datetime-local" />
+
+      <label>Location</label>
+      <input type="text" placeholder="Enter event location" />
+
+      <hr />
+
+      <h3>Event Settings</h3>
+
+      <div class="toggle-row">
+        <label for="unlimitedSeats" class="toggle-label">Unlimited Seats</label>
+        <input type="checkbox" id="unlimitedSeats" />
+      </div>
+      
+      <label for="seatCapacity">Seat Capacity</label>
+      <input
+        type="number"
+        id="seatCapacity"
+        placeholder="Enter maximum number of seats"
+      />
+      
+      <p class="field-note">Limit the number of students who can register.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="cancel-btn" id="cancelModal">Cancel</button>
+      <button class="publish-btn">Publish</button>
+    </div>
+  </div>
+</div>
 
   <script src="../../Shared/JS/admin-sidebar.js"></script>
   <script src="../JS/content.js"></script>

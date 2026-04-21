@@ -1,20 +1,101 @@
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-    <div class="logo">
-        <h2>IAU'ers</h2>
-        <p>Admin Panel</p>
-    </div
-    <ul class="menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="content.html">Content</a></li>
-        <li><a href="analytics.html">Analytics</a></li>
-        <li><a href="users.html">Users</a></li>
-        <li><a href="settings.html">Settings</a></li>
-    </ul>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU’ers Admin - Analytics</title>
 
-<button class="menu-btn" id="menuBtn">☰</button>
+  <link rel="stylesheet" href="../CSS/analytics.css" />
+  <link rel="stylesheet" href="../../Shared/CSS/admin-sidebar.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
 <body>
-    <link rel="stylesheet" href="css/sidebar.css">
-    <script src="js/sidebar.js"></script>
+  <div class="dashboard-container">
+    <div id="admin-sidebar"></div>
+
+    <main class="main-content">
+      <section class="page-intro">
+        <h1>Overall Analytics</h1>
+        <p>Comprehensive performance insights</p>
+      </section>
+
+      <section class="analytics-content">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon green-bg">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+            <div>
+              <p class="kpi-label">Engagement</p>
+              <h3 id="engagementValue">72.3%</h3>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon blue-bg">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <p class="kpi-label">Responses</p>
+              <h3 id="responsesValue">487</h3>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon yellow-bg">
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <div>
+              <p class="kpi-label">Satisfaction</p>
+              <h3 id="satisfactionValue">4.4/5</h3>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon purple-bg">
+              <i class="fa-regular fa-thumbs-up"></i>
+            </div>
+            <div>
+              <p class="kpi-label">Would Attend</p>
+              <h3 id="wouldAttendValue">89.7%</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h2>Engagement Over Time</h2>
+          <canvas id="engagementTrendChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h2>Event Comparison</h2>
+          <canvas id="eventComparisonChart"></canvas>
+        </div>
+
+        <div class="chart-card recommendation-card">
+          <h2>Overall Recommendation Rate</h2>
+          <div class="pie-wrapper">
+            <canvas id="recommendationChart"></canvas>
+          </div>
+        </div>
+
+        <div class="top-section">
+          <div class="top-heading">
+            <i class="fa-solid fa-trophy"></i>
+            <h2>Top Performing Events</h2>
+          </div>
+
+          <div class="top-events-list" id="topEventsList"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../Shared/JS/admin-sidebar.js"></script>
+  <script src="../JS/analytics.js"></script>
 </body>
+</html>
