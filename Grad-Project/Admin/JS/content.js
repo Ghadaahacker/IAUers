@@ -40,5 +40,29 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
+  const announcementModal = document.getElementById("announcementModal");
+  const openAnnouncementBtn = document.getElementById("openAnnouncementModalBtn");
+  const closeAnnouncementBtn = document.getElementById("closeAnnouncementModal");
+  const cancelAnnouncementBtn = document.getElementById("cancelAnnouncementModal");
+  
+  if (announcementModal && openAnnouncementBtn && closeAnnouncementBtn && cancelAnnouncementBtn) {
+  
+    openAnnouncementBtn.onclick = () => {
+      announcementModal.style.display = "flex";
+    };
+  
+    closeAnnouncementBtn.onclick = () => {
+      announcementModal.style.display = "none";
+    };
+  
+    cancelAnnouncementBtn.onclick = () => {
+      announcementModal.style.display = "none";
+    };
+  
+    window.addEventListener("click", (e) => {
+      if (e.target === announcementModal) {
+        announcementModal.style.display = "none";
+      }
+    });
+  }
 });

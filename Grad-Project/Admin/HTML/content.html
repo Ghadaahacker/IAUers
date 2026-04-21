@@ -59,7 +59,7 @@
             Add Event
           </button>
 
-          <button class="action-btn secondary" type="button">
+          <button class="action-btn secondary" type="button" id="openAnnouncementModalBtn">
             <span class="material-symbols-outlined">campaign</span>
             Add Announcement
           </button>
@@ -261,6 +261,36 @@
 
     <div class="modal-footer">
       <button class="cancel-btn" id="cancelModal">Cancel</button>
+      <button class="publish-btn">Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Announcement Modal -->
+<div id="announcementModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Create Announcement</h2>
+      <span class="close-btn" id="closeAnnouncementModal">&times;</span>
+    </div>
+
+    <div class="modal-body">
+      <label>Title</label>
+      <input type="text" placeholder="Enter announcement title" />
+
+      <label>Description</label>
+      <textarea placeholder="Enter announcement description"></textarea>
+
+      <label>External Link (Optional)</label>
+      <input type="url" placeholder="https://example.com" />
+
+      <p class="field-note">
+        Add a link for students to access additional information.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="cancel-btn" id="cancelAnnouncementModal">Cancel</button>
       <button class="publish-btn">Publish</button>
     </div>
   </div>
