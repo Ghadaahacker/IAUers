@@ -1,1 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU’ers Building Admin - Booking Management</title>
 
+  <link rel="stylesheet" href="Building-Management.css" />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+</head>
+
+<body>
+  <div class="page-container">
+
+<div class="topbar">
+  <div class="topbar-actions">
+
+    <!-- Settings -->
+    <button class="top-action-btn" type="button">
+      <i class="fa-solid fa-gear"></i>
+    </button>
+
+    <!-- Logout -->
+    <a href="../Login/HTML/login.html" class="top-action-btn">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </a>
+
+    <!-- Profile -->
+    <button class="icon-btn" type="button">
+      <i class="fa-regular fa-user"></i>
+    </button>
+
+  </div>
+</div> 
+    <main class="main-content">
+      <section class="header">
+        <h1>Building Booking Management</h1>
+        <p>Review and manage venue booking requests.</p>
+      </section>
+
+      <section class="stats">
+        <div class="stat-card">
+          <p>Pending</p>
+          <h2 id="pending-count">0</h2>
+          <span>Active requests</span>
+        </div>
+
+        <div class="stat-card">
+          <p>Accepted</p>
+          <h2 id="accepted-count">0</h2>
+          <span>Scheduled events</span>
+        </div>
+
+        <div class="stat-card">
+          <p>Rejected</p>
+          <h2 id="rejected-count">0</h2>
+          <span>Past 30 days</span>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <!-- Left -->
+        <div class="requests-section">
+          <h2>Booking Requests</h2>
+
+          <div class="filters">
+            <button class="filter-btn active" type="button" data-filter="All">All</button>
+            <button class="filter-btn" type="button" data-filter="Pending">Pending</button>
+            <button class="filter-btn" type="button" data-filter="Accepted">Accepted</button>
+            <button class="filter-btn" type="button" data-filter="Rejected">Rejected</button>
+          </div>
+
+          <div class="request-list" id="request-list"></div>
+        </div>
+
+        <!-- Right -->
+        <div class="details-section">
+          <h2>Selected Request</h2>
+
+          <h3 id="detail-title">Select a request</h3>
+
+          <p><strong>Organizer:</strong> <span id="detail-organizer">—</span></p>
+          <p><strong>Hall:</strong> <span id="detail-hall">—</span></p>
+          <p><strong>Capacity:</strong> <span id="detail-capacity">—</span></p>
+          <p><strong>Date:</strong> <span id="detail-date">—</span></p>
+          <p><strong>Status:</strong> <span id="detail-status">—</span></p>
+
+          <div class="actions">
+            <button class="accept" id="accept-btn" type="button">Accept</button>
+            <button class="reject" id="reject-btn" type="button">Reject</button>
+          </div>
+          <!-- Reject Reason -->
+          <div class="reject-box" id="reject-box">
+         <textarea id="reject-reason" placeholder="Write the reason for rejection..."></textarea>
+          <button id="submit-reject">Send Rejection</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+   
+  <script src="Building-Management.js"></script>
+</body>
+</html>

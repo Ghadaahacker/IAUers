@@ -1,1 +1,295 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+/* Body */
+body {
+  font-family: "Inter", Arial, sans-serif;
+  background: #f5f7fb;
+  color: #1d1e34;
+  overflow: auto; /* مهم عشان السكرول */
+}
+
+/* Page Layout */
+.page-container {
+  min-height: 100vh;
+  padding: 0 24px 30px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===================== */
+/* 🔝 TOPBAR */
+/* ===================== */
+
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 64px;
+  margin-bottom: 10px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Buttons */
+.icon-btn,
+.top-action-btn {
+  background: #ffffff;
+  border: 1px solid #e3e8ef;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #32395a;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.icon-btn:hover,
+.top-action-btn:hover {
+  background: #f0f4f8;
+}
+
+/* ===================== */
+/* MAIN CONTENT */
+/* ===================== */
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  margin-bottom: 18px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.header p {
+  font-size: 15px;
+  color: #6f7c8f;
+}
+
+/* ===================== */
+/* STATS */
+/* ===================== */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.stat-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid #e3e8ef;
+}
+
+.stat-card p {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.stat-card h2 {
+  font-size: 36px;
+  margin-bottom: 6px;
+}
+
+.stat-card span {
+  font-size: 13px;
+  color: #6f7c8f;
+}
+
+/* ===================== */
+/* GRID */
+/* ===================== */
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+}
+
+/* ===================== */
+/* LEFT - REQUESTS */
+/* ===================== */
+
+.requests-section {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #e3e8ef;
+}
+
+.requests-section h2 {
+  margin-bottom: 14px;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.filters button {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #eef2f6;
+  cursor: pointer;
+}
+
+.filters .active {
+  background: #1e3a8a;
+  color: white;
+}
+
+/* Request list */
+.request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Card */
+.request-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafc;
+  padding: 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.request-card:hover {
+  background: #eef3ff;
+}
+
+.request-card.selected {
+  border: 2px solid #1e3a8a;
+}
+
+/* Status */
+.status {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: white;
+}
+
+.pending {
+  background: #fbbf24;
+}
+
+.accepted {
+  background: #10b981;
+}
+
+.rejected {
+  background: #ef4444;
+}
+
+/* ===================== */
+/* RIGHT - DETAILS */
+/* ===================== */
+
+.details-section {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #e3e8ef;
+}
+
+.details-section h2 {
+  margin-bottom: 14px;
+}
+
+.details-section p {
+  margin-bottom: 8px;
+}
+
+/* Buttons */
+.actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.accept {
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.reject {
+  background: #e5e7eb;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* ===================== */
+/* REJECT BOX */
+/* ===================== */
+
+.reject-box {
+  display: none;
+  margin-top: 10px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reject-box textarea {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.reject-box button {
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+/* ===================== */
+/* RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 1000px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
