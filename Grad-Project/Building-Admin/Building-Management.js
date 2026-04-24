@@ -57,6 +57,9 @@ const rejectedCount = document.getElementById("rejected-count");
 
 const acceptBtn = document.getElementById("accept-btn");
 const rejectBtn = document.getElementById("reject-btn");
+const rejectBox = document.getElementById("reject-box");
+const rejectReasonInput = document.getElementById("reject-reason");
+const submitRejectBtn = document.getElementById("submit-reject");
 
 let currentFilter = "All";
 let selectedBookingId = null;
@@ -117,6 +120,8 @@ function renderRequests() {
 
     card.addEventListener("click", () => {
       selectedBookingId = booking.id;
+      rejectBox.classList.remove("show");
+      rejectReasonInput.value = "";
       renderDetails(booking);
       renderRequests();
     });
@@ -125,6 +130,7 @@ function renderRequests() {
   });
 
   const selectedStillVisible = filteredBookings.some(b => b.id === selectedBookingId);
+
   if (!selectedStillVisible && filteredBookings.length > 0) {
     selectedBookingId = filteredBookings[0].id;
     renderDetails(filteredBookings[0]);
@@ -156,6 +162,9 @@ acceptBtn.addEventListener("click", () => {
   booking.status = "Accepted";
   booking.rejectionReason = "";
 
+  rejectBox.classList.remove("show");
+  rejectReasonInput.value = "";
+
   renderDetails(booking);
   updateStats();
   renderRequests();
@@ -163,12 +172,15 @@ acceptBtn.addEventListener("click", () => {
 
 rejectBtn.addEventListener("click", () => {
   if (selectedBookingId === null) return;
+  rejectBox.classList.toggle("show");
+});
 
-  const reason = prompt("Write the reason for rejection:");
-  if (reason === null) return;
+submitRejectBtn.addEventListener("click", () => {
+  if (selectedBookingId === null) return;
 
-  const trimmedReason = reason.trim();
-  if (trimmedReason === "") {
+  const reason = rejectReasonInput.value.trim();
+
+  if (reason === "") {
     alert("Please enter a reason for rejection.");
     return;
   }
@@ -177,14 +189,55 @@ rejectBtn.addEventListener("click", () => {
   if (!booking) return;
 
   booking.status = "Rejected";
-  booking.rejectionReason = trimmedReason;
+  booking.rejectionReason = reason;
+
+  rejectBox.classList.remove("show");
+  rejectReasonInput.value = "";
 
   renderDetails(booking);
   updateStats();
   renderRequests();
 });
 
-// first load
+/* Modals */
+const settingsBtn = document.getElementById("settings-btn");
+const profileBtn = document.getElementById("profile-btn");
+
+const settingsModal = document.getElementById("settings-modal");
+const profileModal = document.getElementById("profile-modal");
+
+const closeSettings = document.getElementById("close-settings");
+const closeProfile = document.getElementById("close-profile");
+
+settingsBtn.addEventListener("click", () => {
+  settingsModal.classList.add("show");
+});
+
+profileBtn.addEventListener("click", () => {
+  profileModal.classList.add("show");
+});
+
+closeSettings.addEventListener("click", () => {
+  settingsModal.classList.remove("show");
+});
+
+closeProfile.addEventListener("click", () => {
+  profileModal.classList.remove("show");
+});
+
+settingsModal.addEventListener("click", (e) => {
+  if (e.target === settingsModal) {
+    settingsModal.classList.remove("show");
+  }
+});
+
+profileModal.addEventListener("click", (e) => {
+  if (e.target === profileModal) {
+    profileModal.classList.remove("show");
+  }
+});
+
+/* First load */
 updateStats();
 
 if (bookings.length > 0) {
@@ -193,3 +246,10 @@ if (bookings.length > 0) {
 }
 
 renderRequests();
+const loggedInAdmin = {
+  name: "Sara Ahmed",
+  email: "sara@iau.edu.sa"
+};
+
+document.getElementById("profile-name").textContent = loggedInAdmin.name;
+document.getElementById("profile-email").textContent = loggedInAdmin.email;

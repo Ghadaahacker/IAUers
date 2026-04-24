@@ -16,26 +16,28 @@
 <body>
   <div class="page-container">
 
-<div class="topbar">
-  <div class="topbar-actions">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-actions">
 
-    <!-- Settings -->
-    <button class="top-action-btn" type="button">
-      <i class="fa-solid fa-gear"></i>
-    </button>
+        <!-- Profile first -->
+        <button class="top-action-btn" id="profile-btn" type="button">
+          <i class="fa-regular fa-user"></i>
+        </button>
 
-    <!-- Logout -->
-    <a href="../Login/HTML/login.html" class="top-action-btn">
-      <i class="fa-solid fa-right-from-bracket"></i>
-    </a>
+        <!-- Settings second -->
+        <button class="top-action-btn" id="settings-btn" type="button">
+          <i class="fa-solid fa-gear"></i>
+        </button>
 
-    <!-- Profile -->
-    <button class="icon-btn" type="button">
-      <i class="fa-regular fa-user"></i>
-    </button>
+        <!-- Logout third -->
+        <a href="../Login/HTML/login.html" class="top-action-btn">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
 
-  </div>
-</div> 
+      </div>
+    </div>
+
     <main class="main-content">
       <section class="header">
         <h1>Building Booking Management</h1>
@@ -63,7 +65,6 @@
       </section>
 
       <section class="content-grid">
-        <!-- Left -->
         <div class="requests-section">
           <h2>Booking Requests</h2>
 
@@ -77,7 +78,6 @@
           <div class="request-list" id="request-list"></div>
         </div>
 
-        <!-- Right -->
         <div class="details-section">
           <h2>Selected Request</h2>
 
@@ -93,16 +93,80 @@
             <button class="accept" id="accept-btn" type="button">Accept</button>
             <button class="reject" id="reject-btn" type="button">Reject</button>
           </div>
-          <!-- Reject Reason -->
+
           <div class="reject-box" id="reject-box">
-         <textarea id="reject-reason" placeholder="Write the reason for rejection..."></textarea>
-          <button id="submit-reject">Send Rejection</button>
+            <textarea id="reject-reason" placeholder="Write the reason for rejection..."></textarea>
+            <button id="submit-reject" type="button">Send Rejection</button>
           </div>
         </div>
       </section>
     </main>
 
-   
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+      <div class="modal-card">
+        <button class="modal-close" id="close-settings" type="button">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="modal-icon">
+          <i class="fa-solid fa-gear"></i>
+        </div>
+
+        <h2>Building Admin Settings</h2>
+        <p class="modal-subtitle">Manage booking request preferences.</p>
+
+        <div class="setting-row">
+          <div>
+            <h3>New Booking Requests</h3>
+            <p>Receive notifications when a new booking request arrives.</p>
+          </div>
+
+          <label class="switch">
+            <input type="checkbox" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="support-box">
+          <h3>Contact Support</h3>
+
+          <p class="support-email">
+            Email:
+            <a href="mailto:organg67@gmail.com">organg67@gmail.com</a>
+          </p>
+
+          <textarea placeholder="Write your message to support..."></textarea>
+          <button type="button">Send Message</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profile-modal">
+  <div class="modal-card small">
+    
+    <button class="modal-close" id="close-profile" type="button">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div class="modal-icon">
+      <i class="fa-regular fa-user"></i>
+    </div>
+
+    <!-- Name -->
+    <h2 id="profile-name">—</h2>
+
+    <!-- Email -->
+    <p class="modal-subtitle" id="profile-email">—</p>
+
+  </div>
+</div>
+      </div>
+    </div>
+
+  </div>
+
   <script src="Building-Management.js"></script>
 </body>
 </html>
