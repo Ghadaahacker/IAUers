@@ -73,10 +73,11 @@
 
           <div class="select-wrap">
             <span class="material-symbols-outlined select-icon">folder_open</span>
-            <select>
-              <option>All Content</option>
-              <option>Events</option>
-              <option>Announcements</option>
+            <select id="contentTypeFilter">
+              <option value="all">All Content</option>
+              <option value="event">Events</option>
+              <option value="announcement">Announcements</option>
+              <option value="draft">Drafts Only</option>
             </select>
           </div>
 
@@ -97,115 +98,115 @@
                 <span class="badge type event">EVENT</span>
                 <span class="badge status published">PUBLISHED</span>
               </div>
-
+        
               <h3>Annual International Research Symposium 2024</h3>
               <p>
                 A flagship event bringing together scholars from across 15 countries
                 to discuss the future of digital ethics in higher education.
               </p>
-
+        
               <div class="meta">
-                <span>
-                  <span class="material-symbols-outlined small">calendar_month</span>
-                  Oct 14, 2024
-                </span>
-                <span>
-                  <span class="material-symbols-outlined small">visibility</span>
-                  4.2k views
-                </span>
+                <span><span class="material-symbols-outlined small">calendar_month</span> Oct 14, 2024</span>
+                <span><span class="material-symbols-outlined small">visibility</span> 4.2k views</span>
               </div>
             </div>
-
+        
             <div class="content-actions">
-              <button class="icon-btn" title="Edit" type="button">
+              <button class="icon-btn edit-event-btn" title="Edit" type="button"
+                data-title="Annual International Research Symposium 2024"
+                data-description="A flagship event bringing together scholars from across 15 countries to discuss the future of digital ethics in higher education."
+                data-date="2024-10-14T10:00"
+                data-location="Main Auditorium">
                 <span class="material-symbols-outlined">edit</span>
               </button>
-              <button class="icon-btn" title="Analytics" type="button">
+        
+              <button class="icon-btn analytics-btn" title="Analytics" type="button"
+                data-title="Annual International Research Symposium 2024"
+                data-date="Oct 14, 2024"
+                data-location="Main Auditorium">
                 <span class="material-symbols-outlined">bar_chart</span>
               </button>
+        
               <button class="icon-btn" title="Delete" type="button">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </div>
           </article>
-
+        
           <article class="content-card">
             <div class="content-info">
               <div class="badges">
                 <span class="badge type announcement">ANNOUNCEMENT</span>
                 <span class="badge status draft">DRAFT</span>
               </div>
-
+        
               <h3>Update to Faculty Compensation Framework</h3>
               <p>
                 Internal memo regarding the revised compensation and benefits structure
                 for the 2025 academic year.
               </p>
-
+        
               <div class="meta">
-                <span>
-                  <span class="material-symbols-outlined small">calendar_month</span>
-                  Sep 28, 2024
-                </span>
-                <span>
-                  <span class="material-symbols-outlined small">visibility</span>
-                  -- views
-                </span>
+                <span><span class="material-symbols-outlined small">calendar_month</span> Sep 28, 2024</span>
+                <span><span class="material-symbols-outlined small">visibility</span> -- views</span>
               </div>
             </div>
-
+        
             <div class="content-actions">
-              <button class="icon-btn" title="Edit" type="button">
+              <button class="icon-btn edit-announcement-btn" title="Edit" type="button"
+                data-title="Update to Faculty Compensation Framework"
+                data-description="Internal memo regarding the revised compensation and benefits structure for the 2025 academic year."
+                data-link="">
                 <span class="material-symbols-outlined">edit</span>
               </button>
-              <button class="icon-btn" title="Analytics" type="button">
-                <span class="material-symbols-outlined">bar_chart</span>
-              </button>
+        
               <button class="icon-btn" title="Delete" type="button">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </div>
           </article>
-
+        
           <article class="content-card">
             <div class="content-info">
               <div class="badges">
                 <span class="badge type event">EVENT</span>
                 <span class="badge status published">PUBLISHED</span>
               </div>
-
+        
               <h3>Homecoming Weekend: Alumni Networking Night</h3>
               <p>
                 A night of professional networking and nostalgia for IAU graduates
                 from the classes of 1990–2020.
               </p>
-
+        
               <div class="meta">
-                <span>
-                  <span class="material-symbols-outlined small">calendar_month</span>
-                  Oct 22, 2024
-                </span>
-                <span>
-                  <span class="material-symbols-outlined small">visibility</span>
-                  892 views
-                </span>
+                <span><span class="material-symbols-outlined small">calendar_month</span> Oct 22, 2024</span>
+                <span><span class="material-symbols-outlined small">visibility</span> 892 views</span>
               </div>
             </div>
-
+        
             <div class="content-actions">
-              <button class="icon-btn" title="Edit" type="button">
+              <button class="icon-btn edit-event-btn" title="Edit" type="button"
+                data-title="Homecoming Weekend: Alumni Networking Night"
+                data-description="A night of professional networking and nostalgia for IAU graduates from the classes of 1990–2020."
+                data-date="2024-10-22T18:00"
+                data-location="IAU Campus">
                 <span class="material-symbols-outlined">edit</span>
               </button>
-              <button class="icon-btn" title="Analytics" type="button">
+        
+              <button class="icon-btn analytics-btn" title="Analytics" type="button"
+                data-title="Homecoming Weekend: Alumni Networking Night"
+                data-date="Oct 22, 2024"
+                data-location="IAU Campus">
                 <span class="material-symbols-outlined">bar_chart</span>
               </button>
+        
               <button class="icon-btn" title="Delete" type="button">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </div>
           </article>
         </section>
-
         <footer class="page-footer">
           <div class="pagination">
             <button class="page-btn" type="button">‹</button>
@@ -219,7 +220,8 @@
     </main>
   </div>
 
-  <!-- Event Modal -->
+
+        <!-- Event Modal -->
 <div id="eventModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -260,8 +262,9 @@
     </div>
 
     <div class="modal-footer">
-      <button class="cancel-btn" id="cancelModal">Cancel</button>
-      <button class="publish-btn">Publish</button>
+      <button class="cancel-btn" id="cancelModal" type="button">Cancel</button>
+      <button class="draft-btn" id="saveEventDraftBtn" type="button">Save as Draft</button>
+      <button class="publish-btn" type="button">Publish</button>
     </div>
   </div>
 </div>
@@ -290,8 +293,9 @@
     </div>
 
     <div class="modal-footer">
-      <button class="cancel-btn" id="cancelAnnouncementModal">Cancel</button>
-      <button class="publish-btn">Publish</button>
+      <button class="cancel-btn" id="cancelAnnouncementModal" type="button">Cancel</button>
+      <button class="draft-btn" id="saveAnnouncementDraftBtn" type="button">Save as Draft</button>
+      <button class="publish-btn" type="button">Publish</button>
     </div>
   </div>
 </div>

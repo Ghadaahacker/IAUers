@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU’ers Admin - Event Analytics</title>
+
+  <link rel="stylesheet" href="../CSS/event-analytics.css" />
+  <link rel="stylesheet" href="../../Shared/CSS/admin-sidebar.css" />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <div id="admin-sidebar"></div>
+
+    <main class="main-content">
+      <!-- Event Header -->
+      <section class="event-header">
+        <a href="content.html" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          Back to Content
+        </a>
+
+        <h1 id="eventTitle">Event Analytics</h1>
+
+        <div class="event-meta">
+            <span>
+                <i class="fa-regular fa-calendar"></i>
+                <span id="eventDate">Date</span>
+              </span>
+              
+              <span>
+                <i class="fa-solid fa-location-dot"></i>
+                <span id="eventLocation">Location</span>
+              </span>
+        </div>
+      </section>
+
+      <!-- Main Analytics Content -->
+      <section class="analytics-page-content">
+        <h2 class="section-heading">Event Performance Overview</h2>
+
+        <!-- Summary Cards -->
+        <section class="event-stats-grid">
+          <div class="event-stat-card">
+            <div class="stat-icon yellow-bg">
+              <i class="fa-solid fa-star"></i>
+            </div>
+
+            <div>
+              <p>Avg Satisfaction</p>
+              <h3>4.3/5</h3>
+              <div class="stars">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-regular fa-star"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-stat-card">
+            <div class="stat-icon blue-bg">
+              <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div>
+              <p>Total Responses</p>
+              <h3>142</h3>
+            </div>
+          </div>
+
+          <div class="event-stat-card">
+            <div class="stat-icon green-bg">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+
+            <div>
+              <p>Attendance Rate</p>
+              <h3>83.4%</h3>
+            </div>
+          </div>
+        </section>
+
+        <!-- Satisfaction Chart -->
+        <section class="chart-card">
+          <h2>Satisfaction Distribution</h2>
+          <canvas id="satisfactionChart"></canvas>
+        </section>
+
+        <!-- Would Attend Chart -->
+        <section class="chart-card recommendation-card">
+          <h2>Would Attend Similar Events</h2>
+          <div class="pie-wrapper">
+            <canvas id="wouldAttendChart"></canvas>
+          </div>
+        </section>
+
+        <!-- Demographics -->
+        <section class="demographics-section">
+          <h2 class="section-heading">Demographics</h2>
+
+          <div class="demographics-grid">
+            <div class="demographic-card">
+              <h3>By College</h3>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Engineering</span>
+                  <strong>67 (35.8%)</strong>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill blue-fill" style="width: 35.8%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Computer Science</span>
+                  <strong>52 (27.8%)</strong>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill blue-fill" style="width: 27.8%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Business</span>
+                  <strong>38 (20.3%)</strong>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill blue-fill" style="width: 20.3%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Sciences</span>
+                  <strong>30 (16.1%)</strong>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill blue-fill" style="width: 16.1%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="demographic-card">
+              <h3>By Academic Year</h3>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Year 1</span>
+                  <strong>28 (15%)</strong>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill purple-fill" style="width: 15%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Year 2</span>
+                  <strong>45 (24.1%)</strong>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill purple-fill" style="width: 24.1%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Year 3</span>
+                  <strong>62 (33.2%)</strong>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill purple-fill" style="width: 33.2%;"></div>
+                </div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Year 4</span>
+                  <strong>52 (27.8%)</strong>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill purple-fill" style="width: 27.8%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../Shared/JS/admin-sidebar.js"></script>
+  <script src="../JS/event-analytics.js"></script>
+</body>
+</html>
