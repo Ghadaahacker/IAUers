@@ -1,1 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU’ers Student - My Journey</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+
+  <link rel="stylesheet" href="../CSS/journey.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="brand-text">
+            <h2>IAU’ers<br>Student</h2>
+            <p>Academic Portal</p>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="home.html" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+          </a>
+
+          <a href="schedule.html" class="nav-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>Schedule</span>
+          </a>
+
+          <a href="tickets.html" class="nav-item">
+            <i class="fa-solid fa-ticket"></i>
+            <span>My Tickets</span>
+          </a>
+
+          <a href="journey.html" class="nav-item active">
+            <i class="fa-regular fa-compass"></i>
+            <span>My Journey</span>
+          </a>
+
+          <a href="profile.html" class="nav-item">
+            <i class="fa-regular fa-user"></i>
+            <span>My Profile</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="nav-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+
+        <a href="../login/login.html" class="nav-item">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="journeySearch" placeholder="Search courses or tasks..." />
+        </div>
+
+        <button class="icon-btn" type="button" aria-label="Profile">
+          <i class="fa-regular fa-user"></i>
+        </button>
+      </header>
+
+      <section class="page-header-bar">
+        <div>
+          <h1>My Journey</h1>
+          <p>Track your courses and stay on top of your schedule.</p>
+        </div>
+      </section>
+
+      <section class="journey-layout">
+        <!-- Quick Access -->
+        <section class="content-section">
+          <div class="section-head">
+            <h2>Quick Access</h2>
+          </div>
+
+          <div class="quick-grid">
+            <a
+              class="quick-card quick-dark"
+              href="https://vle.iau.edu.sa/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div class="quick-icon">
+                <i class="fa-solid fa-book-open"></i>
+              </div>
+              <h3>IAU Blackboard</h3>
+              <p>Learning Portal</p>
+              <span class="quick-link-icon">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </span>
+            </a>
+
+            <a
+              class="quick-card quick-blue"
+              href="https://sis.iau.edu.sa/psp/ps/?cmd=login&languageCd=ARA"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div class="quick-icon">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </div>
+              <h3>IAU SIS</h3>
+              <p>Student Portal</p>
+              <span class="quick-link-icon">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Courses -->
+        <section class="content-section">
+          <div class="section-head">
+            <h2>My Courses</h2>
+            <button id="openCourseModalBtn" class="section-link-btn" type="button">
+              <i class="fa-solid fa-plus"></i>
+              <span>Add Course</span>
+            </button>
+          </div>
+
+          <div id="coursesList" class="stack-list"></div>
+        </section>
+
+        <!-- Tasks -->
+        <section class="content-section">
+          <div class="section-head">
+            <h2>Upcoming Tasks</h2>
+            <button id="openTaskModalBtn" class="section-link-btn" type="button">
+              <i class="fa-solid fa-plus"></i>
+              <span>Add Task</span>
+            </button>
+          </div>
+
+          <div id="tasksList" class="stack-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add Course Modal -->
+  <div id="courseModal" class="modal hidden">
+    <div class="modal-overlay" data-close="course"></div>
+
+    <div class="modal-card">
+      <button id="closeCourseModalBtn" class="close-modal-btn" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal-header">
+        <h3>Add Course</h3>
+      </div>
+
+      <form id="courseForm" class="modal-form">
+        <label class="form-label" for="courseName">Course Name</label>
+        <input id="courseName" class="form-input" type="text" placeholder="e.g., Data Structures" required />
+
+        <label class="form-label" for="courseCode">Course Code</label>
+        <input id="courseCode" class="form-input" type="text" placeholder="e.g., CS201" required />
+
+        <label class="form-label">Color</label>
+        <div id="colorOptions" class="color-grid">
+          <button type="button" class="color-option selected" data-color="#3b82f6"></button>
+          <button type="button" class="color-option" data-color="#06c755"></button>
+          <button type="button" class="color-option" data-color="#a855f7"></button>
+          <button type="button" class="color-option" data-color="#ff7a00"></button>
+          <button type="button" class="color-option" data-color="#ec4899"></button>
+          <button type="button" class="color-option" data-color="#6366f1"></button>
+          <button type="button" class="color-option" data-color="#14b8a6"></button>
+          <button type="button" class="color-option" data-color="#ff2d3a"></button>
+        </div>
+
+        <button class="submit-btn" type="submit">Add Course</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div id="taskModal" class="modal hidden">
+    <div class="modal-overlay" data-close="task"></div>
+
+    <div class="modal-card">
+      <button id="closeTaskModalBtn" class="close-modal-btn" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal-header">
+        <h3>Add Task</h3>
+      </div>
+
+      <form id="taskForm" class="modal-form">
+        <label class="form-label">Task Type</label>
+        <div id="taskTypeOptions" class="type-grid">
+          <button type="button" class="type-option selected" data-type="Quiz">Quiz</button>
+          <button type="button" class="type-option" data-type="Assignment">Assignment</button>
+          <button type="button" class="type-option" data-type="Exam">Exam</button>
+        </div>
+
+        <label class="form-label" for="taskCourse">Course</label>
+        <select id="taskCourse" class="form-input" required>
+          <option value="">Select a course</option>
+        </select>
+
+        <label class="form-label" for="taskTitle">Title</label>
+        <input id="taskTitle" class="form-input" type="text" placeholder="e.g., Midterm Exam" required />
+
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label" for="taskDate">Date</label>
+            <input id="taskDate" class="form-input" type="date" required />
+          </div>
+
+          <div class="form-col">
+            <label class="form-label" for="taskTime">Time</label>
+            <input id="taskTime" class="form-input" type="time" required />
+          </div>
+        </div>
+
+        <button class="submit-btn" type="submit">Add Task</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../JS/journey.js"></script>
+</body>
+</html>
