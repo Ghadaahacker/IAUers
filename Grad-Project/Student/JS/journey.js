@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const coursesList = document.getElementById("coursesList");
   const tasksList = document.getElementById("tasksList");
-  const journeySearch = document.getElementById("journeySearch");
 
   const courseModal = document.getElementById("courseModal");
   const taskModal = document.getElementById("taskModal");
@@ -139,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderCourses() {
     const courses = loadCourses();
-    const searchValue = journeySearch.value.trim().toLowerCase();
+    const searchValue = journeySearch ? journeySearch.value.trim().toLowerCase() : "";
 
     const filteredCourses = courses.filter(course => {
       return [course.name, course.code]
@@ -415,10 +414,12 @@ document.addEventListener("DOMContentLoaded", function () {
     resetTaskForm();
   });
 
-  journeySearch.addEventListener("input", function () {
-    renderCourses();
-    renderTasks();
-  });
+  if (journeySearch) {
+    journeySearch.addEventListener("input", function () {
+      renderCourses();
+      renderTasks();
+    });
+  }
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {

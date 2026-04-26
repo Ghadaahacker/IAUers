@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const pendingTicketsList = document.getElementById("pendingTicketsList");
 
   const ticketSearch = document.getElementById("ticketSearch");
-
+  
   const ticketModal = document.getElementById("ticketModal");
   const modalOverlay = document.getElementById("modalOverlay");
   const closeModalBtn = document.getElementById("closeModalBtn");
@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderTickets() {
-    const searchValue = ticketSearch.value.trim().toLowerCase();
+    const searchValue = ticketSearch ? ticketSearch.value.trim().toLowerCase() : "";
     const tickets = loadTickets();
 
     const filteredTickets = tickets.filter(ticket => {
@@ -228,7 +228,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  ticketSearch.addEventListener("input", renderTickets);
+  if (ticketSearch) {
+    ticketSearch.addEventListener("input", renderTickets);
+  }
 
   closeModalBtn.addEventListener("click", closeTicketModal);
   modalOverlay.addEventListener("click", closeTicketModal);

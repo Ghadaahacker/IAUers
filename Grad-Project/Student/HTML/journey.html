@@ -24,16 +24,6 @@
     
     <div id="student-sidebar"></div>
     <main class="main-content">
-      <header class="topbar">
-        <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="journeySearch" placeholder="Search courses or tasks..." />
-        </div>
-
-        <button class="icon-btn" type="button" aria-label="Profile">
-          <i class="fa-regular fa-user"></i>
-        </button>
-      </header>
 
       <section class="page-header-bar">
         <div>
@@ -83,9 +73,8 @@
             </a>
           </div>
         </section>
-
         <!-- Courses -->
-        <section class="content-section">
+         <section class="content-section">
           <div class="section-head">
             <h2>My Courses</h2>
             <button id="openCourseModalBtn" class="section-link-btn" type="button">
@@ -93,12 +82,16 @@
               <span>Add Course</span>
             </button>
           </div>
-
-          <div id="coursesList" class="stack-list"></div>
+          
+          <div id="coursesList" class="stack-list">
+            <div class="empty-state">
+              No courses added yet. Start by adding your current semester courses.
+            </div>
+          </div>
         </section>
-
+        
         <!-- Tasks -->
-        <section class="content-section">
+         <section class="content-section">
           <div class="section-head">
             <h2>Upcoming Tasks</h2>
             <button id="openTaskModalBtn" class="section-link-btn" type="button">
@@ -106,12 +99,13 @@
               <span>Add Task</span>
             </button>
           </div>
-
-          <div id="tasksList" class="stack-list"></div>
+          
+          <div id="tasksList" class="stack-list">
+            <div class="empty-state">
+              No academic tasks yet. Add quizzes, assignments, or exams and they will be ready for your calendar workflow.
+            </div>
+          </div>
         </section>
-      </section>
-    </main>
-  </div>
 
   <!-- Add Course Modal -->
   <div id="courseModal" class="modal hidden">
