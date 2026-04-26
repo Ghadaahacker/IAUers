@@ -3,21 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Academic Profile</title>
-  <link rel="stylesheet" href="../CSS/profile.css" />
+  <title>IAU'ers Student - Profile</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   />
-  <link rel="stylesheet" href="../../Shared/CSS/student-sidebar.css" />
+  <link rel="stylesheet" href="../CSS/profile.css" />
 </head>
 <body>
-  <div class="app-shell">
-    <div id="student-sidebar"></div>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="brand-text">
+            <h2>IAU'ers<br>Student</h2>
+            <p>Academic Portal</p>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="home.html" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+          </a>
+
+          <a href="schedule.html" class="nav-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>Schedule</span>
+          </a>
+
+          <a href="tickets.html" class="nav-item">
+            <i class="fa-solid fa-ticket"></i>
+            <span>My Tickets</span>
+          </a>
+
+          <a href="journey.html" class="nav-item">
+            <i class="fa-regular fa-compass"></i>
+            <span>My Journey</span>
+          </a>
+
+          <a href="profile.html" class="nav-item active">
+            <i class="fa-regular fa-user"></i>
+            <span>My Profile</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="nav-item bottom-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+
+        <a href="../login/login.html" class="nav-item bottom-item">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
 
     <!-- Main -->
     <main class="main-content">
-      
+      <!-- Top bar -->
+      <header class="topbar">
+        <nav class="top-links">
+          <a href="home.html">Home</a>
+          <a href="Grad-Project/Student/HTML/schedule.html">Schedule</a>
+          <a href="Grad-Project/Student/HTML/profile.html" class="active-link">My Profile</a>
+        </nav>
+
+        <div class="top-actions">
+          <button class="icon-btn">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAndem0I4Rrl05AGoEphJbj2AsPfwh8UObSg&s"
+            alt="Small Avatar"
+            class="top-avatar"
+          />
+        </div>
+      </header>
+
       <!-- Hero -->
       <section class="hero">
         <div class="hero-overlay"></div>
@@ -29,120 +107,166 @@
             <span>Information Systems and Business Analytics</span>
           </div>
         </div>
-
-        <div class="hero-buttons">
-          <button class="btn btn-light" id="editProfileBtn">Edit Profile</button>
-          <button class="btn btn-dark">Academic Record</button>
+        <div class="header-actions">
+          <button class="header-btn secondary-btn" id="editProfileBtn">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>Edit Profile</span>
+          </button>
+          <button class="header-btn primary-btn">
+            <i class="fa-solid fa-file-lines"></i>
+            <span>Academic Record</span>
+          </button>
         </div>
       </section>
 
-      <!-- Dashboard content -->
-      <section class="profile-grid">
-        <!-- Left profile card -->
-        <div class="card profile-card">
-          <div class="student-illustration">
+      <!-- Profile Content -->
+      <section class="profile-layout">
+
+        <!-- Left: Student Card -->
+        <aside class="profile-card">
+          <div class="student-photo-block">
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAndem0I4Rrl05AGoEphJbj2AsPfwh8UObSg&s"
-              alt="Student"
+              alt="Student Photo"
+              class="student-photo"
             />
-            <div class="student-id">ID: 2230002023</div>
+            <span class="student-id-badge">ID: 2230002023</span>
           </div>
 
-          <div class="info-block">
-            <span class="label">FULL NAME</span>
-            <h3>Walaa</h3>
+          <div class="profile-info-block">
+            <span class="info-label">FULL NAME</span>
+            <h3 class="info-value">Walaa</h3>
           </div>
 
-          <div class="info-block">
-            <span class="label">IAU EMAIL</span>
-            <p>Wallaa223@iau.edu.sa</p>
+          <div class="profile-info-block">
+            <span class="info-label">IAU EMAIL</span>
+            <p class="info-value-sm">Wallaa223@iau.edu.sa</p>
           </div>
 
-          <div class="info-block">
-            <span class="label">DEPARTMENT</span>
-            <p>College of Business Administration</p>
+          <div class="profile-info-block">
+            <span class="info-label">DEPARTMENT</span>
+            <p class="info-value-sm">College of Business Administration</p>
           </div>
 
-          <div class="card-icons">
-            <button><i class="fa-brands fa-instagram"></i></button>
-            <button><i class="fa-solid fa-phone"></i></button>
-            <button><i class="fa-solid fa-paper-plane"></i></button>
+          <div class="profile-info-block">
+            <span class="info-label">MAJOR</span>
+            <p class="info-value-sm">Information Systems and Business Analytics</p>
           </div>
-        </div>
 
-        <!-- Right content -->
-        <div class="right-panel">
-          <div class="stats-row">
-            <div class="card stat-card">
-              <div class="stat-top">
-                <span>Cumulative GPA</span>
-                <small>Current</small>
+          <div class="profile-social">
+            <button class="social-btn" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </button>
+            <button class="social-btn" aria-label="Phone">
+              <i class="fa-solid fa-phone"></i>
+            </button>
+            <button class="social-btn" aria-label="Message">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Right: Stats + Courses -->
+        <div class="profile-right">
+
+          <!-- Stats -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="card-top">
+                <div class="card-icon light-blue">
+                  <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <span class="status-badge badge-gold">Current</span>
               </div>
-              <div class="stat-value">4.62 <span>/5.00</span></div>
+              <h2>4.62</h2>
+              <p>Cumulative GPA <span class="stat-sub">/ 5.00</span></p>
               <div class="progress-bar">
                 <div class="progress-fill" style="width: 92.4%;"></div>
               </div>
             </div>
 
-            <div class="card stat-card">
-              <div class="stat-top">
-                <span>Credits Earned</span>
-                <small>Progress</small>
+            <div class="stat-card">
+              <div class="card-top">
+                <div class="card-icon light-blue">
+                  <i class="fa-solid fa-book"></i>
+                </div>
+                <span class="status-badge badge-blue">In Progress</span>
               </div>
-              <div class="stat-value">102 <span>/132</span></div>
+              <h2>102</h2>
+              <p>Credits Earned <span class="stat-sub">/ 132</span></p>
               <div class="progress-bar">
                 <div class="progress-fill" style="width: 77.2%;"></div>
               </div>
             </div>
+
+            <div class="stat-card">
+              <div class="card-top">
+                <div class="card-icon light-gray">
+                  <i class="fa-regular fa-calendar"></i>
+                </div>
+                <span class="status-badge badge-pink">Active</span>
+              </div>
+              <h2>04</h2>
+              <p>Enrolled Courses</p>
+            </div>
           </div>
 
-          <div class="card courses-card">
-            <div class="courses-header">
-              <h3>Enrolled Courses</h3>
-              <span>Semester 2, 2024</span>
+          <!-- Courses Section -->
+          <section class="courses-section">
+            <div class="section-title">
+              <span class="title-line"></span>
+              <h2>Enrolled Courses</h2>
+              <span class="section-meta">Semester 2, 2024</span>
             </div>
 
-            <div class="courses-list">
-              <div class="course-item">
-                <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
-                <div>
+            <div class="courses-grid">
+              <div class="course-card">
+                <div class="course-icon-wrap">
+                  <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div class="course-info">
                   <h4>CS301: Advanced Algorithms</h4>
-                  <p>Section 1 - 3 Credit</p>
+                  <p>Section 1 &bull; 3 Credits</p>
                 </div>
               </div>
 
-              <div class="course-item">
-                <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
-                <div>
+              <div class="course-card">
+                <div class="course-icon-wrap">
+                  <i class="fa-solid fa-database"></i>
+                </div>
+                <div class="course-info">
                   <h4>CS312: Database Systems</h4>
-                  <p>Section 2 - 3 Credit</p>
+                  <p>Section 2 &bull; 3 Credits</p>
                 </div>
               </div>
 
-              <div class="course-item">
-                <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
-                <div>
+              <div class="course-card">
+                <div class="course-icon-wrap">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="course-info">
                   <h4>CS450: Cyber Security</h4>
-                  <p>Section 4 - 3 Credit</p>
+                  <p>Section 4 &bull; 3 Credits</p>
                 </div>
               </div>
 
-              <div class="course-item">
-                <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
-                <div>
+              <div class="course-card">
+                <div class="course-icon-wrap">
+                  <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <div class="course-info">
                   <h4>CS208: Networking</h4>
-                  <p>Section 2 - 3 Credit</p>
+                  <p>Section 2 &bull; 3 Credits</p>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
+
         </div>
       </section>
     </main>
   </div>
 
   <script src="../JS/profile.js"></script>
-  <script src="../../Shared/JS/student-sidebar.js"></script>
 </body>
 </html>
-
