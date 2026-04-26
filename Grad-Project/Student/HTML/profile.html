@@ -9,36 +9,11 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   />
+  <link rel="stylesheet" href="../../Shared/CSS/student-sidebar.css" />
 </head>
 <body>
   <div class="app-shell">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">IAU’ers App</div>
-
-      <div class="user-box">
-        <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDEr_mFcPrd_GSdj_h0Ev-YXgZ_r0KgSIY7g&s"
-          alt="User Avatar"
-          class="user-avatar"
-        />
-        <h3>Walaa</h3>
-        <p>Information Systems and Business Analytics</p>
-      </div>
-
-      <nav class="sidebar-nav">
-        <a href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
-        <a href="schedule.html"><i class="fa-regular fa-calendar"></i><span>Schedule</span></a>
-        <a href="tickets.html"><i class="fa-regular fa-ticket"></i><span>My Tickets</span></a>
-        <a href="journey.html"><i class="fa-regular fa-map"></i><span>My Journey</span></a>
-        <a href="profile.html" class="active"><i class="fa-regular fa-user"></i><span>My Profile</span></a>
-      </nav>
-
-      <a href="#" class="logout-link">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        <span>Logout</span>
-      </a>
-    </aside>
+    <div id="student-sidebar"></div>
 
     <!-- Main -->
     <main class="main-content">
@@ -186,6 +161,7 @@
   </div>
 
   <script src="../JS/profile.js"></script>
+  <script src="../../Shared/JS/student-sidebar.js"></script>
 </body>
 </html>
 

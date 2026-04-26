@@ -1,0 +1,113 @@
+#student-sidebar {
+    min-height: 100vh;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;  
+    width: 220px;
+    height: 100vh;   
+    background: #eef2f6;
+    border-right: 1px solid #e1e7ef; 
+    display: flex;
+    flex-direction: column;
+    padding: 24px 18px;
+    }
+    
+
+  .sidebar-top {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .brand {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  
+  .brand-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #1d1e34, #3a5a96);
+    color: #ffffff !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  
+  .brand-logo i {
+    color: #ffffff !important;
+  }
+  
+  .brand h2 {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: #1d1e34;
+  }
+  
+  .brand p {
+    font-size: 13px;
+    color: #5f6e80;
+    margin-top: 6px;
+  }
+  
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 20px;
+  }
+  
+  .nav-item {
+    text-decoration: none;
+    color: #32395a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 400;
+    transition: 0.2s ease;
+    position: relative;
+  }
+  
+  .nav-item i {
+    width: 18px;
+    text-align: center;
+    color: inherit;
+  }
+  
+  .nav-item:hover {
+    background: #e6edf5;
+  }
+  
+  .nav-item.active {
+    background: #ffffff;
+    color: #3a5a96;
+    font-weight: 700;
+    box-shadow: inset 4px 0 0 #3a5a96;
+  }
+  
+  .nav-item.active::before {
+    display: none !important;
+  }
+  
+  .logout {
+    color: #32395a;
+  }

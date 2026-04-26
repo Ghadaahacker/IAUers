@@ -18,63 +18,12 @@
   />
 
   <link rel="stylesheet" href="../CSS/home.css" />
+  <link rel="stylesheet" href="../../Shared/CSS/student-sidebar.css" />
 </head>
 <body>
   <div class="layout">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="brand">
-          <div class="brand-icon">
-            <i class="fa-solid fa-shield-halved"></i>
-          </div>
-          <div class="brand-text">
-            <h2>IAU’ers<br>Student</h2>
-            <p>Academic Portal</p>
-          </div>
-        </div>
-
-        <nav class="nav-menu">
-          <a href="home.html" class="nav-item active">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-          </a>
-
-          <a href="schedule.html" class="nav-item">
-            <i class="fa-regular fa-calendar"></i>
-            <span>Schedule</span>
-          </a>
-
-          <a href="tickets.html" class="nav-item">
-            <i class="fa-solid fa-ticket"></i>
-            <span>My Tickets</span>
-          </a>
-
-          <a href="journey.html" class="nav-item">
-            <i class="fa-regular fa-compass"></i>
-            <span>My Journey</span>
-          </a>
-
-          <a href="profile.html" class="nav-item">
-            <i class="fa-regular fa-user"></i>
-            <span>My Profile</span>
-          </a>
-        </nav>
-      </div>
-
-      <div class="sidebar-bottom">
-        <a href="settings.html" class="nav-item bottom-item">
-          <i class="fa-solid fa-gear"></i>
-          <span>Settings</span>
-        </a>
-
-        <a href="../login/login.html" class="nav-item bottom-item">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span>Logout</span>
-        </a>
-      </div>
-    </aside>
+    <div id="student-sidebar"></div>
 
     <!-- Main -->
     <main class="main-content">
@@ -249,6 +198,7 @@
     </main>
   </div>
 
+  <script src="../../Shared/JS/student-sidebar.js"></script>
   <script src="../JS/home.js"></script>
 </body>
 </html>
