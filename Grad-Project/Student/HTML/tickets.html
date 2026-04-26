@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU’ers Student - My Tickets</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
+  <link rel="stylesheet" href="../CSS/tickets.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="brand-text">
+            <h2>IAU’ers<br>Student</h2>
+            <p>Academic Portal</p>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="home.html" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+          </a>
+
+          <a href="schedule.html" class="nav-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>Schedule</span>
+          </a>
+
+          <a href="tickets.html" class="nav-item active">
+            <i class="fa-solid fa-ticket"></i>
+            <span>My Tickets</span>
+          </a>
+
+          <a href="journey.html" class="nav-item">
+            <i class="fa-regular fa-compass"></i>
+            <span>My Journey</span>
+          </a>
+
+          <a href="profile.html" class="nav-item">
+            <i class="fa-regular fa-user"></i>
+            <span>My Profile</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <a href="settings.html" class="nav-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+
+        <a href="../login/login.html" class="nav-item">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="ticketSearch" placeholder="Search tickets..." />
+        </div>
+
+        <button class="icon-btn" type="button" aria-label="Profile">
+          <i class="fa-regular fa-user"></i>
+        </button>
+      </header>
+
+      <section class="page-header-bar">
+        <div>
+          <h1>My Tickets</h1>
+          <p>Your registered events and ticket requests.</p>
+        </div>
+      </section>
+
+      <section class="tickets-layout">
+        <section class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-icon icon-confirmed">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="summary-content">
+              <h2 id="confirmedCount">0</h2>
+              <p>Confirmed</p>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon icon-pending">
+              <i class="fa-regular fa-clock"></i>
+            </div>
+            <div class="summary-content">
+              <h2 id="pendingCount">0</h2>
+              <p>Pending</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <div class="section-head">
+            <h2>Confirmed Tickets</h2>
+            <span id="confirmedListCount">0 tickets</span>
+          </div>
+
+          <div id="confirmedTicketsList" class="ticket-list"></div>
+        </section>
+
+        <section class="content-section">
+          <div class="section-head">
+            <h2>Pending Requests</h2>
+            <span id="pendingListCount">0 requests</span>
+          </div>
+
+          <div id="pendingTicketsList" class="ticket-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <!-- Ticket Modal -->
+  <div id="ticketModal" class="modal hidden">
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+    <div class="modal-card">
+      <button id="closeModalBtn" class="close-modal-btn" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal-header">
+        <span id="modalStatusTag" class="modal-status-tag">Confirmed</span>
+        <h3 id="modalEventTitle">Event Title</h3>
+        <p id="modalTicketId" class="modal-ticket-id">TKT-000000</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-info">
+          <div class="info-row">
+            <i class="fa-regular fa-calendar"></i>
+            <span id="modalEventDate"></span>
+          </div>
+
+          <div class="info-row">
+            <i class="fa-regular fa-clock"></i>
+            <span id="modalEventTime"></span>
+          </div>
+
+          <div class="info-row">
+            <i class="fa-solid fa-location-dot"></i>
+            <span id="modalEventLocation"></span>
+          </div>
+
+          <div class="info-row">
+            <i class="fa-solid fa-layer-group"></i>
+            <span id="modalEventCategory"></span>
+          </div>
+        </div>
+
+        <div class="qr-section">
+          <div id="qrCodeContainer" class="qr-box"></div>
+          <p class="qr-note">This QR code is generated from the actual ticket data and can be scanned by admin for validation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../JS/tickets.js"></script>
+</body>
+</html>
