@@ -3,7 +3,13 @@ import { auth, db } from "../../Shared/JS/firebase-config.js";
 import {
   collection,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  getDocs,
+  query,
+  orderBy,
+  deleteDoc,
+  doc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -70,7 +76,40 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const filterSelect = document.getElementById("contentTypeFilter");
-  const contentCards = document.querySelectorAll(".content-card");
+  const contentList = document.getElementById("contentList");
+  let editingEventId = null;
+  let allEvents = [];
+  let currentPage = 1;
+  const eventsPerPage = 5;
+
+  function applyContentFilter() {
+    const selected = filterSelect ? filterSelect.value : "all";
+    const cards = document.querySelectorAll(".content-card");
+  
+    cards.forEach((card) => {
+      const typeBadge = card.querySelector(".badge.type");
+      const statusBadge = card.querySelector(".badge.status");
+  
+      const type = typeBadge ? typeBadge.textContent.toLowerCase() : "";
+      const status = statusBadge ? statusBadge.textContent.toLowerCase() : "";
+  
+      let show = true;
+  
+      if (selected === "event") {
+        show = type.includes("event");
+      } else if (selected === "announcement") {
+        show = type.includes("announcement");
+      } else if (selected === "draft") {
+        show = status.includes("draft");
+      }
+  
+      card.style.display = show ? "flex" : "none";
+    });
+  }
+  
+  if (filterSelect) {
+    filterSelect.addEventListener("change", applyContentFilter);
+  }
 
   if (filterSelect) {
     filterSelect.addEventListener("change", () => {
@@ -139,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelector("#announcementModal input[type='url']").value = btn.dataset.link;
     });
   });
-  
+
   async function saveEventToFirebase(status) {
     const titleInput = document.querySelector("#eventModal input[type='text']");
     const descriptionInput = document.querySelector("#eventModal textarea");
@@ -167,32 +206,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     try {
-      await addDoc(collection(db, "events"), {
+      const eventData = {
         title,
         description,
         dateTime,
         location,
         unlimitedSeats,
         seatCapacity: unlimitedSeats ? null : Number(seatCapacity),
-        status, // published أو draft
+        status,
         type: "event",
-        createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
-        createdAt: serverTimestamp()
-      });
-  
-      alert(status === "published" ? "Event published successfully." : "Event saved as draft.");
-  
+        updatedAt: serverTimestamp()
+      };
+      
+      if (editingEventId) {
+        await updateDoc(doc(db, "events", editingEventId), eventData);
+        editingEventId = null;
+      } else {
+        await addDoc(collection(db, "events"), {
+          ...eventData,
+          createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
+          createdAt: serverTimestamp()
+        });
+      }
+      
+      alert(
+        status === "published"
+          ? "Event published successfully."
+          : "Event saved as draft."
+      );
+      
       modal.style.display = "none";
-  
+      
       titleInput.value = "";
       descriptionInput.value = "";
       dateTimeInput.value = "";
       locationInput.value = "";
       seatCapacityInput.value = "";
+      
       unlimitedSeatsCheckbox.checked = false;
       seatCapacityInput.disabled = false;
-  
-    } catch (error) {
+      
+      loadEventsFromFirebase();
+      
+    }
+
+     catch (error) {
       console.error("Error saving event:", error);
       alert("Failed to save event. Check console.");
     }
@@ -211,4 +269,257 @@ document.addEventListener("DOMContentLoaded", () => {
       saveEventToFirebase("draft");
     });
   }
+
+  function renderEventsPage() {
+
+    contentList.innerHTML = "";
+  
+    const start = (currentPage - 1) * eventsPerPage;
+    const end = start + eventsPerPage;
+  
+    const eventsToShow = allEvents.slice(start, end);
+  
+    eventsToShow.forEach((event) => {
+  
+      const statusClass =
+        event.status === "published"
+          ? "published"
+          : "draft";
+  
+      const card = document.createElement("article");
+  
+      card.className = "content-card";
+  
+      card.innerHTML = `
+        <div class="content-info">
+      
+          <div class="badges">
+           <span class="badge type event">EVENT</span>
+
+            <span class="badge status ${statusClass}">
+             ${event.status.toUpperCase()}
+           </span>
+          </div>
+          
+          <h3>${event.title}</h3>
+          <p>${event.description}</p>
+          
+          <div class="meta">
+          
+          <span>
+           <span class="material-symbols-outlined small">
+             calendar_month
+           </span>
+           
+           ${new Date(event.dateTime).toLocaleString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          })}
+          </span>
+
+          <span>
+            <span class="material-symbols-outlined small">
+              location_on
+            </span>
+
+            ${event.location}
+         </span>
+
+        </div>
+
+       </div>
+
+       <div class="content-actions">
+
+       ${event.status === "draft" ? `
+        <button
+          class="icon-btn edit-event-btn"
+          title="Edit"
+          type="button"
+        >
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+      ` : ""}
+      
+       <button
+        class="icon-btn analytics-btn"
+        title="Analytics"
+        type="button"
+       >
+
+       <span class="material-symbols-outlined">bar_chart</span>
+       </button>
+
+       <button
+        class="icon-btn delete-event-btn"
+        title="Delete"
+        type="button" 
+         >
+        <span class="material-symbols-outlined">delete</span>
+        </button>
+
+        </div>
+       `;
+  
+       contentList.appendChild(card);
+       const editBtn = card.querySelector(".edit-event-btn");
+
+        if (editBtn) {
+          editBtn.addEventListener("click", () => {
+            editingEventId = event.id;
+
+            modal.style.display = "flex";
+
+            document.querySelector("#eventModal input[type='text']").value = event.title;
+            document.querySelector("#eventModal textarea").value = event.description;
+            document.querySelector("#eventModal input[type='datetime-local']").value = event.dateTime;
+            document.querySelectorAll("#eventModal input[type='text']")[1].value = event.location;
+
+            document.getElementById("unlimitedSeats").checked = event.unlimitedSeats;
+            document.getElementById("seatCapacity").value = event.seatCapacity || "";
+            document.getElementById("seatCapacity").disabled = event.unlimitedSeats;
+          });
+        }
+
+       const deleteBtn = card.querySelector(".delete-event-btn");
+ 
+       deleteBtn.addEventListener("click", async () => {
+         const confirmDelete = confirm("Are you sure you want to delete this event?");
+ 
+         if (!confirmDelete) return;
+ 
+         await deleteDoc(doc(db, "events", event.id));
+ 
+         loadEventsFromFirebase();
+       });
+ 
+       const analyticsBtn = card.querySelector(".analytics-btn");
+ 
+       analyticsBtn.addEventListener("click", () => {
+         const title = encodeURIComponent(event.title);
+         const date = encodeURIComponent(
+           new Date(event.dateTime).toLocaleString("en-GB", {
+             day: "numeric",
+             month: "short",
+             year: "numeric",
+             hour: "2-digit",
+             minute: "2-digit"
+           })
+         );
+         const location = encodeURIComponent(event.location);
+ 
+         window.location.href = `event-analytics.html?title=${title}&date=${date}&location=${location}`;
+       });
+ 
+     });
+ 
+     applyContentFilter();
+   }
+ 
+  function renderPagination() {
+
+    const pagination = document.querySelector(".pagination");
+  
+    if (!pagination) return;
+  
+    pagination.innerHTML = "";
+  
+    const totalPages = Math.ceil(allEvents.length / eventsPerPage);
+  
+    const prevBtn = document.createElement("button");
+  
+    prevBtn.className = "page-btn";
+    prevBtn.innerHTML = "‹";
+  
+    prevBtn.disabled = currentPage === 1;
+  
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderEventsPage();
+        renderPagination();
+      }
+    });
+  
+    pagination.appendChild(prevBtn);
+
+    for (let i = 1; i <= totalPages; i++) {
+  
+      const pageBtn = document.createElement("button");
+  
+      pageBtn.className = "page-btn";
+  
+      if (i === currentPage) {
+        pageBtn.classList.add("active");
+      }
+  
+      pageBtn.textContent = i;
+  
+      pageBtn.addEventListener("click", () => {
+        currentPage = i;
+        renderEventsPage();
+        renderPagination();
+      });
+  
+      pagination.appendChild(pageBtn);
+    }
+  
+    const nextBtn = document.createElement("button");
+  
+    nextBtn.className = "page-btn";
+    nextBtn.innerHTML = "›";
+  
+    nextBtn.disabled = currentPage === totalPages;
+  
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderEventsPage();
+        renderPagination();
+      }
+    });
+  
+    pagination.appendChild(nextBtn);
+  }
+
+  async function loadEventsFromFirebase() {
+    if (!contentList) return;
+  
+    try {
+      const q = query(
+        collection(db, "events"),
+        orderBy("createdAt", "desc")
+      );
+  
+      const snapshot = await getDocs(q);
+  
+      allEvents = [];
+      
+      snapshot.forEach((eventDoc) => {
+        
+        allEvents.push({
+          id: eventDoc.id,
+          ...eventDoc.data()
+        });
+      });
+
+      const totalPages = Math.ceil(allEvents.length / eventsPerPage);
+      
+      if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+      }
+
+      renderEventsPage();
+      renderPagination();
+  
+    } catch (error) {
+      console.error("Error loading events:", error);
+    }
+  }
+  
+  loadEventsFromFirebase();
+        
 });

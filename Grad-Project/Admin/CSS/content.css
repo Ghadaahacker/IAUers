@@ -305,8 +305,8 @@
   }
   
   .badge.status.draft {
-    background: #eef1f5;
-    color: #7a8795;
+    background: var(--warning);
+    color: #8a5a17;
   }
   
   .content-info h3 {
@@ -435,10 +435,6 @@
       gap: 16px;
     }
   
-    .pagination,
-    .support-link {
-      justify-self: start;
-    }
   }
   
   @media (max-width: 600px) {
@@ -454,10 +450,6 @@
     .filters-row {
       flex-direction: column;
       align-items: stretch;
-    }
-  
-    .search-top {
-      width: 180px;
     }
   
     .page-header h1 {
