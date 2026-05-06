@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
      DATA — Profile
   ══════════════════════════════════════════ */
   let profileData = {
-    name:         "Walaa",
-    email:        "Wallaa223@iau.edu.sa",
+    name:         "Student",
+    email:        "Student223@iau.edu.sa",
     department:   "College of Business Administration",
     major:        "Information Systems and Business Analytics",
     id:           "2230002023",
