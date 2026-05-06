@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       code:        "CS208",
       name:        "Networking",
-      doctor:      "Dr. Abdullah Assiri",
+      doctor:      "Dr. Abdullah Alshehri",
       section:     "Section 2",
       credits:     3,
       location:    "Building D — Room 302",
