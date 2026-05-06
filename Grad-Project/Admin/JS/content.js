@@ -1,3 +1,11 @@
+import { auth, db } from "../../Shared/JS/firebase-config.js";
+
+import {
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const modal = document.getElementById("eventModal");
@@ -132,4 +140,75 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   
+  async function saveEventToFirebase(status) {
+    const titleInput = document.querySelector("#eventModal input[type='text']");
+    const descriptionInput = document.querySelector("#eventModal textarea");
+    const dateTimeInput = document.querySelector("#eventModal input[type='datetime-local']");
+    const locationInput = document.querySelectorAll("#eventModal input[type='text']")[1];
+  
+    const unlimitedSeatsCheckbox = document.getElementById("unlimitedSeats");
+    const seatCapacityInput = document.getElementById("seatCapacity");
+  
+    const title = titleInput.value.trim();
+    const description = descriptionInput.value.trim();
+    const dateTime = dateTimeInput.value;
+    const location = locationInput.value.trim();
+    const unlimitedSeats = unlimitedSeatsCheckbox.checked;
+    const seatCapacity = seatCapacityInput.value;
+  
+    if (!title || !description || !dateTime || !location) {
+      alert("Please fill all event fields.");
+      return;
+    }
+  
+    if (!unlimitedSeats && !seatCapacity) {
+      alert("Please enter seat capacity or choose Unlimited Seats.");
+      return;
+    }
+  
+    try {
+      await addDoc(collection(db, "events"), {
+        title,
+        description,
+        dateTime,
+        location,
+        unlimitedSeats,
+        seatCapacity: unlimitedSeats ? null : Number(seatCapacity),
+        status, // published أو draft
+        type: "event",
+        createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
+        createdAt: serverTimestamp()
+      });
+  
+      alert(status === "published" ? "Event published successfully." : "Event saved as draft.");
+  
+      modal.style.display = "none";
+  
+      titleInput.value = "";
+      descriptionInput.value = "";
+      dateTimeInput.value = "";
+      locationInput.value = "";
+      seatCapacityInput.value = "";
+      unlimitedSeatsCheckbox.checked = false;
+      seatCapacityInput.disabled = false;
+  
+    } catch (error) {
+      console.error("Error saving event:", error);
+      alert("Failed to save event. Check console.");
+    }
+  }
+  
+  const publishEventBtn = document.querySelector("#eventModal .publish-btn");
+  
+  if (publishEventBtn) {
+    publishEventBtn.addEventListener("click", () => {
+      saveEventToFirebase("published");
+    });
+  }
+  
+  if (saveEventDraftBtn) {
+    saveEventDraftBtn.addEventListener("click", () => {
+      saveEventToFirebase("draft");
+    });
+  }
 });
