@@ -31,9 +31,17 @@ loginForm.addEventListener("submit", async function (e) {
   }
 
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+    // تسجيل الدخول
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
     const user = userCredential.user;
 
+    // جلب بيانات المستخدم من Firestore
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
@@ -44,22 +52,34 @@ loginForm.addEventListener("submit", async function (e) {
 
     const userData = userSnap.data();
 
-    // 🔥 التوجيه حسب الدور
+    console.log("User role:", userData.role);
+
+    // التوجيه حسب الدور
     if (userData.role === "student") {
-      window.location.href = "../../Student/HTML/home.html";
+
+      window.location.href =
+        "../../Student/HTML/home.html";
 
     } else if (userData.role === "admin") {
-      window.location.href = "../../Admin/HTML/home.html";
+
+      window.location.href =
+        "../../Admin/HTML/home.html";
 
     } else if (userData.role === "buildingManager") {
-      window.location.href = "../../Building-Admin/home.html"; // 👈 هنا التعديل
+
+      window.location.href =
+        "../../Building-Admin/Building-Management.html";
 
     } else {
+
       errorMessage.textContent = "Unknown role.";
+
     }
 
   } catch (error) {
+
     console.error(error);
     errorMessage.textContent = "Invalid email or password.";
+
   }
 });
