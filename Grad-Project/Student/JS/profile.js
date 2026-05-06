@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  /*DATA — Profile*/
-  
+  /* ══════════════════════════════════════════
+     DATA — Profile
+  ══════════════════════════════════════════ */
   let profileData = {
     name:         "Walaa",
     email:        "Wallaa223@iau.edu.sa",
@@ -13,7 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
     totalCredits: 132
   };
 
-  /*DATA — Courses*/
+  /* ══════════════════════════════════════════
+     DATA — Courses (عدّلي هنا بياناتك)
+  ══════════════════════════════════════════ */
   const coursesData = [
     {
       code:        "CS301",
@@ -57,11 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       code:        "CS208",
       name:        "Networking",
-      doctor:      "Dr. Abdullah Alshehri",
+      doctor:      "Dr. Mona Al-Rashidi",
       section:     "Section 2",
       credits:     3,
       location:    "Building D — Room 302",
-      schedule:    "Mon / Wed / Thu  •  8:00 – 10:00AM",
+      schedule:    "Mon / Wed / Thu  •  8:00 – 8:50 AM",
       absences:    2,
       maxAbsences: 6,
       status:      "On Track",
@@ -69,7 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
-  /*INJECT ALL MODALS + STYLES*/
+  /* ══════════════════════════════════════════
+     INJECT ALL MODALS + STYLES
+  ══════════════════════════════════════════ */
   document.body.insertAdjacentHTML("beforeend", `
 
     <!-- ── EDIT PROFILE MODAL ── -->
@@ -317,7 +322,9 @@ document.addEventListener("DOMContentLoaded", () => {
     </style>
   `);
 
-  /*HELPERS */
+  /* ══════════════════════════════════════════
+     HELPERS
+  ══════════════════════════════════════════ */
   function showToast(msg) {
     const toast = document.getElementById("toast");
     document.getElementById("toastMsg").textContent = msg;
@@ -341,7 +348,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /*RENDER PROFILE CARD*/
+  /* ══════════════════════════════════════════
+     RENDER PROFILE CARD
+  ══════════════════════════════════════════ */
   function renderProfileCard() {
     const nameEl = document.querySelector(".info-value");
     if (nameEl) nameEl.textContent = profileData.name;
@@ -351,7 +360,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (smEls[2]) smEls[2].textContent = profileData.major;
   }
 
-  /*EDIT PROFILE */
+  /* ══════════════════════════════════════════
+     EDIT PROFILE
+  ══════════════════════════════════════════ */
   document.getElementById("editProfileBtn").addEventListener("click", () => {
     document.getElementById("inputName").value  = profileData.name;
     document.getElementById("inputEmail").value = profileData.email;
@@ -381,7 +392,9 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast("Profile updated successfully!");
   });
 
-  /*ACADEMIC RECORD*/
+  /* ══════════════════════════════════════════
+     ACADEMIC RECORD
+  ══════════════════════════════════════════ */
   const academicBtn = document.querySelector(".primary-btn");
   if (academicBtn) {
     academicBtn.addEventListener("click", () => {
@@ -401,7 +414,9 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => window.print(), 200);
   });
 
-  /*COURSE CARDS → DETAIL MODAL */
+  /* ══════════════════════════════════════════
+     COURSE CARDS → DETAIL MODAL
+  ══════════════════════════════════════════ */
   const courseIconsMap = {
     "CS301": "fa-microchip",
     "CS312": "fa-database",
@@ -452,7 +467,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("closeCourseBtn").addEventListener("click", () => closeModal("courseModal"));
 
-  /*SOCIAL BUTTONS */
+  /* ══════════════════════════════════════════
+     SOCIAL BUTTONS
+  ══════════════════════════════════════════ */
   const socialActions = {
     "Instagram": () => window.open("https://instagram.com", "_blank"),
     "Phone":     () => window.open("tel:+966500000000"),
@@ -463,7 +480,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (socialActions[label]) btn.addEventListener("click", socialActions[label]);
   });
 
-  /*LOGOUT — Confirm Dialog */
+  /* ══════════════════════════════════════════
+     LOGOUT — Confirm Dialog
+  ══════════════════════════════════════════ */
   document.querySelectorAll(".nav-item, .sidebar-bottom a").forEach(link => {
     const text = link.textContent.trim().toLowerCase();
     if (text.includes("logout")) {
@@ -483,7 +502,9 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "../login/login.html";
   });
 
-  /*INIT */
+  /* ══════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════ */
   renderProfileCard();
 
 });
