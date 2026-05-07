@@ -26,13 +26,13 @@
         <section class="stats-grid">
           <div class="stat-card">
             <h4>TOTAL CONTENT</h4>
-            <h2>1,284</h2>
+            <h2 id="totalContentCount">0</h2>
             <p class="stat-note success">↗ +12% from last month</p>
           </div>
 
           <div class="stat-card">
             <h4>ACTIVE EVENTS</h4>
-            <h2>42</h2>
+            <h2 id="activeEventsCount">0</h2>
             <p class="stat-note neutral">
               <span class="material-symbols-outlined stat-inline-icon">calendar_month</span>
               12 upcoming this week
@@ -41,7 +41,7 @@
 
           <div class="stat-card">
             <h4>PENDING DRAFTS</h4>
-            <h2>18</h2>
+            <h2 id="pendingDraftsCount">0</h2>
             <p class="stat-note warning">⚑ Requires review</p>
           </div>
         </section>
@@ -76,88 +76,18 @@
 
           <div class="select-wrap">
             <span class="material-symbols-outlined select-icon">swap_vert</span>
-            <select>
-              <option>Newest First</option>
-              <option>Oldest First</option>
-              <option>Most Viewed</option>
+            <select id="sortFilter">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title">Title A-Z</option>
             </select>
           </div>
         </section>
 
-        <section class="content-list">
-          <article class="content-card">
-            <div class="content-info">
-              <div class="badges">
-                <span class="badge type event">EVENT</span>
-                <span class="badge status published">PUBLISHED</span>
-              </div>
-
-              <h3>Annual International Research Symposium 2024</h3>
-              <p>
-                A flagship event bringing together scholars from across 15 countries
-                to discuss the future of digital ethics in higher education.
-              </p>
-
-              <div class="meta">
-                <span><span class="material-symbols-outlined small">calendar_month</span> Oct 14, 2024</span>
-                <span><span class="material-symbols-outlined small">visibility</span> 4.2k views</span>
-              </div>
-            </div>
-
-            <div class="content-actions">
-              <button class="icon-btn edit-event-btn" title="Edit" type="button">
-                <span class="material-symbols-outlined">edit</span>
-              </button>
-
-              <button class="icon-btn analytics-btn" title="Analytics" type="button">
-                <span class="material-symbols-outlined">bar_chart</span>
-              </button>
-
-              <button class="icon-btn" title="Delete" type="button">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </div>
-          </article>
-
-          <article class="content-card">
-            <div class="content-info">
-              <div class="badges">
-                <span class="badge type announcement">ANNOUNCEMENT</span>
-                <span class="badge status draft">DRAFT</span>
-              </div>
-
-              <h3>Update to Faculty Compensation Framework</h3>
-              <p>
-                Internal memo regarding the revised compensation and benefits structure
-                for the 2025 academic year.
-              </p>
-
-              <div class="meta">
-                <span><span class="material-symbols-outlined small">calendar_month</span> Sep 28, 2024</span>
-                <span><span class="material-symbols-outlined small">visibility</span> -- views</span>
-              </div>
-            </div>
-
-            <div class="content-actions">
-              <button class="icon-btn edit-announcement-btn" title="Edit" type="button">
-                <span class="material-symbols-outlined">edit</span>
-              </button>
-
-              <button class="icon-btn" title="Delete" type="button">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </div>
-          </article>
-        </section>
+        <section class="content-list" id="contentList"></section>
 
         <footer class="page-footer">
-          <div class="pagination">
-            <button class="page-btn" type="button">‹</button>
-            <button class="page-btn active" type="button">1</button>
-            <button class="page-btn" type="button">2</button>
-            <button class="page-btn" type="button">3</button>
-            <button class="page-btn" type="button">›</button>
-          </div>
+          <div class="pagination"></div>
         </footer>
       </section>
     </main>
@@ -248,6 +178,6 @@
   </div>
 
   <script src="../../Shared/JS/admin-sidebar.js"></script>
-  <script src="../JS/content.js"></script>
+  <script type="module" src="../JS/content.js"></script>
 </body>
 </html>

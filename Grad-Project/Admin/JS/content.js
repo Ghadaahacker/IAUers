@@ -1,3 +1,16 @@
+import { auth, db } from "../../Shared/JS/firebase-config.js";
+
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  deleteDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const eventModal = document.getElementById("eventModal");
   const announcementModal = document.getElementById("announcementModal");
@@ -121,6 +134,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveAnnouncementDraftBtn = document.getElementById("saveAnnouncementDraftBtn");
   const publishAnnouncementBtn = document.getElementById("publishAnnouncementBtn");
 
+  let allEvents = [];
+  let currentPage = 1;
+  const eventsPerPage = 5;
+  
+  const contentList = document.getElementById("contentList");
+  const sortFilter = document.getElementById("sortFilter");
+
   saveAnnouncementDraftBtn.addEventListener("click", () => {
     alert("Announcement saved as draft.");
     resetAnnouncementForm();
@@ -147,4 +167,271 @@ document.addEventListener("DOMContentLoaded", () => {
       closeModalFunc(announcementModal);
     }
   });
+
+  function updateStats() {
+
+    const totalContentCount = document.getElementById("totalContentCount");
+    const activeEventsCount = document.getElementById("activeEventsCount");
+    const pendingDraftsCount = document.getElementById("pendingDraftsCount");
+  
+    const total = allEvents.length;
+  
+    const published =
+      allEvents.filter(event => event.status === "published").length;
+  
+    const drafts =
+      allEvents.filter(event => event.status === "draft").length;
+  
+    totalContentCount.textContent = total;
+    activeEventsCount.textContent = published;
+    pendingDraftsCount.textContent = drafts;
+  }
+  
+  function renderPagination() {
+  
+    const pagination = document.querySelector(".pagination");
+  
+    if (!pagination) return;
+  
+    pagination.innerHTML = "";
+  
+    const totalPages =
+      Math.ceil(allEvents.length / eventsPerPage);
+  
+    const prevBtn = document.createElement("button");
+  
+    prevBtn.className = "page-btn";
+    prevBtn.textContent = "‹";
+  
+    prevBtn.disabled = currentPage === 1;
+  
+    prevBtn.addEventListener("click", () => {
+      currentPage--;
+      renderEventsPage();
+      renderPagination();
+    });
+  
+    pagination.appendChild(prevBtn);
+  
+    for (let i = 1; i <= totalPages; i++) {
+  
+      const pageBtn = document.createElement("button");
+  
+      pageBtn.className =
+        i === currentPage
+          ? "page-btn active"
+          : "page-btn";
+  
+      pageBtn.textContent = i;
+  
+      pageBtn.addEventListener("click", () => {
+        currentPage = i;
+        renderEventsPage();
+        renderPagination();
+      });
+  
+      pagination.appendChild(pageBtn);
+    }
+  
+    const nextBtn = document.createElement("button");
+  
+    nextBtn.className = "page-btn";
+    nextBtn.textContent = "›";
+  
+    nextBtn.disabled = currentPage === totalPages;
+  
+    nextBtn.addEventListener("click", () => {
+      currentPage++;
+      renderEventsPage();
+      renderPagination();
+    });
+  
+    pagination.appendChild(nextBtn);
+  }
+  
+  function renderEventsPage() {
+  
+    if (!contentList) return;
+  
+    contentList.innerHTML = "";
+  
+    const selectedSort =
+      sortFilter ? sortFilter.value : "newest";
+  
+    if (selectedSort === "newest") {
+  
+      allEvents.sort(
+        (a, b) =>
+          new Date(b.dateTime) - new Date(a.dateTime)
+      );
+  
+    } else if (selectedSort === "oldest") {
+  
+      allEvents.sort(
+        (a, b) =>
+          new Date(a.dateTime) - new Date(b.dateTime)
+      );
+  
+    } else if (selectedSort === "title") {
+  
+      allEvents.sort(
+        (a, b) =>
+          a.title.localeCompare(b.title)
+      );
+    }
+  
+    const start =
+      (currentPage - 1) * eventsPerPage;
+  
+    const end = start + eventsPerPage;
+  
+    const eventsToShow =
+      allEvents.slice(start, end);
+  
+    eventsToShow.forEach((event) => {
+  
+      const statusClass =
+        event.status === "published"
+          ? "published"
+          : "draft";
+  
+      const card = document.createElement("article");
+  
+      card.className = "content-card";
+  
+      card.innerHTML = `
+        <div class="content-info">
+  
+          <div class="badges">
+  
+            <span class="badge type event">
+              EVENT
+            </span>
+  
+            <span class="badge status ${statusClass}">
+              ${event.status.toUpperCase()}
+            </span>
+  
+          </div>
+  
+          <h3>${event.title}</h3>
+  
+          <p>${event.description}</p>
+  
+          <div class="meta">
+  
+            <span>
+              <span class="material-symbols-outlined small">
+                calendar_month
+              </span>
+  
+              ${new Date(event.dateTime).toLocaleString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+              })}
+            </span>
+  
+            <span>
+              <span class="material-symbols-outlined small">
+                location_on
+              </span>
+  
+              ${event.location || event.hall || ""}
+            </span>
+  
+          </div>
+  
+        </div>
+  
+        <div class="content-actions">
+  
+          <button
+            class="icon-btn analytics-btn"
+            title="Analytics"
+            type="button"
+          >
+            <span class="material-symbols-outlined">
+              bar_chart
+            </span>
+          </button>
+  
+          <button
+            class="icon-btn delete-event-btn"
+            title="Delete"
+            type="button"
+          >
+            <span class="material-symbols-outlined">
+              delete
+            </span>
+          </button>
+  
+        </div>
+      `;
+  
+      const deleteBtn =
+        card.querySelector(".delete-event-btn");
+  
+      deleteBtn.addEventListener("click", async () => {
+  
+        const confirmDelete =
+          confirm("Delete this event?");
+  
+        if (!confirmDelete) return;
+  
+        await deleteDoc(doc(db, "events", event.id));
+  
+        loadEventsFromFirebase();
+      });
+  
+      contentList.appendChild(card);
+    });
+  }
+  
+  async function loadEventsFromFirebase() {
+  
+    try {
+  
+      const q = query(
+        collection(db, "events"),
+        orderBy("createdAt", "desc")
+      );
+  
+      const snapshot = await getDocs(q);
+  
+      allEvents = [];
+  
+      snapshot.forEach((eventDoc) => {
+  
+        allEvents.push({
+          id: eventDoc.id,
+          ...eventDoc.data()
+        });
+      });
+  
+      updateStats();
+      renderEventsPage();
+      renderPagination();
+  
+    } catch (error) {
+  
+      console.error("Error loading events:", error);
+    }
+  }
+  
+  if (sortFilter) {
+  
+    sortFilter.addEventListener("change", () => {
+  
+      currentPage = 1;
+  
+      renderEventsPage();
+      renderPagination();
+    });
+  }
+  
+  loadEventsFromFirebase();
+
 });
