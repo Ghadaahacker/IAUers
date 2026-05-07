@@ -8,14 +8,8 @@
   <link rel="stylesheet" href="../CSS/content.css" />
   <link rel="stylesheet" href="../../Shared/CSS/admin-sidebar.css" />
 
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 
 <body>
@@ -111,18 +105,11 @@
             </div>
 
             <div class="content-actions">
-              <button class="icon-btn edit-event-btn" title="Edit" type="button"
-                data-title="Annual International Research Symposium 2024"
-                data-description="A flagship event bringing together scholars from across 15 countries to discuss the future of digital ethics in higher education."
-                data-date="2024-10-14T10:00"
-                data-location="Main Auditorium">
+              <button class="icon-btn edit-event-btn" title="Edit" type="button">
                 <span class="material-symbols-outlined">edit</span>
               </button>
 
-              <button class="icon-btn analytics-btn" title="Analytics" type="button"
-                data-title="Annual International Research Symposium 2024"
-                data-date="Oct 14, 2024"
-                data-location="Main Auditorium">
+              <button class="icon-btn analytics-btn" title="Analytics" type="button">
                 <span class="material-symbols-outlined">bar_chart</span>
               </button>
 
@@ -152,52 +139,8 @@
             </div>
 
             <div class="content-actions">
-              <button class="icon-btn edit-announcement-btn" title="Edit" type="button"
-                data-title="Update to Faculty Compensation Framework"
-                data-description="Internal memo regarding the revised compensation and benefits structure for the 2025 academic year."
-                data-link="">
+              <button class="icon-btn edit-announcement-btn" title="Edit" type="button">
                 <span class="material-symbols-outlined">edit</span>
-              </button>
-
-              <button class="icon-btn" title="Delete" type="button">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </div>
-          </article>
-
-          <article class="content-card">
-            <div class="content-info">
-              <div class="badges">
-                <span class="badge type event">EVENT</span>
-                <span class="badge status published">PUBLISHED</span>
-              </div>
-
-              <h3>Homecoming Weekend: Alumni Networking Night</h3>
-              <p>
-                A night of professional networking and nostalgia for IAU graduates
-                from the classes of 1990–2020.
-              </p>
-
-              <div class="meta">
-                <span><span class="material-symbols-outlined small">calendar_month</span> Oct 22, 2024</span>
-                <span><span class="material-symbols-outlined small">visibility</span> 892 views</span>
-              </div>
-            </div>
-
-            <div class="content-actions">
-              <button class="icon-btn edit-event-btn" title="Edit" type="button"
-                data-title="Homecoming Weekend: Alumni Networking Night"
-                data-description="A night of professional networking and nostalgia for IAU graduates from the classes of 1990–2020."
-                data-date="2024-10-22T18:00"
-                data-location="IAU Campus">
-                <span class="material-symbols-outlined">edit</span>
-              </button>
-
-              <button class="icon-btn analytics-btn" title="Analytics" type="button"
-                data-title="Homecoming Weekend: Alumni Networking Night"
-                data-date="Oct 22, 2024"
-                data-location="IAU Campus">
-                <span class="material-symbols-outlined">bar_chart</span>
               </button>
 
               <button class="icon-btn" title="Delete" type="button">
@@ -230,13 +173,13 @@
 
       <div class="modal-body">
         <label>Title</label>
-        <input type="text" placeholder="Enter event title" />
+        <input type="text" id="eventTitleInput" placeholder="Enter event title" />
 
         <label>Description</label>
-        <textarea placeholder="Enter event description"></textarea>
+        <textarea id="eventDescriptionInput" placeholder="Enter event description"></textarea>
 
         <label>Date & Time</label>
-        <input type="datetime-local" />
+        <input type="datetime-local" id="eventDateTimeInput" />
 
         <label for="buildingHall">Building / Hall</label>
         <select id="buildingHall">
@@ -261,8 +204,7 @@
             This event requires venue approval. Your request will be sent to the responsible Building Manager before publishing.
           </span>
         </div>
-
-      
+      </div>
 
       <div class="modal-footer">
         <button class="cancel-btn" id="cancelModal" type="button">Cancel</button>
@@ -284,13 +226,13 @@
 
       <div class="modal-body">
         <label>Title</label>
-        <input type="text" placeholder="Enter announcement title" />
+        <input type="text" id="announcementTitleInput" placeholder="Enter announcement title" />
 
         <label>Description</label>
-        <textarea placeholder="Enter announcement description"></textarea>
+        <textarea id="announcementDescriptionInput" placeholder="Enter announcement description"></textarea>
 
         <label>External Link (Optional)</label>
-        <input type="url" placeholder="https://example.com" />
+        <input type="url" id="announcementLinkInput" placeholder="https://example.com" />
 
         <p class="field-note">
           Add a link for students to access additional information.
@@ -300,7 +242,7 @@
       <div class="modal-footer">
         <button class="cancel-btn" id="cancelAnnouncementModal" type="button">Cancel</button>
         <button class="draft-btn" id="saveAnnouncementDraftBtn" type="button">Save as Draft</button>
-        <button class="publish-btn" type="button">Publish</button>
+        <button class="publish-btn" id="publishAnnouncementBtn" type="button">Publish</button>
       </div>
     </div>
   </div>

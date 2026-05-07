@@ -1,4 +1,4 @@
-[5/7/2026 9:19 PM] Sumaia .: * {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -27,28 +27,21 @@
   --navy-dark: #1d1e34;
   --navy: #32395a;
   --blue: #3a5a96;
-  --light-blue: #d2dbe5;
   --bg: #f5f7fa;
   --white: #ffffff;
   --text: #1d1e34;
   --muted: #5f6e80;
   --border: #e1e7ef;
-  --soft: #f0f4f8;
   --success: #dcefe2;
   --warning: #f4e0c8;
-  --danger: #f6d7d7;
   --shadow: 0 10px 25px rgba(29, 30, 52, 0.06);
-  --radius-xl: 22px;
   --radius-lg: 16px;
-  --radius-md: 12px;
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: var(--bg);
   color: var(--text);
-  margin: 0;
-  padding: 0;
 }
 
 .dashboard {
@@ -57,14 +50,12 @@ body {
   background: var(--bg);
 }
 
-/* Main */
 .main-content {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-/* Page content */
 .page-content {
   padding: 34px 36px 18px;
   display: flex;
@@ -83,7 +74,6 @@ body {
   margin-bottom: 24px;
 }
 
-/* Stats */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -96,7 +86,7 @@ body {
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 18px 18px 16px;
+  padding: 18px;
   min-height: 136px;
   box-shadow: var(--shadow);
 }
@@ -139,7 +129,6 @@ body {
   color: #4d79a5;
 }
 
-/* Action buttons */
 .actions-row {
   display: flex;
   gap: 14px;
@@ -173,17 +162,7 @@ body {
   color: var(--navy-dark);
 }
 
-.action-btn.primary:hover {
-  filter: brightness(1.03);
-}
-
-.action-btn.secondary:hover {
-  background: #dde5ee;
-}
-
-/* Filters */
 .filters-row {
-  background: transparent;
   display: flex;
   gap: 14px;
   align-items: center;
@@ -204,33 +183,25 @@ body {
   padding: 0 12px;
 }
 
-.filter-search .material-symbols-outlined {
-  color: #7c8798;
-  font-size: 20px;
-}
-
 .filter-search input {
   width: 100%;
   border: none;
   outline: none;
   background: transparent;
   font-size: 14px;
-  color: var(--text);
 }
 
 .select-wrap {
   position: relative;
-  display: flex;
-  align-items: center;
   min-width: 170px;
 }
 
 .select-icon {
   position: absolute;
   left: 12px;
+  top: 14px;
   font-size: 18px !important;
   color: #7c8798;
-  pointer-events: none;
 }
 
 .select-wrap select {
@@ -243,12 +214,8 @@ body {
   color: var(--text);
   outline: none;
   font-size: 14px;
-  appearance: none;
-[5/7/2026 9:19 PM] Sumaia .: -webkit-appearance: none;
-  -moz-appearance: none;
 }
 
-/* Content cards */
 .content-list {
   display: flex;
   flex-direction: column;
@@ -273,15 +240,11 @@ body {
 
 .badges {
   display: flex;
-  align-items: center;
   gap: 8px;
   margin-bottom: 14px;
-  flex-wrap: wrap;
 }
 
 .badge {
-  display: inline-flex;
-  align-items: center;
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 11px;
@@ -311,7 +274,6 @@ body {
 
 .content-info h3 {
   font-size: 18px;
-  line-height: 1.4;
   margin-bottom: 10px;
   color: var(--navy-dark);
 }
@@ -326,9 +288,7 @@ body {
 
 .meta {
   display: flex;
-  align-items: center;
   gap: 20px;
-  flex-wrap: wrap;
   color: var(--muted);
   font-size: 13px;
 }
@@ -344,10 +304,8 @@ body {
   color: var(--muted);
 }
 
-/* Content actions */
 .content-actions {
   display: flex;
-  align-items: center;
   gap: 10px;
 }
 
@@ -359,7 +317,6 @@ body {
   color: var(--navy);
   border-radius: 50%;
   cursor: pointer;
-  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,20 +327,15 @@ body {
   color: var(--blue);
 }
 
-/* Footer */
 .page-footer {
-  margin-top: auto;
   padding: 20px 0 0;
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 .pagination {
   display: flex;
-  align-items: center;
   gap: 8px;
-  justify-self: center;
 }
 
 .page-btn {
@@ -399,10 +351,8 @@ body {
 .page-btn.active {
   background: var(--navy-dark);
   color: var(--white);
-  border-color: var(--navy-dark);
 }
 
-/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -425,7 +375,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .close-btn {
@@ -453,6 +403,11 @@ body {
   outline: none;
 }
 
+.modal-body textarea {
+  height: 90px;
+  resize: none;
+}
+
 .modal-body input:focus,
 .modal-body textarea:focus,
 .modal-body select:focus {
@@ -460,20 +415,8 @@ body {
   box-shadow: 0 0 0 3px rgba(58, 90, 150, 0.12);
 }
 
-.modal-body textarea {
-  height: 90px;
-  resize: none;
-}
-
-.field-note {
-  font-size: 14px;
-  color: var(--muted);
-  margin-top: -4px;
-}
-
 .approval-note {
   display: flex;
-  align-items: flex-start;
   gap: 10px;
   background: #eef4ff;
   color: var(--blue);
@@ -486,12 +429,15 @@ body {
 
 .approval-note i {
   margin-top: 3px;
-  color: var(--blue);
+}
+
+.field-note {
+  font-size: 14px;
+  color: var(--muted);
 }
 
 .modal-footer {
   display: flex;
-  justify-content: space-between;
   gap: 10px;
   margin-top: 20px;
 }
@@ -508,7 +454,7 @@ body {
 }
 
 .cancel-btn {
-[5/7/2026 9:19 PM] Sumaia .: background: #eef2f6;
+  background: #eef2f6;
   color: var(--navy-dark);
 }
 
@@ -522,72 +468,22 @@ body {
   color: white;
 }
 
-.draft-btn:hover {
-  background: #ecd2ad;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-    max-width: 100%;
-  }
-}
-
 @media (max-width: 900px) {
   .dashboard {
     grid-template-columns: 1fr;
   }
 
-  .page-content {
-    padding-left: 20px;
-    padding-right: 20px;
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
   .content-card {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  .content-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .page-footer {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .pagination,
-  .support-link {
-    justify-self: start;
-  }
 }
 
 @media (max-width: 600px) {
-  .actions-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .action-btn {
-    width: 100%;
-  }
-
-  .filters-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-top {
-    width: 180px;
-  }
-
-  .page-header h1 {
-    font-size: 28px;
-  }
-
   .modal-content {
     width: calc(100% - 28px);
   }
