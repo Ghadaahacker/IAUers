@@ -242,16 +242,16 @@
         <select id="buildingHall">
           <option value="">Select building and hall</option>
           <option value="D3-Audit Room" data-building="D3" data-capacity="300">
-            D3 - Audit Room, Capacity: 300 seats
+            D3 - Audit Room, Capacity 300 seats
           </option>
           <option value="D3-Second Floor Room" data-building="D3" data-capacity="200">
-            D3 - Second Floor Room, Capacity: 200 seats
+            D3 - Second Floor Room, Capacity 200 seats
           </option>
           <option value="A7-1056 Hall" data-building="A7" data-capacity="50">
-            A7 - 1056 Hall, Capacity: 50 seats
+            A7 - 1056 Hall, Capacity 50 seats
           </option>
           <option value="A7-1057" data-building="A7" data-capacity="30">
-            A7 - 1057, Capacity: 30 seats
+            A7 - 1057, Capacity 30 seats
           </option>
         </select>
 
@@ -262,7 +262,19 @@
           </span>
         </div>
 
+        <hr />
 
+        <h3>Event Settings</h3>
+
+        <div class="toggle-row">
+          <label for="unlimitedSeats" class="toggle-label">Unlimited Seats</label>
+          <input type="checkbox" id="unlimitedSeats" />
+        </div>
+
+        <p class="field-note">
+          Seat capacity is based on the selected building/hall.
+        </p>
+      </div>
 
       <div class="modal-footer">
         <button class="cancel-btn" id="cancelModal" type="button">Cancel</button>
