@@ -140,6 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const contentList = document.getElementById("contentList");
   const sortFilter = document.getElementById("sortFilter");
+  const filterSelect = document.getElementById("contentTypeFilter");
 
   saveAnnouncementDraftBtn.addEventListener("click", () => {
     alert("Announcement saved as draft.");
@@ -187,41 +188,47 @@ document.addEventListener("DOMContentLoaded", () => {
     pendingDraftsCount.textContent = drafts;
   }
   
+  function getFilteredEvents() {
+    const selectedType = filterSelect ? filterSelect.value : "all";
+  
+    return allEvents.filter((event) => {
+      if (selectedType === "all") return true;
+      if (selectedType === "event") return event.type === "event";
+      if (selectedType === "announcement") return event.type === "announcement";
+      if (selectedType === "draft") return event.status === "draft";
+      return true;
+    });
+  }
+  
   function renderPagination() {
-  
     const pagination = document.querySelector(".pagination");
-  
     if (!pagination) return;
   
     pagination.innerHTML = "";
   
-    const totalPages =
-      Math.ceil(allEvents.length / eventsPerPage);
+    const filteredEvents = getFilteredEvents();
+    const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+  
+    if (totalPages <= 1) return;
   
     const prevBtn = document.createElement("button");
-  
     prevBtn.className = "page-btn";
     prevBtn.textContent = "‹";
-  
     prevBtn.disabled = currentPage === 1;
   
     prevBtn.addEventListener("click", () => {
-      currentPage--;
-      renderEventsPage();
-      renderPagination();
+      if (currentPage > 1) {
+        currentPage--;
+        renderEventsPage();
+        renderPagination();
+      }
     });
   
     pagination.appendChild(prevBtn);
   
     for (let i = 1; i <= totalPages; i++) {
-  
       const pageBtn = document.createElement("button");
-  
-      pageBtn.className =
-        i === currentPage
-          ? "page-btn active"
-          : "page-btn";
-  
+      pageBtn.className = i === currentPage ? "page-btn active" : "page-btn";
       pageBtn.textContent = i;
   
       pageBtn.addEventListener("click", () => {
@@ -234,97 +241,79 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     const nextBtn = document.createElement("button");
-  
     nextBtn.className = "page-btn";
     nextBtn.textContent = "›";
-  
     nextBtn.disabled = currentPage === totalPages;
   
     nextBtn.addEventListener("click", () => {
-      currentPage++;
-      renderEventsPage();
-      renderPagination();
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderEventsPage();
+        renderPagination();
+      }
     });
   
     pagination.appendChild(nextBtn);
   }
   
   function renderEventsPage() {
-  
     if (!contentList) return;
   
     contentList.innerHTML = "";
   
-    const selectedSort =
-      sortFilter ? sortFilter.value : "newest";
+    let filteredEvents = getFilteredEvents();
+  
+    const selectedSort = sortFilter ? sortFilter.value : "newest";
   
     if (selectedSort === "newest") {
-  
-      allEvents.sort(
-        (a, b) =>
-          new Date(b.dateTime) - new Date(a.dateTime)
-      );
-  
+      filteredEvents.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
     } else if (selectedSort === "oldest") {
-  
-      allEvents.sort(
-        (a, b) =>
-          new Date(a.dateTime) - new Date(b.dateTime)
-      );
-  
+      filteredEvents.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
     } else if (selectedSort === "title") {
-  
-      allEvents.sort(
-        (a, b) =>
-          a.title.localeCompare(b.title)
-      );
+      filteredEvents.sort((a, b) => a.title.localeCompare(b.title));
     }
   
-    const start =
-      (currentPage - 1) * eventsPerPage;
+    const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
   
+    if (currentPage > totalPages && totalPages > 0) {
+      currentPage = totalPages;
+    }
+  
+    const start = (currentPage - 1) * eventsPerPage;
     const end = start + eventsPerPage;
   
-    const eventsToShow =
-      allEvents.slice(start, end);
+    const eventsToShow = filteredEvents.slice(start, end);
+  
+    if (eventsToShow.length === 0) {
+      contentList.innerHTML = `
+        <div class="empty-state">
+          No content found for the selected filter.
+        </div>
+      `;
+      return;
+    }
   
     eventsToShow.forEach((event) => {
-  
-      const statusClass =
-        event.status === "published"
-          ? "published"
-          : "draft";
+      const statusClass = event.status === "published" ? "published" : "draft";
+      const typeLabel = event.type === "announcement" ? "ANNOUNCEMENT" : "EVENT";
+      const typeClass = event.type === "announcement" ? "announcement" : "event";
   
       const card = document.createElement("article");
-  
       card.className = "content-card";
   
       card.innerHTML = `
         <div class="content-info">
-  
           <div class="badges">
-  
-            <span class="badge type event">
-              EVENT
-            </span>
-  
-            <span class="badge status ${statusClass}">
-              ${event.status.toUpperCase()}
-            </span>
-  
+            <span class="badge type ${typeClass}">${typeLabel}</span>
+            <span class="badge status ${statusClass}">${event.status.toUpperCase()}</span>
           </div>
   
           <h3>${event.title}</h3>
-  
           <p>${event.description}</p>
   
           <div class="meta">
-  
             <span>
-              <span class="material-symbols-outlined small">
-                calendar_month
-              </span>
-  
+              <span class="material-symbols-outlined small">calendar_month</span>
               ${new Date(event.dateTime).toLocaleString("en-GB", {
                 day: "numeric",
                 month: "short",
@@ -335,54 +324,30 @@ document.addEventListener("DOMContentLoaded", () => {
             </span>
   
             <span>
-              <span class="material-symbols-outlined small">
-                location_on
-              </span>
-  
-              ${event.location || event.hall || ""}
+              <span class="material-symbols-outlined small">location_on</span>
+              ${event.location || event.hall || event.link || ""}
             </span>
-  
           </div>
-  
         </div>
   
         <div class="content-actions">
-  
-          <button
-            class="icon-btn analytics-btn"
-            title="Analytics"
-            type="button"
-          >
-            <span class="material-symbols-outlined">
-              bar_chart
-            </span>
+          <button class="icon-btn analytics-btn" title="Analytics" type="button">
+            <span class="material-symbols-outlined">bar_chart</span>
           </button>
   
-          <button
-            class="icon-btn delete-event-btn"
-            title="Delete"
-            type="button"
-          >
-            <span class="material-symbols-outlined">
-              delete
-            </span>
+          <button class="icon-btn delete-event-btn" title="Delete" type="button">
+            <span class="material-symbols-outlined">delete</span>
           </button>
-  
         </div>
       `;
   
-      const deleteBtn =
-        card.querySelector(".delete-event-btn");
+      const deleteBtn = card.querySelector(".delete-event-btn");
   
       deleteBtn.addEventListener("click", async () => {
-  
-        const confirmDelete =
-          confirm("Delete this event?");
-  
+        const confirmDelete = confirm("Delete this content?");
         if (!confirmDelete) return;
   
         await deleteDoc(doc(db, "events", event.id));
-  
         loadEventsFromFirebase();
       });
   
@@ -427,6 +392,14 @@ document.addEventListener("DOMContentLoaded", () => {
   
       currentPage = 1;
   
+      renderEventsPage();
+      renderPagination();
+    });
+  }
+
+  if (filterSelect) {
+    filterSelect.addEventListener("change", () => {
+      currentPage = 1;
       renderEventsPage();
       renderPagination();
     });
