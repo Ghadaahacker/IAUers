@@ -485,6 +485,20 @@ document.addEventListener("DOMContentLoaded", () => {
     pagination.appendChild(nextBtn);
   }
 
+  function updateStats() {
+    const totalContentCount = document.getElementById("totalContentCount");
+    const activeEventsCount = document.getElementById("activeEventsCount");
+    const pendingDraftsCount = document.getElementById("pendingDraftsCount");
+  
+    const total = allEvents.length;
+    const published = allEvents.filter(event => event.status === "published").length;
+    const drafts = allEvents.filter(event => event.status === "draft").length;
+  
+    if (totalContentCount) totalContentCount.textContent = total;
+    if (activeEventsCount) activeEventsCount.textContent = published;
+    if (pendingDraftsCount) pendingDraftsCount.textContent = drafts;
+  }
+
   async function loadEventsFromFirebase() {
     if (!contentList) return;
   
@@ -514,6 +528,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       renderEventsPage();
       renderPagination();
+      updateStats();
   
     } catch (error) {
       console.error("Error loading events:", error);
