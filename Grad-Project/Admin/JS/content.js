@@ -270,6 +270,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const sortFilter = document.getElementById("sortFilter");
+
+  if (sortFilter) {
+    sortFilter.addEventListener("change", () => {
+      currentPage = 1;
+      renderEventsPage();
+      renderPagination();
+    });
+  }
+
   function renderEventsPage() {
 
     contentList.innerHTML = "";
@@ -277,6 +287,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const start = (currentPage - 1) * eventsPerPage;
     const end = start + eventsPerPage;
   
+    const selectedSort = sortFilter ? sortFilter.value : "newest";
+
+    if (selectedSort === "newest") {
+      allEvents.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+    } else if (selectedSort === "oldest") {
+      allEvents.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+    } else if (selectedSort === "title") {
+      allEvents.sort((a, b) => a.title.localeCompare(b.title));
+    }
+    
     const eventsToShow = allEvents.slice(start, end);
   
     eventsToShow.forEach((event) => {
