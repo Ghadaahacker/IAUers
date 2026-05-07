@@ -17,12 +17,11 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
 </head>
+
 <body>
   <div class="dashboard">
-    <!-- Shared Sidebar -->
     <div id="admin-sidebar"></div>
 
-    <!-- Main Content -->
     <main class="main-content">
       <section class="page-content">
         <div class="page-header">
@@ -33,13 +32,13 @@
         <section class="stats-grid">
           <div class="stat-card">
             <h4>TOTAL CONTENT</h4>
-            <h2 id="totalContentCount">0</h2>
+            <h2>1,284</h2>
             <p class="stat-note success">↗ +12% from last month</p>
           </div>
 
           <div class="stat-card">
             <h4>ACTIVE EVENTS</h4>
-            <h2 id="activeEventsCount">0</h2>
+            <h2>42</h2>
             <p class="stat-note neutral">
               <span class="material-symbols-outlined stat-inline-icon">calendar_month</span>
               12 upcoming this week
@@ -48,7 +47,7 @@
 
           <div class="stat-card">
             <h4>PENDING DRAFTS</h4>
-            <h2 id="pendingDraftsCount">0</h2>
+            <h2>18</h2>
             <p class="stat-note warning">⚑ Requires review</p>
           </div>
         </section>
@@ -83,105 +82,230 @@
 
           <div class="select-wrap">
             <span class="material-symbols-outlined select-icon">swap_vert</span>
-            <select id="sortFilter">
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="title">Title A-Z</option>
+            <select>
+              <option>Newest First</option>
+              <option>Oldest First</option>
+              <option>Most Viewed</option>
             </select>
           </div>
         </section>
 
-        <section class="content-list" id="contentList"></section>
+        <section class="content-list">
+          <article class="content-card">
+            <div class="content-info">
+              <div class="badges">
+                <span class="badge type event">EVENT</span>
+                <span class="badge status published">PUBLISHED</span>
+              </div>
+
+              <h3>Annual International Research Symposium 2024</h3>
+              <p>
+                A flagship event bringing together scholars from across 15 countries
+                to discuss the future of digital ethics in higher education.
+              </p>
+
+              <div class="meta">
+                <span><span class="material-symbols-outlined small">calendar_month</span> Oct 14, 2024</span>
+                <span><span class="material-symbols-outlined small">visibility</span> 4.2k views</span>
+              </div>
+            </div>
+
+            <div class="content-actions">
+              <button class="icon-btn edit-event-btn" title="Edit" type="button"
+                data-title="Annual International Research Symposium 2024"
+                data-description="A flagship event bringing together scholars from across 15 countries to discuss the future of digital ethics in higher education."
+                data-date="2024-10-14T10:00"
+                data-location="Main Auditorium">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+
+              <button class="icon-btn analytics-btn" title="Analytics" type="button"
+                data-title="Annual International Research Symposium 2024"
+                data-date="Oct 14, 2024"
+                data-location="Main Auditorium">
+                <span class="material-symbols-outlined">bar_chart</span>
+              </button>
+
+              <button class="icon-btn" title="Delete" type="button">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="content-card">
+            <div class="content-info">
+              <div class="badges">
+                <span class="badge type announcement">ANNOUNCEMENT</span>
+                <span class="badge status draft">DRAFT</span>
+              </div>
+
+              <h3>Update to Faculty Compensation Framework</h3>
+              <p>
+                Internal memo regarding the revised compensation and benefits structure
+                for the 2025 academic year.
+              </p>
+
+              <div class="meta">
+                <span><span class="material-symbols-outlined small">calendar_month</span> Sep 28, 2024</span>
+                <span><span class="material-symbols-outlined small">visibility</span> -- views</span>
+              </div>
+            </div>
+
+            <div class="content-actions">
+              <button class="icon-btn edit-announcement-btn" title="Edit" type="button"
+                data-title="Update to Faculty Compensation Framework"
+                data-description="Internal memo regarding the revised compensation and benefits structure for the 2025 academic year."
+                data-link="">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+
+              <button class="icon-btn" title="Delete" type="button">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="content-card">
+            <div class="content-info">
+              <div class="badges">
+                <span class="badge type event">EVENT</span>
+                <span class="badge status published">PUBLISHED</span>
+              </div>
+
+              <h3>Homecoming Weekend: Alumni Networking Night</h3>
+              <p>
+                A night of professional networking and nostalgia for IAU graduates
+                from the classes of 1990–2020.
+              </p>
+
+              <div class="meta">
+                <span><span class="material-symbols-outlined small">calendar_month</span> Oct 22, 2024</span>
+                <span><span class="material-symbols-outlined small">visibility</span> 892 views</span>
+              </div>
+            </div>
+
+            <div class="content-actions">
+              <button class="icon-btn edit-event-btn" title="Edit" type="button"
+                data-title="Homecoming Weekend: Alumni Networking Night"
+                data-description="A night of professional networking and nostalgia for IAU graduates from the classes of 1990–2020."
+                data-date="2024-10-22T18:00"
+                data-location="IAU Campus">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+
+              <button class="icon-btn analytics-btn" title="Analytics" type="button"
+                data-title="Homecoming Weekend: Alumni Networking Night"
+                data-date="Oct 22, 2024"
+                data-location="IAU Campus">
+                <span class="material-symbols-outlined">bar_chart</span>
+              </button>
+
+              <button class="icon-btn" title="Delete" type="button">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </article>
+        </section>
 
         <footer class="page-footer">
           <div class="pagination">
+            <button class="page-btn" type="button">‹</button>
+            <button class="page-btn active" type="button">1</button>
+            <button class="page-btn" type="button">2</button>
+            <button class="page-btn" type="button">3</button>
+            <button class="page-btn" type="button">›</button>
           </div>
         </footer>
       </section>
     </main>
   </div>
 
-
-        <!-- Event Modal -->
-<div id="eventModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>Create Event</h2>
-      <span class="close-btn" id="closeModal">&times;</span>
-    </div>
-
-    <div class="modal-body">
-      <label>Title</label>
-      <input type="text" placeholder="Enter event title" />
-
-      <label>Description</label>
-      <textarea placeholder="Enter event description"></textarea>
-
-      <label>Date & Time</label>
-      <input type="datetime-local" />
-
-      <label>Location</label>
-      <input type="text" placeholder="Enter event location" />
-
-      <hr/>
-
-      <h3>Event Settings</h3>
-
-      <div class="toggle-row">
-        <label for="unlimitedSeats" class="toggle-label">Unlimited Seats</label>
-        <input type="checkbox" id="unlimitedSeats" />
+  <!-- Event Modal -->
+  <div id="eventModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create Event</h2>
+        <span class="close-btn" id="closeModal">&times;</span>
       </div>
-      
-      <label for="seatCapacity">Seat Capacity</label>
-      <input
-        type="number"
-        id="seatCapacity"
-        placeholder="Enter maximum number of seats"
-      />
-      
-      <p class="field-note">Limit the number of students who can register.</p>
-    </div>
 
-    <div class="modal-footer">
-      <button class="cancel-btn" id="cancelModal" type="button">Cancel</button>
-      <button class="draft-btn" id="saveEventDraftBtn" type="button">Save as Draft</button>
-      <button class="publish-btn" type="button">Publish</button>
+      <div class="modal-body">
+        <label>Title</label>
+        <input type="text" placeholder="Enter event title" />
+
+        <label>Description</label>
+        <textarea placeholder="Enter event description"></textarea>
+
+        <label>Date & Time</label>
+        <input type="datetime-local" />
+
+        <label for="buildingHall">Building / Hall</label>
+        <select id="buildingHall">
+          <option value="">Select building and hall</option>
+          <option value="D3-Audit Room" data-building="D3" data-capacity="300">
+            D3 - Audit Room, Capacity 300 seats
+          </option>
+          <option value="D3-Second Floor Room" data-building="D3" data-capacity="200">
+            D3 - Second Floor Room, Capacity 200 seats
+          </option>
+          <option value="A7-1056 Hall" data-building="A7" data-capacity="50">
+            A7 - 1056 Hall, Capacity 50 seats
+          </option>
+          <option value="A7-1057" data-building="A7" data-capacity="30">
+            A7 - 1057, Capacity 30 seats
+          </option>
+        </select>
+
+        <div class="approval-note">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>
+            This event requires venue approval. Your request will be sent to the responsible Building Manager before publishing.
+          </span>
+        </div>
+
+      
+
+      <div class="modal-footer">
+        <button class="cancel-btn" id="cancelModal" type="button">Cancel</button>
+        <button class="draft-btn" id="saveEventDraftBtn" type="button">Save as Draft</button>
+        <button class="publish-btn" id="sendBuildingRequestBtn" type="button">
+          Send to Building Manager
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Announcement Modal -->
-<div id="announcementModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>Create Announcement</h2>
-      <span class="close-btn" id="closeAnnouncementModal">&times;</span>
-    </div>
+  <!-- Announcement Modal -->
+  <div id="announcementModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create Announcement</h2>
+        <span class="close-btn" id="closeAnnouncementModal">&times;</span>
+      </div>
 
-    <div class="modal-body">
-      <label>Title</label>
-      <input type="text" placeholder="Enter announcement title" />
+      <div class="modal-body">
+        <label>Title</label>
+        <input type="text" placeholder="Enter announcement title" />
 
-      <label>Description</label>
-      <textarea placeholder="Enter announcement description"></textarea>
+        <label>Description</label>
+        <textarea placeholder="Enter announcement description"></textarea>
 
-      <label>External Link (Optional)</label>
-      <input type="url" placeholder="https://example.com" />
+        <label>External Link (Optional)</label>
+        <input type="url" placeholder="https://example.com" />
 
-      <p class="field-note">
-        Add a link for students to access additional information.
-      </p>
-    </div>
+        <p class="field-note">
+          Add a link for students to access additional information.
+        </p>
+      </div>
 
-    <div class="modal-footer">
-      <button class="cancel-btn" id="cancelAnnouncementModal" type="button">Cancel</button>
-      <button class="draft-btn" id="saveAnnouncementDraftBtn" type="button">Save as Draft</button>
-      <button class="publish-btn" type="button">Publish</button>
+      <div class="modal-footer">
+        <button class="cancel-btn" id="cancelAnnouncementModal" type="button">Cancel</button>
+        <button class="draft-btn" id="saveAnnouncementDraftBtn" type="button">Save as Draft</button>
+        <button class="publish-btn" type="button">Publish</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script src="../../Shared/JS/admin-sidebar.js"></script>
-  <script type="module" src="../JS/content.js"></script>
+  <script src="../JS/content.js"></script>
 </body>
 </html>
