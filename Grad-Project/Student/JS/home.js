@@ -1,3 +1,12 @@
+import { db } from "../../Shared/JS/firebase-config.js";
+
+import {
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", function () {
   const savedName = localStorage.getItem("studentName") || "Student";
   const greetingText = document.getElementById("greetingText");
@@ -27,4 +36,65 @@ document.addEventListener("DOMContentLoaded", function () {
       link.classList.remove("active");
     }
   });
+
+  const studentEventsList = document.getElementById("studentEventsList");
+
+  async function loadPublishedEventsForStudents() {
+    if (!studentEventsList) return;
+
+    studentEventsList.innerHTML = "";
+
+    try {
+      const q = query(
+        collection(db, "events"),
+        where("status", "==", "published")
+      );
+
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        studentEventsList.innerHTML = `
+          <div class="feed-item no-border">
+            <div class="feed-dot soft-dot"></div>
+            <div class="feed-text">
+              <p>No published events available right now.</p>
+              <span>Check again later</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      snapshot.forEach((eventDoc) => {
+        const event = eventDoc.data();
+
+        studentEventsList.innerHTML += `
+          <div class="feed-item">
+            <div class="feed-dot dark-dot"></div>
+
+            <div class="feed-text">
+              <p><strong>${event.title}</strong></p>
+              <p>${event.description}</p>
+              <span>
+                ${new Date(event.dateTime).toLocaleString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+                • ${event.location}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+
+    } catch (error) {
+      console.error("Error loading student events:", error);
+    }
+  }
+
+  loadPublishedEventsForStudents();
+
 });
