@@ -80,24 +80,56 @@ document.addEventListener("DOMContentLoaded", () => {
     closeModalFunc(announcementModal);
   });
 
-  sendBuildingRequestBtn.addEventListener("click", () => {
-    const selectedHall = buildingHallSelect.options[buildingHallSelect.selectedIndex];
+sendBuildingRequestBtn.addEventListener("click", async () => {
+  const selectedHall = buildingHallSelect.options[buildingHallSelect.selectedIndex];
 
-    if (!eventTitleInput.value.trim()) {
-      alert("Please enter the event title.");
-      return;
-    }
+  if (!eventTitleInput.value.trim()) {
+    alert("Please enter the event title.");
+    return;
+  }
 
-    if (!eventDateTimeInput.value) {
-      alert("Please select date and time.");
-      return;
-    }
+  if (!eventDateTimeInput.value) {
+    alert("Please select date and time.");
+    return;
+  }
 
-    if (!buildingHallSelect.value) {
-      alert("Please select a building / hall.");
-      return;
-    }
+  if (!buildingHallSelect.value) {
+    alert("Please select a building / hall.");
+    return;
+  }
 
+  const building = selectedHall.dataset.building;
+  const capacity = selectedHall.dataset.capacity;
+
+  const buildingManagerEmail =
+    building === "D3" ? "building@iau.edu.sa" :
+    building === "A7" ? "building2@iau.edu.sa" :
+    "";
+
+  try {
+    await addDoc(collection(db, "bookingRequests"), {
+      title: eventTitleInput.value.trim(),
+      description: eventDescriptionInput.value.trim(),
+      dateTime: eventDateTimeInput.value,
+      hall: buildingHallSelect.value,
+      building: building,
+      capacity: Number(capacity),
+      assignedToEmail: buildingManagerEmail,
+      status: "Pending",
+      rejectionReason: "",
+      createdAt: serverTimestamp()
+    });
+
+    alert(`Your request has been sent to ${buildingManagerEmail}.`);
+
+    resetEventForm();
+    closeModalFunc(eventModal);
+
+  } catch (error) {
+    console.error("Error sending request:", error);
+    alert("Request was not sent. Check console.");
+  }
+});
     const building = selectedHall.dataset.building;
     const capacity = selectedHall.dataset.capacity;
 
