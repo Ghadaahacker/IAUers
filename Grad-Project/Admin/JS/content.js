@@ -142,21 +142,51 @@ document.addEventListener("DOMContentLoaded", () => {
   const sortFilter = document.getElementById("sortFilter");
   const filterSelect = document.getElementById("contentTypeFilter");
 
-  saveAnnouncementDraftBtn.addEventListener("click", () => {
-    alert("Announcement saved as draft.");
-    resetAnnouncementForm();
-    closeModalFunc(announcementModal);
-  });
-
-  publishAnnouncementBtn.addEventListener("click", () => {
-    if (!announcementTitleInput.value.trim()) {
-      alert("Please enter the announcement title.");
+  async function saveAnnouncementToFirebase(status) {
+    const title = announcementTitleInput.value.trim();
+    const description = announcementDescriptionInput.value.trim();
+    const link = announcementLinkInput.value.trim();
+  
+    if (!title || !description) {
+      alert("Please fill announcement title and description.");
       return;
     }
-
-    alert("Announcement published successfully.");
-    resetAnnouncementForm();
-    closeModalFunc(announcementModal);
+  
+    try {
+      await addDoc(collection(db, "events"), {
+        title,
+        description,
+        link,
+        type: "announcement",
+        status,
+        dateTime: new Date().toISOString(),
+        createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
+        createdAt: serverTimestamp()
+      });
+  
+      alert(
+        status === "published"
+          ? "Announcement published successfully."
+          : "Announcement saved as draft."
+      );
+  
+      resetAnnouncementForm();
+      closeModalFunc(announcementModal);
+  
+      loadEventsFromFirebase();
+  
+    } catch (error) {
+      console.error("Error saving announcement:", error);
+      alert("Failed to save announcement. Check console.");
+    }
+  }
+  
+  saveAnnouncementDraftBtn.addEventListener("click", () => {
+    saveAnnouncementToFirebase("draft");
+  });
+  
+  publishAnnouncementBtn.addEventListener("click", () => {
+    saveAnnouncementToFirebase("published");
   });
 
   window.addEventListener("click", (event) => {
@@ -324,8 +354,14 @@ document.addEventListener("DOMContentLoaded", () => {
             </span>
   
             <span>
-              <span class="material-symbols-outlined small">location_on</span>
-              ${event.location || event.hall || event.link || ""}
+            <span class="material-symbols-outlined small">
+             ${event.type === "announcement" ? "link" : "location_on"}
+            </span>
+              ${
+                event.type === "announcement"
+                  ? `<a href="${event.link}" target="_blank">${event.link}</a>`
+                  : (event.location || event.hall || "")
+              }
             </span>
           </div>
         </div>
