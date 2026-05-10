@@ -83,7 +83,11 @@ document.addEventListener("DOMContentLoaded", function () {
                   hour: "2-digit",
                   minute: "2-digit"
                 })}
-                • ${event.location}
+                ${
+                  event.type === "announcement"
+                    ? `<a href="${event.link}" target="_blank">Open Link</a>`
+                    : event.location
+                }
               </span>
             </div>
           </div>
