@@ -4,10 +4,11 @@ import {
   collection,
   query,
   where,
-  orderBy,
   onSnapshot,
   doc,
-  updateDoc
+  updateDoc,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 import {
@@ -157,23 +158,6 @@ filterButtons.forEach((button) => {
   });
 });
 
-acceptBtn.addEventListener("click", async () => {
-  if (!selectedBookingId) return;
-
-  try {
-    await updateDoc(doc(db, "bookingRequests", selectedBookingId), {
-      status: "Accepted",
-      rejectionReason: ""
-    });
-
-    rejectBox.classList.remove("show");
-    rejectReasonInput.value = "";
-
-  } catch (error) {
-    console.error("Error accepting request:", error);
-    alert("Could not accept request.");
-  }
-});
 
 rejectBtn.addEventListener("click", () => {
   if (!selectedBookingId) return;
