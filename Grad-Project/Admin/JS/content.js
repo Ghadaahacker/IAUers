@@ -474,5 +474,3 @@ sendBuildingRequestBtn.addEventListener("click", async () => {
   }
   
   loadEventsFromFirebase();
-
-});
