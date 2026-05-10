@@ -1,45 +1,18 @@
-const bookings = [
-  {
-    id: 1,
-    title: "Annual Research Symposium",
-    organizer: "Faculty of Engineering",
-    hall: "Main Auditorium",
-    capacity: 450,
-    date: "Oct 24",
-    status: "Pending",
-    rejectionReason: ""
-  },
-  {
-    id: 2,
-    title: "International Student Gala",
-    organizer: "Student Affairs",
-    hall: "Central Hall",
-    capacity: 300,
-    date: "Nov 12",
-    status: "Accepted",
-    rejectionReason: ""
-  },
-  {
-    id: 3,
-    title: "Basketball Finals",
-    organizer: "Athletics Department",
-    hall: "Sports Complex",
-    capacity: 600,
-    date: "Oct 30",
-    status: "Pending",
-    rejectionReason: ""
-  },
-  {
-    id: 4,
-    title: "Physics Lab Workshop",
-    organizer: "College of Science",
-    hall: "Lab Room 402",
-    capacity: 80,
-    date: "Nov 05",
-    status: "Rejected",
-    rejectionReason: "The hall is already reserved for another event."
-  }
-];
+import { auth, db } from "../Shared/JS/firebase-config.js";
+
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  doc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const requestList = document.getElementById("request-list");
 const filterButtons = document.querySelectorAll(".filter-btn");
@@ -61,17 +34,35 @@ const rejectBox = document.getElementById("reject-box");
 const rejectReasonInput = document.getElementById("reject-reason");
 const submitRejectBtn = document.getElementById("submit-reject");
 
+const settingsBtn = document.getElementById("settings-btn");
+const profileBtn = document.getElementById("profile-btn");
+
+const settingsModal = document.getElementById("settings-modal");
+const profileModal = document.getElementById("profile-modal");
+
+const closeSettings = document.getElementById("close-settings");
+const closeProfile = document.getElementById("close-profile");
+
+const profileName = document.getElementById("profile-name");
+const profileEmail = document.getElementById("profile-email");
+
+let bookings = [];
 let currentFilter = "All";
 let selectedBookingId = null;
 
-function updateStats() {
-  pendingCount.textContent = bookings.filter(b => b.status === "Pending").length;
-  acceptedCount.textContent = bookings.filter(b => b.status === "Accepted").length;
-  rejectedCount.textContent = bookings.filter(b => b.status === "Rejected").length;
+function normalizeStatus(status) {
+  if (status === "Pending Building Approval") return "Pending";
+  return status;
 }
 
 function getStatusClass(status) {
-  return status.toLowerCase();
+  return normalizeStatus(status).toLowerCase();
+}
+
+function updateStats() {
+  pendingCount.textContent = bookings.filter(b => normalizeStatus(b.status) === "Pending").length;
+  acceptedCount.textContent = bookings.filter(b => normalizeStatus(b.status) === "Accepted").length;
+  rejectedCount.textContent = bookings.filter(b => normalizeStatus(b.status) === "Rejected").length;
 }
 
 function renderDetails(booking) {
@@ -85,12 +76,16 @@ function renderDetails(booking) {
     return;
   }
 
-  detailTitle.textContent = booking.title;
-  detailOrganizer.textContent = booking.organizer;
-  detailHall.textContent = booking.hall;
-  detailCapacity.textContent = booking.capacity;
-  detailDate.textContent = booking.date;
-  detailStatus.textContent = booking.status;
+  detailTitle.textContent = booking.title || "Untitled Event";
+  detailOrganizer.textContent = booking.createdBy || "Admin";
+  detailHall.textContent = booking.hall || "—";
+  detailCapacity.textContent = booking.capacity || "—";
+
+  detailDate.textContent = booking.dateTime
+    ? new Date(booking.dateTime).toLocaleString()
+    : "—";
+
+  detailStatus.textContent = normalizeStatus(booking.status);
 }
 
 function renderRequests() {
@@ -99,7 +94,17 @@ function renderRequests() {
   const filteredBookings =
     currentFilter === "All"
       ? bookings
-      : bookings.filter(booking => booking.status === currentFilter);
+      : bookings.filter(booking => normalizeStatus(booking.status) === currentFilter);
+
+  if (filteredBookings.length === 0) {
+    requestList.innerHTML = `
+      <div class="empty-state">
+        No booking requests found.
+      </div>
+    `;
+    renderDetails(null);
+    return;
+  }
 
   filteredBookings.forEach((booking) => {
     const card = document.createElement("div");
@@ -110,12 +115,14 @@ function renderRequests() {
       card.classList.add("selected");
     }
 
+    const shownStatus = normalizeStatus(booking.status);
+
     card.innerHTML = `
       <div>
         <h3>${booking.title}</h3>
-        <p>${booking.organizer} • ${booking.hall}</p>
+        <p>${booking.createdBy || "Admin"} • ${booking.hall}</p>
       </div>
-      <span class="status ${getStatusClass(booking.status)}">${booking.status}</span>
+      <span class="status ${getStatusClass(booking.status)}">${shownStatus}</span>
     `;
 
     card.addEventListener("click", () => {
@@ -129,14 +136,11 @@ function renderRequests() {
     requestList.appendChild(card);
   });
 
-  const selectedStillVisible = filteredBookings.some(b => b.id === selectedBookingId);
+  const selectedBooking = bookings.find(b => b.id === selectedBookingId);
 
-  if (!selectedStillVisible && filteredBookings.length > 0) {
+  if (!selectedBooking && filteredBookings.length > 0) {
     selectedBookingId = filteredBookings[0].id;
     renderDetails(filteredBookings[0]);
-  } else if (!selectedStillVisible && filteredBookings.length === 0) {
-    selectedBookingId = null;
-    renderDetails(null);
   }
 }
 
@@ -153,30 +157,31 @@ filterButtons.forEach((button) => {
   });
 });
 
-acceptBtn.addEventListener("click", () => {
-  if (selectedBookingId === null) return;
+acceptBtn.addEventListener("click", async () => {
+  if (!selectedBookingId) return;
 
-  const booking = bookings.find(b => b.id === selectedBookingId);
-  if (!booking) return;
+  try {
+    await updateDoc(doc(db, "bookingRequests", selectedBookingId), {
+      status: "Accepted",
+      rejectionReason: ""
+    });
 
-  booking.status = "Accepted";
-  booking.rejectionReason = "";
+    rejectBox.classList.remove("show");
+    rejectReasonInput.value = "";
 
-  rejectBox.classList.remove("show");
-  rejectReasonInput.value = "";
-
-  renderDetails(booking);
-  updateStats();
-  renderRequests();
+  } catch (error) {
+    console.error("Error accepting request:", error);
+    alert("Could not accept request.");
+  }
 });
 
 rejectBtn.addEventListener("click", () => {
-  if (selectedBookingId === null) return;
+  if (!selectedBookingId) return;
   rejectBox.classList.toggle("show");
 });
 
-submitRejectBtn.addEventListener("click", () => {
-  if (selectedBookingId === null) return;
+submitRejectBtn.addEventListener("click", async () => {
+  if (!selectedBookingId) return;
 
   const reason = rejectReasonInput.value.trim();
 
@@ -185,30 +190,22 @@ submitRejectBtn.addEventListener("click", () => {
     return;
   }
 
-  const booking = bookings.find(b => b.id === selectedBookingId);
-  if (!booking) return;
+  try {
+    await updateDoc(doc(db, "bookingRequests", selectedBookingId), {
+      status: "Rejected",
+      rejectionReason: reason
+    });
 
-  booking.status = "Rejected";
-  booking.rejectionReason = reason;
+    rejectBox.classList.remove("show");
+    rejectReasonInput.value = "";
 
-  rejectBox.classList.remove("show");
-  rejectReasonInput.value = "";
-
-  renderDetails(booking);
-  updateStats();
-  renderRequests();
+  } catch (error) {
+    console.error("Error rejecting request:", error);
+    alert("Could not reject request.");
+  }
 });
 
 /* Modals */
-const settingsBtn = document.getElementById("settings-btn");
-const profileBtn = document.getElementById("profile-btn");
-
-const settingsModal = document.getElementById("settings-modal");
-const profileModal = document.getElementById("profile-modal");
-
-const closeSettings = document.getElementById("close-settings");
-const closeProfile = document.getElementById("close-profile");
-
 settingsBtn.addEventListener("click", () => {
   settingsModal.classList.add("show");
 });
@@ -237,19 +234,40 @@ profileModal.addEventListener("click", (e) => {
   }
 });
 
-/* First load */
-updateStats();
+/* Firebase live requests */
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    alert("Please login first.");
+    window.location.href = "../Login/HTML/login.html";
+    return;
+  }
 
-if (bookings.length > 0) {
-  selectedBookingId = bookings[0].id;
-  renderDetails(bookings[0]);
-}
+  profileEmail.textContent = user.email;
+  profileName.textContent = user.email.split("@")[0];
 
-renderRequests();
-const loggedInAdmin = {
-  name: "Sara Ahmed",
-  email: "sara@iau.edu.sa"
-};
+  const q = query(
+    collection(db, "bookingRequests"),
+    where("assignedToEmail", "==", user.email),
+    orderBy("createdAt", "desc")
+  );
 
-document.getElementById("profile-name").textContent = loggedInAdmin.name;
-document.getElementById("profile-email").textContent = loggedInAdmin.email;
+  onSnapshot(q, (snapshot) => {
+    bookings = [];
+
+    snapshot.forEach((docSnap) => {
+      bookings.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    updateStats();
+
+    if (bookings.length > 0 && !selectedBookingId) {
+      selectedBookingId = bookings[0].id;
+      renderDetails(bookings[0]);
+    }
+
+    renderRequests();
+  });
+});
