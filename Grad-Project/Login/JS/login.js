@@ -52,6 +52,10 @@ loginForm.addEventListener("submit", async function (e) {
 
     const userData = userSnap.data();
 
+sessionStorage.setItem("userRole", userData.role);
+sessionStorage.setItem("userEmail", email);
+sessionStorage.setItem("userId", user.uid);
+
     console.log("User role:", userData.role);
 
     // التوجيه حسب الدور

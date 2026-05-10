@@ -15,6 +15,13 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
+const currentUserRole = sessionStorage.getItem("userRole");
+const currentUserEmail = sessionStorage.getItem("userEmail");
+
+if (currentUserRole !== "buildingManager") {
+  window.location.href = "../Login/HTML/login.html";
+}
+
 const requestList = document.getElementById("request-list");
 const filterButtons = document.querySelectorAll(".filter-btn");
 
@@ -226,15 +233,15 @@ onAuthStateChanged(auth, (user) => {
     return;
   }
 
-  profileEmail.textContent = user.email;
-  profileName.textContent = user.email.split("@")[0];
+profileEmail.textContent = currentUserEmail;
+profileName.textContent = currentUserEmail.split("@")[0];
 
 const q = query(
   collection(db, "bookingRequests"),
-  where("assignedToEmail", "==", user.email)
+  where("assignedToEmail", "==", currentUserEmail)
 );
 
-console.log("Logged in as:", user.email);
+console.log("Building page session email:", currentUserEmail);
 
   onSnapshot(q, (snapshot) => {
     bookings = [];
