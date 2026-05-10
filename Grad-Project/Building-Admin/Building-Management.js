@@ -245,11 +245,12 @@ onAuthStateChanged(auth, (user) => {
   profileEmail.textContent = user.email;
   profileName.textContent = user.email.split("@")[0];
 
-  const q = query(
-    collection(db, "bookingRequests"),
-    where("assignedToEmail", "==", user.email),
-    orderBy("createdAt", "desc")
-  );
+const q = query(
+  collection(db, "bookingRequests"),
+  where("assignedToEmail", "==", user.email)
+);
+
+console.log("Logged in as:", user.email);
 
   onSnapshot(q, (snapshot) => {
     bookings = [];
