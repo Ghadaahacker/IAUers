@@ -1,4 +1,103 @@
+import { auth, db } from "../../Shared/JS/firebase-config.js";
+
+import {
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
 document.addEventListener("DOMContentLoaded", function () {
+  const weekdayRow = document.getElementById("weekdayRow");
+  const calendarGrid = document.getElementById("calendarGrid");
+  const monthYearLabel = document.getElementById("monthYearLabel");
+
+  const timelineList = document.getElementById("timelineList");
+  const timelineCount = document.getElementById("timelineCount");
+
+  const selectedDayNumber = document.getElementById("selectedDayNumber");
+  const selectedDayText = document.getElementById("selectedDayText");
+  const selectedDayMeta = document.getElementById("selectedDayMeta");
+  const dayStatusText = document.getElementById("dayStatusText");
+
+  const detailsPanelTitle = document.getElementById("detailsPanelTitle");
+  const detailsEmpty = document.getElementById("detailsEmpty");
+  const detailsBox = document.getElementById("detailsBox");
+  const detailsTag = document.getElementById("detailsTag");
+  const detailsTitle = document.getElementById("detailsTitle");
+  const detailsDate = document.getElementById("detailsDate");
+  const detailsTime = document.getElementById("detailsTime");
+  const detailsLocation = document.getElementById("detailsLocation");
+  const detailsDescription = document.getElementById("detailsDescription");
+  const detailsActionBtn = document.getElementById("detailsActionBtn");
+
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const todayBtn = document.getElementById("todayBtn");
+  const clearSelectionBtn = document.getElementById("clearSelectionBtn");
+  const viewTabs = document.querySelectorAll(".view-tab");
+
+  const today = new Date();
+
+  let allItems = [];
+  let currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  let selectedDate = formatDateKey(today);
+  let currentView = "month";
+  let selectedItemId = null;
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "../../Login/HTML/login.html";
+      return;
+    }
+
+    await loadStudentSchedule(user);
+    renderAll();
+  });
+
+  async function loadStudentSchedule(user) {
+    allItems = [];
+
+    try {
+      const q = query(
+        collection(db, "eventRegistrations"),
+        where("studentId", "==", user.uid),
+        where("status", "==", "approved")
+      );
+
+      const snapshot = await getDocs(q);
+
+      snapshot.forEach((docSnap) => {
+        const reg = docSnap.data();
+
+        allItems.push({
+          id: docSnap.id,
+          type: "event",
+          title: reg.eventTitle || "Untitled Event",
+          category: "Event",
+          date: getDateOnly(reg.eventDateTime),
+          startTime: getTimeOnly(reg.eventDateTime),
+          endTime: "",
+          location: reg.eventLocation || "IAU Campus",
+          description: reg.description || "Registered university event.",
+          colorClass: "event"
+        });
+      });
+
+    } catch (error) {
+      console.error("Error loading registered events:", error);
+    }
+
+    // Reserved for later: courses / quizzes / tasks from Firebase
+    // Example later:
+    // courses collection
+    // tasks collection
+  }
+
   function formatDateKey(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -15,6 +114,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const copy = new Date(date);
     copy.setDate(copy.getDate() + days);
     return copy;
+  }
+
+  function getDateOnly(value) {
+    if (!value) return formatDateKey(today);
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return value.slice(0, 10);
+    return formatDateKey(date);
+  }
+
+  function getTimeOnly(value) {
+    if (!value) return "Time not set";
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return "Time not set";
+
+    return date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   }
 
   function formatMonthYear(date) {
@@ -39,181 +156,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function formatMonthShort(dateKey) {
-    return parseDateKey(dateKey).toLocaleDateString("en-US", {
-      month: "short"
-    });
-  }
-
   function formatTimeRange(item) {
-    return item.endTime ? `${item.startTime} - ${item.endTime}` : item.startTime;
+    if (!item.endTime) return item.startTime;
+    return `${item.startTime} - ${item.endTime}`;
   }
-
-  const weekdayRow = document.getElementById("weekdayRow");
-  const calendarGrid = document.getElementById("calendarGrid");
-  const monthYearLabel = document.getElementById("monthYearLabel");
-
-  const myEventsList = document.getElementById("myEventsList");
-  const myTasksList = document.getElementById("myTasksList");
-  const eventsCounter = document.getElementById("eventsCounter");
-  const tasksCounter = document.getElementById("tasksCounter");
-
-  const timelineList = document.getElementById("timelineList");
-  const timelineCount = document.getElementById("timelineCount");
-
-  const selectedDayNumber = document.getElementById("selectedDayNumber");
-  const selectedDayText = document.getElementById("selectedDayText");
-  const selectedDayMeta = document.getElementById("selectedDayMeta");
-  const dayStatusText = document.getElementById("dayStatusText");
-
-  const detailsEmpty = document.getElementById("detailsEmpty");
-  const detailsBox = document.getElementById("detailsBox");
-  const detailsTag = document.getElementById("detailsTag");
-  const detailsTitle = document.getElementById("detailsTitle");
-  const detailsDate = document.getElementById("detailsDate");
-  const detailsTime = document.getElementById("detailsTime");
-  const detailsLocation = document.getElementById("detailsLocation");
-  const detailsDescription = document.getElementById("detailsDescription");
-  const detailsActionBtn = document.getElementById("detailsActionBtn");
-
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const todayBtn = document.getElementById("todayBtn");
-  const clearSelectionBtn = document.getElementById("clearSelectionBtn");
-  const viewTabs = document.querySelectorAll(".view-tab");
-
-  const today = new Date();
-
-  function makeDate(offset) {
-    return formatDateKey(addDays(today, offset));
-  }
-
-  const allItems = [
-    {
-      id: 1,
-      type: "event",
-      title: "Student Club Orientation",
-      category: "Campus Event",
-      date: makeDate(0),
-      startTime: "09:00",
-      endTime: "10:30",
-      location: "Main Hall",
-      description: "Approved university event for student clubs and activities.",
-      colorClass: "event"
-    },
-    {
-      id: 2,
-      type: "task",
-      title: "Database Quiz",
-      category: "Quiz",
-      date: makeDate(0),
-      startTime: "11:00",
-      endTime: "12:00",
-      location: "Room B204",
-      description: "Quiz scheduled from your academic journey.",
-      colorClass: "task-purple"
-    },
-    {
-      id: 3,
-      type: "task",
-      title: "Machine Learning Assignment Due",
-      category: "Assignment",
-      date: makeDate(1),
-      startTime: "23:59",
-      endTime: "",
-      location: "Blackboard",
-      description: "Submit your machine learning assignment before midnight.",
-      colorClass: "task-yellow"
-    },
-    {
-      id: 4,
-      type: "event",
-      title: "Career Fair",
-      category: "Academic Event",
-      date: makeDate(2),
-      startTime: "10:00",
-      endTime: "14:00",
-      location: "University Auditorium",
-      description: "Meet employers and explore internship opportunities.",
-      colorClass: "event"
-    },
-    {
-      id: 5,
-      type: "task",
-      title: "Digital Transformation Presentation",
-      category: "Presentation",
-      date: makeDate(3),
-      startTime: "13:00",
-      endTime: "15:00",
-      location: "Building C12",
-      description: "Group presentation scheduled from your course plan.",
-      colorClass: "task-green"
-    },
-    {
-      id: 6,
-      type: "task",
-      title: "Business Analytics Lecture",
-      category: "Lecture",
-      date: makeDate(-1),
-      startTime: "08:30",
-      endTime: "10:00",
-      location: "Building A - Room 110",
-      description: "Regular lecture from your weekly academic schedule.",
-      colorClass: "task-orange"
-    },
-    {
-      id: 7,
-      type: "event",
-      title: "Founding Day Celebration",
-      category: "Cultural",
-      date: makeDate(7),
-      startTime: "10:00",
-      endTime: "16:00",
-      location: "University Auditorium",
-      description: "Approved campus event that appears after registration approval.",
-      colorClass: "event"
-    },
-    {
-      id: 8,
-      type: "task",
-      title: "Project Team Meeting",
-      category: "Task",
-      date: makeDate(7),
-      startTime: "15:30",
-      endTime: "17:00",
-      location: "Online",
-      description: "Team meeting and sprint discussion.",
-      colorClass: "task-purple"
-    }
-  ];
-
-  let currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
-  let selectedDate = formatDateKey(today);
-  let currentView = "month";
-  let selectedItemId = null;
 
   function getItemsByDate(dateKey) {
     return allItems
       .filter(item => item.date === dateKey)
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
-  }
-
-  function getItemsForCurrentMonth() {
-    return allItems.filter(item => {
-      const d = parseDateKey(item.date);
-      return (
-        d.getFullYear() === currentDate.getFullYear() &&
-        d.getMonth() === currentDate.getMonth()
-      );
-    });
-  }
-
-  function getEventsForCurrentMonth() {
-    return getItemsForCurrentMonth().filter(item => item.type === "event");
-  }
-
-  function getTasksForCurrentMonth() {
-    return getItemsForCurrentMonth().filter(item => item.type === "task");
   }
 
   function getVisibleDates() {
@@ -225,9 +176,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const base = parseDateKey(selectedDate);
       const start = addDays(base, -base.getDay());
       const dates = [];
+
       for (let i = 0; i < 7; i++) {
         dates.push(formatDateKey(addDays(start, i)));
       }
+
       return dates;
     }
 
@@ -244,6 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderWeekdays() {
     weekdayRow.innerHTML = "";
+
     ["S", "M", "T", "W", "T", "F", "S"].forEach(label => {
       const div = document.createElement("div");
       div.textContent = label;
@@ -257,9 +211,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
+
     const firstDayIndex = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const prevMonthDays = new Date(year, month, 0).getDate();
+
     const totalCells = 42;
 
     for (let i = 0; i < totalCells; i++) {
@@ -294,18 +250,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const dateKey = formatDateKey(cellDate);
       const dayItems = getItemsByDate(dateKey);
 
-      const hasEvents = dayItems.some(item => item.type === "event");
-      const hasTasks = dayItems.some(item => item.type === "task");
-      const isToday = dateKey === formatDateKey(today);
-
       if (dateKey === selectedDate) {
         cell.classList.add("selected");
-      }
-
-      if (hasEvents && !hasTasks) {
-        cell.classList.add("highlight-event");
-      } else if (!hasEvents && hasTasks) {
-        cell.classList.add("highlight-task");
       }
 
       const num = document.createElement("div");
@@ -315,6 +261,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const markers = document.createElement("div");
       markers.className = "calendar-markers";
+
+      const hasEvents = dayItems.some(item => item.type === "event");
+      const hasTasks = dayItems.some(item => item.type === "task");
 
       if (hasEvents) {
         const dot = document.createElement("span");
@@ -330,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       cell.appendChild(markers);
 
-      if (isToday) {
+      if (dateKey === formatDateKey(today)) {
         const badge = document.createElement("div");
         badge.className = "calendar-badge-mini";
         badge.textContent = "Today";
@@ -343,6 +292,7 @@ document.addEventListener("DOMContentLoaded", function () {
         renderAll();
 
         const items = getItemsByDate(dateKey);
+
         if (items.length) {
           showDetails(items[0].id);
         } else {
@@ -351,63 +301,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       calendarGrid.appendChild(cell);
-    }
-  }
-
-  function renderBottomPanels() {
-    const monthEvents = getEventsForCurrentMonth();
-    const monthTasks = getTasksForCurrentMonth();
-
-    eventsCounter.textContent = `${monthEvents.length} ${monthEvents.length === 1 ? "item" : "items"}`;
-    tasksCounter.textContent = `${monthTasks.length} ${monthTasks.length === 1 ? "item" : "items"}`;
-
-    myEventsList.innerHTML = "";
-    myTasksList.innerHTML = "";
-
-    if (!monthEvents.length) {
-      myEventsList.innerHTML = `<div class="simple-empty">No approved events for this month yet.</div>`;
-    } else {
-      monthEvents.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "simple-card event";
-        card.innerHTML = `
-          <h4>${item.title}</h4>
-          <p>${formatMonthShort(item.date)} ${parseDateKey(item.date).getDate()} • ${formatTimeRange(item)}</p>
-          <p>${item.location}</p>
-        `;
-        card.addEventListener("click", function () {
-          selectedDate = item.date;
-          const itemDate = parseDateKey(item.date);
-          currentDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), 1);
-          selectedItemId = item.id;
-          renderAll();
-          showDetails(item.id);
-        });
-        myEventsList.appendChild(card);
-      });
-    }
-
-    if (!monthTasks.length) {
-      myTasksList.innerHTML = `<div class="simple-empty">No tasks from My Journey for this month yet.</div>`;
-    } else {
-      monthTasks.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "simple-card task";
-        card.innerHTML = `
-          <h4>${item.title}</h4>
-          <p>${formatMonthShort(item.date)} ${parseDateKey(item.date).getDate()} • ${formatTimeRange(item)}</p>
-          <p>${item.category}</p>
-        `;
-        card.addEventListener("click", function () {
-          selectedDate = item.date;
-          const itemDate = parseDateKey(item.date);
-          currentDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), 1);
-          selectedItemId = item.id;
-          renderAll();
-          showDetails(item.id);
-        });
-        myTasksList.appendChild(card);
-      });
     }
   }
 
@@ -420,11 +313,13 @@ document.addEventListener("DOMContentLoaded", function () {
     selectedDayMeta.textContent = formatLongDate(selectedDate);
 
     if (!items.length) {
-      dayStatusText.textContent = `"No events or tasks are scheduled for this day yet."`;
+      dayStatusText.textContent = "No registered events or academic items are scheduled for this selected day.";
     } else {
       const eventCount = items.filter(item => item.type === "event").length;
       const taskCount = items.filter(item => item.type === "task").length;
-      dayStatusText.textContent = `"You have ${eventCount} event${eventCount !== 1 ? "s" : ""} and ${taskCount} task${taskCount !== 1 ? "s" : ""} scheduled for this day."`;
+
+      dayStatusText.textContent =
+        `You have ${eventCount} event${eventCount !== 1 ? "s" : ""} and ${taskCount} task${taskCount !== 1 ? "s" : ""} in this selected day.`;
     }
   }
 
@@ -442,29 +337,44 @@ document.addEventListener("DOMContentLoaded", function () {
       if (a.date === b.date) {
         return a.startTime.localeCompare(b.startTime);
       }
+
       return a.date.localeCompare(b.date);
     });
 
-    timelineCount.textContent = `${visibleItems.length} ${visibleItems.length === 1 ? "item" : "items"}`;
+    timelineCount.textContent =
+      `${visibleItems.length} ${visibleItems.length === 1 ? "item" : "items"}`;
 
     if (!visibleItems.length) {
-      timelineList.innerHTML = `<div class="timeline-empty">No scheduled items in this view.</div>`;
+      timelineList.innerHTML = `
+        <div class="timeline-empty">
+          No registered events or academic items in this ${currentView} view.
+        </div>
+      `;
       return;
     }
 
     visibleItems.forEach(item => {
       const block = document.createElement("div");
       block.className = `timeline-item ${item.colorClass}`;
+
       block.innerHTML = `
-        <div class="timeline-time">${formatLongDate(item.date)} • ${formatTimeRange(item)}</div>
-        <div class="timeline-title">${item.title}</div>
+        <div class="timeline-time">
+          ${formatLongDate(item.date)} • ${formatTimeRange(item)}
+        </div>
+
+        <div class="timeline-title">
+          ${item.title}
+        </div>
       `;
 
       block.addEventListener("click", function () {
         selectedDate = item.date;
+
         const itemDate = parseDateKey(item.date);
         currentDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), 1);
+
         selectedItemId = item.id;
+
         renderAll();
         showDetails(item.id);
       });
@@ -475,9 +385,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function showDetails(itemId) {
     const item = allItems.find(entry => entry.id === itemId);
+
     if (!item) return;
 
     selectedItemId = item.id;
+
     detailsEmpty.classList.add("hidden");
     detailsBox.classList.remove("hidden");
 
@@ -489,11 +401,25 @@ document.addEventListener("DOMContentLoaded", function () {
     detailsDescription.textContent = item.description;
 
     if (item.type === "event") {
+      detailsPanelTitle.textContent = "Event Details";
       detailsTag.style.background = "#dfe9fa";
       detailsTag.style.color = "#245df2";
       detailsActionBtn.textContent = "Open Event";
       detailsActionBtn.classList.remove("secondary");
+    } else if (item.category.toLowerCase().includes("quiz")) {
+      detailsPanelTitle.textContent = "Quiz Details";
+      detailsTag.style.background = "#efe8ff";
+      detailsTag.style.color = "#7d4cff";
+      detailsActionBtn.textContent = "Open Quiz";
+      detailsActionBtn.classList.add("secondary");
+    } else if (item.category.toLowerCase().includes("assignment")) {
+      detailsPanelTitle.textContent = "Assignment Details";
+      detailsTag.style.background = "#fff2cc";
+      detailsTag.style.color = "#a86d00";
+      detailsActionBtn.textContent = "Open Assignment";
+      detailsActionBtn.classList.add("secondary");
     } else {
+      detailsPanelTitle.textContent = "Task Details";
       detailsTag.style.background = "#efe8ff";
       detailsTag.style.color = "#7d4cff";
       detailsActionBtn.textContent = "Open Task";
@@ -503,6 +429,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function clearDetails() {
     selectedItemId = null;
+    detailsPanelTitle.textContent = "Item Details";
     detailsEmpty.classList.remove("hidden");
     detailsBox.classList.add("hidden");
   }
@@ -518,23 +445,11 @@ document.addEventListener("DOMContentLoaded", function () {
       currentDate = new Date(d.getFullYear(), d.getMonth(), 1);
     } else {
       currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-      const selected = parseDateKey(selectedDate);
-      const safeDay = Math.min(
-        selected.getDate(),
-        new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate()
-      );
-      selectedDate = formatDateKey(
-        new Date(currentDate.getFullYear(), currentDate.getMonth(), safeDay)
-      );
+      selectedDate = formatDateKey(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
     }
 
     renderAll();
-    const items = getItemsByDate(selectedDate);
-    if (items.length) {
-      showDetails(items[0].id);
-    } else {
-      clearDetails();
-    }
+    clearDetails();
   }
 
   function goNext() {
@@ -548,32 +463,23 @@ document.addEventListener("DOMContentLoaded", function () {
       currentDate = new Date(d.getFullYear(), d.getMonth(), 1);
     } else {
       currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-      const selected = parseDateKey(selectedDate);
-      const safeDay = Math.min(
-        selected.getDate(),
-        new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate()
-      );
-      selectedDate = formatDateKey(
-        new Date(currentDate.getFullYear(), currentDate.getMonth(), safeDay)
-      );
+      selectedDate = formatDateKey(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
     }
 
     renderAll();
-    const items = getItemsByDate(selectedDate);
-    if (items.length) {
-      showDetails(items[0].id);
-    } else {
-      clearDetails();
-    }
+    clearDetails();
   }
 
   function goToday() {
     const now = new Date();
+
     currentDate = new Date(now.getFullYear(), now.getMonth(), 1);
     selectedDate = formatDateKey(now);
+
     renderAll();
 
     const items = getItemsByDate(selectedDate);
+
     if (items.length) {
       showDetails(items[0].id);
     } else {
@@ -584,18 +490,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderAll() {
     renderWeekdays();
     renderCalendar();
-    renderBottomPanels();
     renderDaySummary();
     renderTimeline();
-
-    if (selectedItemId) {
-      const exists = allItems.some(item => item.id === selectedItemId);
-      if (exists) {
-        showDetails(selectedItemId);
-      } else {
-        clearDetails();
-      }
-    }
   }
 
   prevBtn.addEventListener("click", goPrevious);
@@ -608,24 +504,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   detailsActionBtn.addEventListener("click", function () {
     if (!selectedItemId) return;
+
     const item = allItems.find(entry => entry.id === selectedItemId);
+
     if (!item) return;
-    alert(`${item.type === "event" ? "Event" : "Task"} opened: ${item.title}`);
+
+    alert(`${item.type === "event" ? "Event" : "Item"} opened: ${item.title}`);
   });
 
   viewTabs.forEach(tab => {
     tab.addEventListener("click", function () {
       viewTabs.forEach(btn => btn.classList.remove("active"));
       this.classList.add("active");
+
       currentView = this.dataset.view;
+
       renderTimeline();
     });
   });
-
-  renderAll();
-
-  const initialItems = getItemsByDate(selectedDate);
-  if (initialItems.length) {
-    showDetails(initialItems[0].id);
-  }
 });
