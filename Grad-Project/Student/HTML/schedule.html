@@ -32,120 +32,155 @@
       </section>
 
       <section class="schedule-layout">
-        <section class="left-column">
-          <div class="calendar-card">
-            <div class="calendar-toolbar">
-              <button id="prevBtn" class="toolbar-btn" type="button" aria-label="Previous month">
-                <i class="fa-solid fa-chevron-left"></i>
-              </button>
 
-              <h2 id="monthYearLabel"></h2>
+  <!-- LEFT -->
+  <section class="left-column">
 
-              <button id="nextBtn" class="toolbar-btn" type="button" aria-label="Next month">
-                <i class="fa-solid fa-chevron-right"></i>
-              </button>
-            </div>
+    <div class="calendar-card">
 
-            <div class="view-tabs">
-              <button class="view-tab" data-view="day" type="button">Day</button>
-              <button class="view-tab" data-view="week" type="button">Week</button>
-              <button class="view-tab active" data-view="month" type="button">Month</button>
-            </div>
+      <div class="calendar-toolbar">
 
-            <div id="weekdayRow" class="weekday-row"></div>
-            <div id="calendarGrid" class="days-grid"></div>
-          </div>
+        <button id="prevBtn" class="toolbar-btn" type="button">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
 
-          <div class="split-panels">
-            <div class="panel-card">
-              <div class="panel-head">
-                <h3>My Events</h3>
-                <span id="eventsCounter">0 items</span>
-              </div>
-              <div id="myEventsList" class="panel-list"></div>
-            </div>
+        <h2 id="monthYearLabel"></h2>
 
-            <div class="panel-card">
-              <div class="panel-head">
-                <h3>My Tasks</h3>
-                <span id="tasksCounter">0 items</span>
-              </div>
-              <div id="myTasksList" class="panel-list"></div>
-            </div>
-          </div>
-        </section>
+        <button id="nextBtn" class="toolbar-btn" type="button">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
 
-        <aside class="right-column">
-          <div class="summary-card">
-            <div class="summary-top">
-              <div>
-                <h3 id="selectedDayNumber">--</h3>
-                <p id="selectedDayText">Select a day</p>
-                <span id="selectedDayMeta">No date selected</span>
-              </div>
+      </div>
 
-              <div class="summary-actions">
-                <button id="todayBtn" class="summary-btn" type="button" title="Go to today">
-                  <i class="fa-regular fa-calendar-check"></i>
-                </button>
+      <div id="weekdayRow" class="weekday-row"></div>
 
-                <button id="clearSelectionBtn" class="summary-btn" type="button" title="Clear details">
-                  <i class="fa-regular fa-rectangle-xmark"></i>
-                </button>
-              </div>
-            </div>
+      <div id="calendarGrid" class="days-grid"></div>
 
-            <p id="dayStatusText" class="summary-text">
-              Select any day to view your events and academic tasks timeline.
-            </p>
-          </div>
+    </div>
 
-          <div class="timeline-card">
-            <div class="timeline-head">
-              <h3>Daily Timeline</h3>
-              <span id="timelineCount">0 items</span>
-            </div>
-            <div id="timelineList" class="timeline-list"></div>
-          </div>
+  </section>
 
-          <div class="details-card">
-            <div class="details-head">
-              <h3>Item Details</h3>
-            </div>
+  <!-- RIGHT -->
+  <aside class="right-column">
 
-            <div id="detailsEmpty" class="details-empty">
-              <div class="details-empty-icon">
-                <i class="fa-regular fa-calendar"></i>
-              </div>
-              <p>Select an event or task to see its details.</p>
-            </div>
+    <div class="timeline-merged-card">
 
-            <div id="detailsBox" class="details-box hidden">
-              <span id="detailsTag" class="details-tag"></span>
-              <h4 id="detailsTitle"></h4>
+      <div class="timeline-top">
 
-              <div class="detail-row">
-                <i class="fa-regular fa-calendar"></i>
-                <span id="detailsDate"></span>
-              </div>
+        <div>
 
-              <div class="detail-row">
-                <i class="fa-regular fa-clock"></i>
-                <span id="detailsTime"></span>
-              </div>
+          <h3 id="selectedDayNumber">--</h3>
 
-              <div class="detail-row">
-                <i class="fa-solid fa-location-dot"></i>
-                <span id="detailsLocation"></span>
-              </div>
+          <p id="selectedDayText">
+            Select a day
+          </p>
 
-              <p id="detailsDescription" class="details-description"></p>
+          <span id="selectedDayMeta">
+            No date selected
+          </span>
 
-              <button id="detailsActionBtn" class="details-action-btn" type="button">Open Item</button>
-            </div>
-          </div>
-        </aside>
-      </section>
+        </div>
+
+        <div class="summary-actions">
+
+          <button id="todayBtn" class="summary-btn" type="button">
+            <i class="fa-regular fa-calendar-check"></i>
+          </button>
+
+          <button id="clearSelectionBtn" class="summary-btn" type="button">
+            <i class="fa-regular fa-rectangle-xmark"></i>
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="timeline-controls">
+
+        <div class="view-tabs">
+
+          <button class="view-tab" data-view="day" type="button">
+            Day
+          </button>
+
+          <button class="view-tab" data-view="week" type="button">
+            Week
+          </button>
+
+          <button class="view-tab active" data-view="month" type="button">
+            Month
+          </button>
+
+        </div>
+
+        <span id="timelineCount">0 items</span>
+
+      </div>
+
+      <p id="dayStatusText" class="summary-text">
+        Select any day to view your events and academic tasks timeline.
+      </p>
+
+      <div id="timelineList" class="timeline-list"></div>
+
+    </div>
+
+    <div class="details-card">
+
+      <div class="details-head">
+        <h3 id="detailsPanelTitle">Item Details</h3>
+      </div>
+
+      <div id="detailsEmpty" class="details-empty">
+
+        <div class="details-empty-icon">
+          <i class="fa-regular fa-calendar"></i>
+        </div>
+
+        <p>
+          Select an event or task to see its details.
+        </p>
+
+      </div>
+
+      <div id="detailsBox" class="details-box hidden">
+
+        <span id="detailsTag" class="details-tag"></span>
+
+        <h4 id="detailsTitle"></h4>
+
+        <div class="detail-row">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="detailsDate"></span>
+        </div>
+
+        <div class="detail-row">
+          <i class="fa-regular fa-clock"></i>
+          <span id="detailsTime"></span>
+        </div>
+
+        <div class="detail-row">
+          <i class="fa-solid fa-location-dot"></i>
+          <span id="detailsLocation"></span>
+        </div>
+
+        <p id="detailsDescription" class="details-description"></p>
+
+        <button
+          id="detailsActionBtn"
+          class="details-action-btn"
+          type="button">
+
+          Open Item
+        </button>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+</section>
     </main>
   </div>
 
