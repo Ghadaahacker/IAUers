@@ -76,10 +76,8 @@ body {
 }
 
 .calendar-card,
-.panel-card,
-.summary-card,
-.timeline-card,
-.details-card {
+.details-card,
+.timeline-merged-card {
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: 24px;
@@ -116,31 +114,6 @@ body {
   cursor: pointer;
 }
 
-.view-tabs {
-  display: inline-flex;
-  gap: 6px;
-  background: #ebe4ff;
-  border-radius: 999px;
-  padding: 4px;
-  margin: 0 auto 18px;
-}
-
-.view-tab {
-  border: none;
-  background: transparent;
-  color: #2e2e3d;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 9px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.view-tab.active {
-  background: #7d4cff;
-  color: white;
-}
-
 .weekday-row,
 .days-grid {
   display: grid;
@@ -161,7 +134,7 @@ body {
 }
 
 .calendar-day {
-  min-height: 90px;
+  min-height: 88px;
   border-radius: 20px;
   padding: 10px;
   background: #fcfcfe;
@@ -184,22 +157,13 @@ body {
   box-shadow: inset 0 0 0 2px #f2a900;
 }
 
-.calendar-day.highlight-event {
-  background: var(--primary);
-  color: white;
-}
-
-.calendar-day.highlight-task {
-  background: #dbe4f3;
-}
-
 .day-num {
   font-size: 16px;
   font-weight: 700;
 }
 
 .calendar-markers {
-  margin-top: 8px;
+  margin-top: 10px;
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -212,15 +176,11 @@ body {
 }
 
 .marker-event {
-  background: var(--primary);
+  background: #245df2;
 }
 
 .marker-task {
   background: #7d4cff;
-}
-
-.calendar-day.highlight-event .marker-event {
-  background: white;
 }
 
 .calendar-badge-mini {
@@ -229,105 +189,39 @@ body {
   left: 10px;
   font-size: 10px;
   font-weight: 700;
+  color: #eb7b39;
 }
 
-.split-panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+.timeline-merged-card {
+  padding: 22px;
+  border-radius: 28px;
 }
 
-.panel-card {
-  padding: 16px;
-  min-height: 240px;
-}
-
-.panel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.panel-head h3 {
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.panel-head span {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.panel-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.simple-card {
-  border-radius: 16px;
-  padding: 14px;
-  cursor: pointer;
-  border: 1px solid #edf1f6;
-  transition: 0.18s ease;
-}
-
-.simple-card:hover {
-  transform: translateY(-1px);
-}
-
-.simple-card.event {
-  background: #eef3ff;
-}
-
-.simple-card.task {
-  background: #f2ecff;
-}
-
-.simple-card h4 {
-  font-size: 15px;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.simple-card p,
-.simple-empty {
-  font-size: 13px;
-  color: #52617d;
-  line-height: 1.6;
-}
-
-.summary-card,
-.timeline-card,
-.details-card {
-  padding: 20px;
-}
-
-.summary-top {
+.timeline-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: 18px;
+  margin-bottom: 22px;
 }
 
-.summary-top h3 {
-  font-size: 58px;
+.timeline-top h3 {
+  font-size: 60px;
   line-height: 1;
   color: #eb7b39;
   font-weight: 300;
   margin-bottom: 8px;
 }
 
-.summary-top p {
+.timeline-top p {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 6px;
 }
 
-.summary-top span {
+.timeline-top span {
   font-size: 13px;
-  color: #9a9aa5;
+  color: #8f95a3;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -347,36 +241,56 @@ body {
   cursor: pointer;
 }
 
+.timeline-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.timeline-controls span {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.view-tabs {
+  display: inline-flex;
+  gap: 6px;
+  background: #ebe4ff;
+  border-radius: 999px;
+  padding: 4px;
+}
+
+.view-tab {
+  border: none;
+  background: transparent;
+  color: #2e2e3d;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.view-tab.active {
+  background: #7d4cff;
+  color: white;
+}
+
 .summary-text {
-  margin-top: 16px;
+  margin-bottom: 22px;
   font-size: 15px;
   color: #777780;
   line-height: 1.7;
   font-style: italic;
 }
 
-.timeline-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.timeline-head h3,
-.details-head h3 {
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.timeline-head span {
-  font-size: 13px;
-  color: var(--muted);
-}
-
 .timeline-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .timeline-empty {
@@ -386,9 +300,14 @@ body {
 }
 
 .timeline-item {
-  border-radius: 16px;
-  padding: 14px 16px;
+  border-radius: 18px;
+  padding: 16px;
   cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.timeline-item:hover {
+  transform: translateY(-1px);
 }
 
 .timeline-item.event {
@@ -413,14 +332,28 @@ body {
 
 .timeline-time {
   font-size: 12px;
-  color: #6a7080;
-  margin-bottom: 4px;
+  color: #68758e;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 
 .timeline-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #283046;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1f2a44;
+}
+
+.details-card {
+  padding: 22px;
+}
+
+.details-head {
+  margin-bottom: 18px;
+}
+
+.details-head h3 {
+  font-size: 19px;
+  font-weight: 800;
 }
 
 .details-empty {
@@ -459,13 +392,14 @@ body {
   color: var(--primary);
   padding: 7px 12px;
   border-radius: 999px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .details-box h4 {
   font-size: 20px;
   font-weight: 800;
   margin-bottom: 16px;
+  line-height: 1.5;
 }
 
 .detail-row {
@@ -495,6 +429,11 @@ body {
   font-weight: 800;
   padding: 16px;
   cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.details-action-btn:hover {
+  transform: translateY(-1px);
 }
 
 .details-action-btn.secondary {
@@ -510,13 +449,7 @@ body {
 
 @media (max-width: 1100px) {
   .layout {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
+    grid-template-columns: 1fr;
   }
 
   .schedule-layout {
@@ -524,11 +457,22 @@ body {
   }
 }
 
-@media (max-width: 820px) {
-  .split-panels {
-    grid-template-columns: 1fr;
+@media (max-width: 900px) {
+  .timeline-controls {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
+  .timeline-top {
+    flex-direction: column;
+  }
+
+  .timeline-top h3 {
+    font-size: 46px;
+  }
+}
+
+@media (max-width: 820px) {
   .calendar-toolbar {
     grid-template-columns: 48px 1fr 48px;
   }
@@ -542,5 +486,4 @@ body {
     min-height: 72px;
     padding: 8px;
   }
-
 }
