@@ -166,7 +166,7 @@ filterButtons.forEach((button) => {
 });
 
 acceptBtn.addEventListener("click", async () => {
-
+alert("Accept button clicked");
   if (!selectedBookingId) {
     alert("Please select a request first.");
     return;
@@ -201,11 +201,14 @@ acceptBtn.addEventListener("click", async () => {
       createdBy: selectedBooking.createdBy || "Admin",
       createdAt: serverTimestamp()
     });
+
 await addDoc(collection(db, "activityLogs"), {
   message: `Event "${selectedBooking.title}" was approved.`,
   type: "approved",
   createdAt: serverTimestamp()
 });
+
+alert("Activity log saved.");
 
     rejectBox.classList.remove("show");
 
@@ -238,6 +241,8 @@ submitRejectBtn.addEventListener("click", async () => {
       status: "Rejected",
       rejectionReason: reason
     });
+
+    alert("Activity log saved.");
 
     const selectedBooking = bookings.find(
   booking => booking.id === selectedBookingId

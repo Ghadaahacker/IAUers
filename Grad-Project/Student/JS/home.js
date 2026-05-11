@@ -18,6 +18,7 @@ import {
 document.addEventListener("DOMContentLoaded", function () {
   const greetingText = document.getElementById("greetingText");
   const studentEventsList = document.getElementById("studentEventsList");
+  const announcementsList = document.getElementById("announcementsList");
 
   const eventDetailsModal = document.getElementById("eventDetailsModal");
   const closeEventModal = document.getElementById("closeEventModal");
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     await loadStudentGreeting(user.uid);
     await loadPublishedEventsForStudents();
+    await loadPublishedAnnouncementsForStudents();
   });
 
   async function loadStudentGreeting(uid) {
@@ -81,7 +83,8 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const q = query(
         collection(db, "events"),
-        where("status", "==", "published")
+        where("status", "==", "published"),
+        where("type", "==", "event")
       );
 
       const snapshot = await getDocs(q);
@@ -118,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           <p class="event-location">
             <i class="fa-solid fa-location-dot"></i>
-            ${event.location || "IAU Campus"}
+            ${event.location || event.hall || "IAU Campus"}
           </p>
 
           <p class="event-date">
@@ -135,13 +138,54 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
       console.error("Error loading student events:", error);
+    }
+  }
 
-      studentEventsList.innerHTML = `
-        <div class="empty-card">
-          <h3>Failed to load events.</h3>
-          <p>Please try again later.</p>
-        </div>
-      `;
+  async function loadPublishedAnnouncementsForStudents() {
+    announcementsList.innerHTML = "";
+
+    try {
+      const q = query(
+        collection(db, "events"),
+        where("status", "==", "published"),
+        where("type", "==", "announcement")
+      );
+
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        announcementsList.innerHTML = `
+          <div class="announcement-card">
+            <div class="announcement-top">Coming Soon</div>
+            <h3>No announcements yet</h3>
+            <p>New announcements will appear here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      snapshot.forEach((docSnap) => {
+        const announcement = docSnap.data();
+
+        const card = document.createElement("div");
+        card.className = "announcement-card";
+
+        card.innerHTML = `
+          <div class="announcement-top">Announcement</div>
+          <h3>${announcement.title || "Untitled Announcement"}</h3>
+          <p>${announcement.description || "No description available."}</p>
+          ${
+            announcement.link
+              ? `<a href="${announcement.link}" target="_blank">Open Link</a>`
+              : ""
+          }
+        `;
+
+        announcementsList.appendChild(card);
+      });
+
+    } catch (error) {
+      console.error("Error loading announcements:", error);
     }
   }
 
@@ -152,13 +196,8 @@ document.addEventListener("DOMContentLoaded", function () {
     modalEventTitle.textContent = event.title || "Untitled Event";
     modalEventDescription.textContent = event.description || "No description available.";
     modalEventDate.textContent = formatDateTime(event.dateTime);
-    modalEventLocation.textContent = event.location || "IAU Campus";
-
-    if (event.unlimitedSeats) {
-      modalEventCapacity.textContent = "Unlimited seats";
-    } else {
-      modalEventCapacity.textContent = `${event.seatCapacity || 0} seats available`;
-    }
+    modalEventLocation.textContent = event.location || event.hall || "IAU Campus";
+    modalEventCapacity.textContent = `${event.seatCapacity || 0} seats available`;
 
     registerBtn.textContent = "Register";
     registerBtn.disabled = false;
@@ -189,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
         eventId: selectedEvent.id,
         eventTitle: selectedEvent.title || "Untitled Event",
         eventDateTime: selectedEvent.dateTime || "",
-        eventLocation: selectedEvent.location || "IAU Campus",
+        eventLocation: selectedEvent.location || selectedEvent.hall || "IAU Campus",
         description: selectedEvent.description || "",
         status: "approved",
         createdAt: serverTimestamp()
@@ -220,10 +259,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!value) return "Date not set";
 
     const date = new Date(value);
-
-    if (isNaN(date.getTime())) {
-      return value;
-    }
+    if (isNaN(date.getTime())) return value;
 
     return date.toLocaleString("en-GB", {
       day: "numeric",
@@ -238,10 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!value) return "Date not set";
 
     const date = new Date(value);
-
-    if (isNaN(date.getTime())) {
-      return value;
-    }
+    if (isNaN(date.getTime())) return value;
 
     return date.toLocaleDateString("en-GB", {
       weekday: "short",
