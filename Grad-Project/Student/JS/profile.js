@@ -1,132 +1,89 @@
-document.addEventListener("DOMContentLoaded", () => {
+import { auth, db } from "../../Shared/JS/firebase-config.js";
 
-  /* ══════════════════════════════════════════
-     DATA — Profile
-  ══════════════════════════════════════════ */
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+  let currentUserId = null;
+
   let profileData = {
-    name:         "Student",
-    email:        "Student223@iau.edu.sa",
-    department:   "College of Business Administration",
-    major:        "Information Systems and Business Analytics",
-    id:           "2230002023",
-    gpa:          4.62,
-    credits:      102,
-    totalCredits: 132
+    name: "",
+    email: "",
+    department: "",
+    major: "",
+    studentId: "",
+    gpa: "",
+    credits: "",
+    totalCredits: "",
+    certificates: 0
   };
 
-  /* ══════════════════════════════════════════
-     DATA — Courses (عدّلي هنا بياناتك)
-  ══════════════════════════════════════════ */
-  const coursesData = [
-    {
-      code:        "CS301",
-      name:        "Advanced Algorithms",
-      doctor:      "Dr. Ahmed Al-Qahtani",
-      section:     "Section 1",
-      credits:     3,
-      location:    "Building A — Room 204",
-      schedule:    "Sun / Tue / Thu  •  9:00 – 9:50 AM",
-      absences:    1,
-      maxAbsences: 6,
-      status:      "On Track",
-      statusClass: "status-good"
-    },
-    {
-      code:        "CS312",
-      name:        "Database Systems",
-      doctor:      "Dr. Sara Al-Hamdan",
-      section:     "Section 2",
-      credits:     3,
-      location:    "Building B — Room 110",
-      schedule:    "Mon / Wed  •  11:00 AM – 12:15 PM",
-      absences:    3,
-      maxAbsences: 6,
-      status:      "Warning",
-      statusClass: "status-warn"
-    },
-    {
-      code:        "CS450",
-      name:        "Cyber Security",
-      doctor:      "Dr. Khalid Al-Otaibi",
-      section:     "Section 4",
-      credits:     3,
-      location:    "Building C — Lab 3",
-      schedule:    "Sun / Tue  •  1:00 – 2:15 PM",
-      absences:    0,
-      maxAbsences: 6,
-      status:      "Excellent",
-      statusClass: "status-good"
-    },
-    {
-      code:        "CS208",
-      name:        "Networking",
-      doctor:      "Dr. Mona Al-Rashidi",
-      section:     "Section 2",
-      credits:     3,
-      location:    "Building D — Room 302",
-      schedule:    "Mon / Wed / Thu  •  8:00 – 8:50 AM",
-      absences:    2,
-      maxAbsences: 6,
-      status:      "On Track",
-      statusClass: "status-good"
-    }
-  ];
-
-  /* ══════════════════════════════════════════
-     INJECT ALL MODALS + STYLES
-  ══════════════════════════════════════════ */
   document.body.insertAdjacentHTML("beforeend", `
-
-    <!-- ── EDIT PROFILE MODAL ── -->
-    <div id="editModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+    <div id="editModal" class="modal-overlay hidden">
       <div class="modal-box">
         <div class="modal-header">
-          <h3 id="editModalTitle"><i class="fa-solid fa-pen-to-square"></i> Edit Profile</h3>
-          <button id="closeEditBtn" class="modal-close" aria-label="Close">&times;</button>
+          <h3><i class="fa-solid fa-pen-to-square"></i> Edit Profile</h3>
+          <button id="closeEditBtn" class="modal-close">&times;</button>
         </div>
+
         <div class="modal-body">
           <div class="modal-field">
-            <label for="inputName">Full Name</label>
-            <input type="text" id="inputName" placeholder="Your full name" />
+            <label>Full Name</label>
+            <input type="text" id="inputName" />
           </div>
+
           <div class="modal-field">
-            <label for="inputEmail">IAU Email</label>
-            <input type="email" id="inputEmail" placeholder="email@iau.edu.sa" />
+            <label>IAU Email</label>
+            <input type="email" id="inputEmail" />
           </div>
+
           <div class="modal-field">
-            <label for="inputDept">Department</label>
-            <input type="text" id="inputDept" placeholder="Department" />
+            <label>Department</label>
+            <input type="text" id="inputDept" />
           </div>
+
           <div class="modal-field">
-            <label for="inputMajor">Major</label>
-            <input type="text" id="inputMajor" placeholder="Major" />
+            <label>Major</label>
+            <input type="text" id="inputMajor" />
           </div>
         </div>
+
         <div class="modal-footer">
           <button id="cancelEditBtn" class="modal-btn cancel-btn">Cancel</button>
-          <button id="saveEditBtn"   class="modal-btn save-btn">
+          <button id="saveEditBtn" class="modal-btn save-btn">
             <i class="fa-solid fa-check"></i> Save Changes
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ── ACADEMIC RECORD MODAL ── -->
-    <div id="recordModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="recordModalTitle">
+    <div id="recordModal" class="modal-overlay hidden">
       <div class="modal-box">
         <div class="modal-header">
-          <h3 id="recordModalTitle"><i class="fa-solid fa-file-lines"></i> Academic Record</h3>
-          <button id="closeRecordBtn" class="modal-close" aria-label="Close">&times;</button>
+          <h3><i class="fa-solid fa-file-lines"></i> Academic Record</h3>
+          <button id="closeRecordBtn" class="modal-close">&times;</button>
         </div>
+
         <div class="modal-body record-body">
-          <div class="record-row"><span class="record-label">Student ID</span>      <span class="record-value" id="rec-id"></span></div>
-          <div class="record-row"><span class="record-label">Full Name</span>       <span class="record-value" id="rec-name"></span></div>
-          <div class="record-row"><span class="record-label">Cumulative GPA</span>  <span class="record-value" id="rec-gpa"></span></div>
-          <div class="record-row"><span class="record-label">Credits Earned</span>  <span class="record-value" id="rec-credits"></span></div>
-          <div class="record-row"><span class="record-label">Department</span>      <span class="record-value" id="rec-dept"></span></div>
-          <div class="record-row"><span class="record-label">Major</span>           <span class="record-value" id="rec-major"></span></div>
-          <div class="record-row"><span class="record-label">Academic Standing</span><span class="record-value record-badge-good">Excellent Standing</span></div>
+          <div class="record-row"><span>Student ID</span><strong id="rec-id"></strong></div>
+          <div class="record-row"><span>Full Name</span><strong id="rec-name"></strong></div>
+          <div class="record-row"><span>Email</span><strong id="rec-email"></strong></div>
+          <div class="record-row"><span>Department</span><strong id="rec-dept"></strong></div>
+          <div class="record-row"><span>Major</span><strong id="rec-major"></strong></div>
+          <div class="record-row"><span>GPA</span><strong id="rec-gpa"></strong></div>
+          <div class="record-row"><span>Credits</span><strong id="rec-credits"></strong></div>
+          <div class="record-row"><span>Academic Standing</span><strong class="record-badge-good">Excellent Standing</strong></div>
         </div>
+
         <div class="modal-footer">
           <button id="printRecordBtn" class="modal-btn save-btn">
             <i class="fa-solid fa-print"></i> Print Record
@@ -135,376 +92,423 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     </div>
 
-    <!-- ── COURSE DETAIL MODAL ── -->
-    <div id="courseModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="courseModalTitle">
-      <div class="modal-box modal-box-wide">
-        <div class="modal-header">
-          <h3 id="courseModalTitle"><i class="fa-solid fa-book-open"></i> Course Details</h3>
-          <button id="closeCourseBtn" class="modal-close" aria-label="Close">&times;</button>
-        </div>
-        <div class="modal-body course-modal-body">
-          <div class="course-modal-top">
-            <div id="cm-icon" class="course-modal-icon"></div>
-            <div>
-              <div id="cm-code" class="cm-code"></div>
-              <h2 id="cm-name" class="cm-name"></h2>
-              <span id="cm-status" class="cm-status-badge"></span>
-            </div>
-          </div>
-          <div class="cm-grid">
-            <div class="cm-item">
-              <div class="cm-item-icon"><i class="fa-solid fa-user-tie"></i></div>
-              <div>
-                <div class="cm-item-label">Doctor</div>
-                <div id="cm-doctor" class="cm-item-value"></div>
-              </div>
-            </div>
-            <div class="cm-item">
-              <div class="cm-item-icon"><i class="fa-solid fa-location-dot"></i></div>
-              <div>
-                <div class="cm-item-label">Location</div>
-                <div id="cm-location" class="cm-item-value"></div>
-              </div>
-            </div>
-            <div class="cm-item">
-              <div class="cm-item-icon"><i class="fa-regular fa-clock"></i></div>
-              <div>
-                <div class="cm-item-label">Schedule</div>
-                <div id="cm-schedule" class="cm-item-value"></div>
-              </div>
-            </div>
-            <div class="cm-item">
-              <div class="cm-item-icon"><i class="fa-solid fa-layer-group"></i></div>
-              <div>
-                <div class="cm-item-label">Section & Credits</div>
-                <div id="cm-section" class="cm-item-value"></div>
-              </div>
-            </div>
-          </div>
-          <div class="cm-absence-block">
-            <div class="cm-absence-header">
-              <span class="cm-item-label">Absence Tracker</span>
-              <span id="cm-abs-count" class="cm-abs-count"></span>
-            </div>
-            <div class="cm-absence-bar-wrap">
-              <div id="cm-absence-bar" class="cm-absence-bar"></div>
-            </div>
-            <p id="cm-abs-note" class="cm-abs-note"></p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── LOGOUT CONFIRM MODAL ── -->
-    <div id="logoutModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="logoutModalTitle">
+    <div id="logoutModal" class="modal-overlay hidden">
       <div class="modal-box modal-box-sm">
         <div class="modal-header">
-          <h3 id="logoutModalTitle"><i class="fa-solid fa-right-from-bracket"></i> Logout</h3>
-          <button id="closeLogoutBtn" class="modal-close" aria-label="Close">&times;</button>
+          <h3><i class="fa-solid fa-right-from-bracket"></i> Logout</h3>
+          <button id="closeLogoutBtn" class="modal-close">&times;</button>
         </div>
+
         <div class="modal-body logout-body">
           <div class="logout-icon-wrap">
             <i class="fa-solid fa-right-from-bracket"></i>
           </div>
           <p class="logout-question">Are you sure you want to logout?</p>
-          <p class="logout-sub">You'll need to sign in again to access your portal.</p>
+          <p class="logout-sub">You will need to sign in again to access your portal.</p>
         </div>
+
         <div class="modal-footer">
-          <button id="cancelLogoutBtn"  class="modal-btn cancel-btn">Cancel</button>
+          <button id="cancelLogoutBtn" class="modal-btn cancel-btn">Cancel</button>
           <button id="confirmLogoutBtn" class="modal-btn logout-confirm-btn">
-            <i class="fa-solid fa-right-from-bracket"></i> Yes, Logout
+            Yes, Logout
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ── TOAST ── -->
     <div id="toast" class="toast hidden">
       <i class="fa-solid fa-circle-check"></i>
       <span id="toastMsg"></span>
     </div>
 
-    <!-- ── STYLES ── -->
     <style>
       .modal-overlay {
-        position: fixed; inset: 0;
+        position: fixed;
+        inset: 0;
         background: rgba(16,24,48,0.48);
         backdrop-filter: blur(4px);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 1000; padding: 20px;
-        animation: fadeIn 0.18s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
       }
-      .modal-overlay.hidden { display: none; }
 
-      @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
-      @keyframes slideUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+      .modal-overlay.hidden,
+      .toast.hidden {
+        display: none;
+      }
 
       .modal-box {
-        background: #fff; border-radius: 24px; width: 100%; max-width: 480px;
+        background: #fff;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 480px;
         box-shadow: 0 24px 60px rgba(16,24,48,0.18);
-        overflow: hidden; animation: slideUp 0.22s ease;
+        overflow: hidden;
       }
-      .modal-box-wide { max-width: 560px; }
-      .modal-box-sm   { max-width: 400px; }
+
+      .modal-box-sm {
+        max-width: 400px;
+      }
 
       .modal-header {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 22px 26px 18px; border-bottom: 1px solid #e8edf5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 26px 18px;
+        border-bottom: 1px solid #e8edf5;
       }
-      .modal-header h3 { font-size: 18px; font-weight: 800; color: #162044; display: flex; align-items: center; gap: 10px; }
-      .modal-header h3 i { color: #2b58a8; }
-      .modal-close { width: 34px; height: 34px; border: none; background: #f0f4fb; border-radius: 50%; font-size: 20px; color: #65728d; cursor: pointer; line-height: 1; transition: 0.18s; }
-      .modal-close:hover { background: #dce7f7; color: #162044; }
 
-      .modal-body { padding: 22px 26px; display: flex; flex-direction: column; gap: 16px; }
+      .modal-header h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #162044;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-      .modal-field { display: flex; flex-direction: column; gap: 6px; }
-      .modal-field label { font-size: 11px; font-weight: 700; color: #96a1b4; text-transform: uppercase; letter-spacing: 0.07em; }
-      .modal-field input { height: 46px; border: 1.5px solid #d8dee8; border-radius: 12px; padding: 0 14px; font-size: 15px; color: #162044; outline: none; transition: 0.18s; font-family: "Inter", sans-serif; }
-      .modal-field input:focus { border-color: #2b58a8; box-shadow: 0 0 0 3px rgba(43,88,168,0.12); }
+      .modal-close {
+        width: 34px;
+        height: 34px;
+        border: none;
+        background: #f0f4fb;
+        border-radius: 50%;
+        font-size: 20px;
+        cursor: pointer;
+      }
 
-      .modal-footer { padding: 16px 26px 22px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #e8edf5; }
-      .modal-btn { display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 12px; padding: 12px 22px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.18s; font-family: "Inter", sans-serif; }
-      .cancel-btn { background: #eef1f7; color: #162044; }
-      .cancel-btn:hover { background: #dce7f7; }
-      .save-btn { background: linear-gradient(90deg,#253a84 0%,#2b58a8 100%); color: #fff; }
-      .save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-      .logout-confirm-btn { background: linear-gradient(90deg,#8b1a1a 0%,#c0392b 100%); color: #fff; }
-      .logout-confirm-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+      .modal-body {
+        padding: 22px 26px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
 
-      /* Record */
-      .record-body { gap: 0; padding: 0 26px; }
-      .record-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0f4fb; font-size: 14px; }
-      .record-row:last-child { border-bottom: none; }
-      .record-label { color: #65728d; font-weight: 500; }
-      .record-value { color: #162044; font-weight: 700; }
-      .record-badge-good { background: #d6f0dc; color: #2a7a3b; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+      .modal-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
 
-      /* Course modal */
-      .course-modal-body { gap: 20px; }
-      .course-modal-top { display: flex; align-items: flex-start; gap: 18px; padding-bottom: 18px; border-bottom: 1px solid #edf2f8; }
-      .course-modal-icon { width: 56px; height: 56px; flex-shrink: 0; background: #dce7f7; color: #2b58a8; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-      .cm-code  { font-size: 12px; font-weight: 700; color: #96a1b4; letter-spacing: 0.07em; margin-bottom: 4px; }
-      .cm-name  { font-size: 20px; font-weight: 800; color: #162044; margin-bottom: 8px; }
-      .cm-status-badge { display: inline-block; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
-      .status-good   { background: #d6f0dc; color: #2a7a3b; }
-      .status-warn   { background: #fdecd4; color: #a05b10; }
-      .status-danger { background: #fdd8d8; color: #b91c1c; }
+      .modal-field label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #96a1b4;
+        text-transform: uppercase;
+      }
 
-      .cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-      .cm-item { display: flex; align-items: flex-start; gap: 12px; background: #f7f9fd; border: 1px solid #e8eef6; border-radius: 14px; padding: 14px; }
-      .cm-item-icon { width: 36px; height: 36px; flex-shrink: 0; background: #dce7f7; color: #2b58a8; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
-      .cm-item-label { font-size: 11px; font-weight: 700; color: #96a1b4; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-      .cm-item-value { font-size: 14px; font-weight: 600; color: #162044; line-height: 1.4; }
+      .modal-field input {
+        height: 46px;
+        border: 1.5px solid #d8dee8;
+        border-radius: 12px;
+        padding: 0 14px;
+        font-size: 15px;
+        outline: none;
+      }
 
-      .cm-absence-block { background: #f7f9fd; border: 1px solid #e8eef6; border-radius: 16px; padding: 16px 18px; }
-      .cm-absence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-      .cm-abs-count { font-size: 14px; font-weight: 700; color: #162044; }
-      .cm-absence-bar-wrap { width: 100%; height: 10px; background: #e2e8f4; border-radius: 999px; overflow: hidden; margin-bottom: 10px; }
-      .cm-absence-bar { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
-      .cm-abs-note { font-size: 13px; color: #65728d; line-height: 1.5; }
+      .modal-footer {
+        padding: 16px 26px 22px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        border-top: 1px solid #e8edf5;
+      }
 
-      /* Logout */
-      .logout-body { align-items: center; text-align: center; padding: 28px 26px 20px; }
-      .logout-icon-wrap { width: 64px; height: 64px; background: #fdeaea; color: #c0392b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 16px; }
-      .logout-question { font-size: 18px; font-weight: 800; color: #162044; margin-bottom: 8px; }
-      .logout-sub      { font-size: 14px; color: #65728d; line-height: 1.5; }
+      .modal-btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 22px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+      }
 
-      /* Toast */
-      .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #162044; color: #fff; display: flex; align-items: center; gap: 10px; padding: 14px 24px; border-radius: 16px; font-size: 15px; font-weight: 600; box-shadow: 0 8px 28px rgba(16,24,48,0.22); z-index: 1100; animation: slideUp 0.22s ease; white-space: nowrap; }
-      .toast.hidden { display: none; }
-      .toast i { color: #5dd08a; font-size: 18px; }
+      .cancel-btn {
+        background: #eef1f7;
+        color: #162044;
+      }
 
-      @media (max-width: 600px) {
-        .cm-grid { grid-template-columns: 1fr; }
-        .course-modal-top { flex-direction: column; }
+      .save-btn {
+        background: linear-gradient(90deg,#253a84 0%,#2b58a8 100%);
+        color: #fff;
+      }
+
+      .logout-confirm-btn {
+        background: linear-gradient(90deg,#8b1a1a 0%,#c0392b 100%);
+        color: #fff;
+      }
+
+      .record-body {
+        gap: 0;
+      }
+
+      .record-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0;
+        border-bottom: 1px solid #f0f4fb;
+        font-size: 14px;
+      }
+
+      .record-row span {
+        color: #65728d;
+      }
+
+      .record-row strong {
+        color: #162044;
+        text-align: right;
+      }
+
+      .record-badge-good {
+        background: #d6f0dc;
+        color: #2a7a3b !important;
+        padding: 4px 12px;
+        border-radius: 999px;
+      }
+
+      .logout-body {
+        align-items: center;
+        text-align: center;
+      }
+
+      .logout-icon-wrap {
+        width: 64px;
+        height: 64px;
+        background: #fdeaea;
+        color: #c0392b;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+      }
+
+      .logout-question {
+        font-size: 18px;
+        font-weight: 800;
+        color: #162044;
+      }
+
+      .logout-sub {
+        font-size: 14px;
+        color: #65728d;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #162044;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 24px;
+        border-radius: 16px;
+        font-size: 15px;
+        font-weight: 600;
+        box-shadow: 0 8px 28px rgba(16,24,48,0.22);
+        z-index: 1100;
+      }
+
+      .toast i {
+        color: #5dd08a;
       }
     </style>
   `);
 
-  /* ══════════════════════════════════════════
-     HELPERS
-  ══════════════════════════════════════════ */
-  function showToast(msg) {
+  function showToast(message) {
     const toast = document.getElementById("toast");
-    document.getElementById("toastMsg").textContent = msg;
+    const toastMsg = document.getElementById("toastMsg");
+
+    toastMsg.textContent = message;
     toast.classList.remove("hidden");
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toast.classList.add("hidden"), 3000);
+
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 3000);
   }
 
-  function openModal(id)  { document.getElementById(id).classList.remove("hidden"); }
-  function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+  function openModal(id) {
+    document.getElementById(id)?.classList.remove("hidden");
+  }
 
-  document.querySelectorAll(".modal-overlay").forEach(overlay => {
-    overlay.addEventListener("click", e => {
-      if (e.target === overlay) closeModal(overlay.id);
-    });
-  });
+  function closeModal(id) {
+    document.getElementById(id)?.classList.add("hidden");
+  }
 
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") {
-      ["editModal","recordModal","courseModal","logoutModal"].forEach(closeModal);
+  function renderProfileCard() {
+    const mainName = document.querySelector(".info-value");
+    if (mainName) mainName.textContent = profileData.name || "Student";
+
+    const smallValues = document.querySelectorAll(".info-value-sm");
+    if (smallValues[0]) smallValues[0].textContent = profileData.email || "No email";
+    if (smallValues[1]) smallValues[1].textContent = profileData.department || "No department";
+    if (smallValues[2]) smallValues[2].textContent = profileData.major || "No major";
+
+    const idBadge = document.querySelector(".student-id-badge");
+    if (idBadge) idBadge.textContent = `ID: ${profileData.studentId || "N/A"}`;
+
+    const statNumbers = document.querySelectorAll(".stat-card h2");
+    if (statNumbers[0]) statNumbers[0].textContent = profileData.gpa || "0.00";
+    if (statNumbers[1]) statNumbers[1].textContent = profileData.credits || "0";
+    if (statNumbers[2]) statNumbers[2].textContent = profileData.certificates ?? 0;
+
+    const statLabels = document.querySelectorAll(".stat-card p");
+    if (statLabels[2]) statLabels[2].textContent = "My Certificates";
+  }
+
+  async function loadProfileFromFirebase(user) {
+    currentUserId = user.uid;
+
+    const userRef = doc(db, "users", currentUserId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      profileData = {
+        ...profileData,
+        ...userSnap.data()
+      };
+    } else {
+      
+
+      await setDoc(userRef, profileData);
+    }
+
+    renderProfileCard();
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "../../Login/HTML/login.html";
+      return;
+    }
+
+    try {
+      await loadProfileFromFirebase(user);
+    } catch (error) {
+      console.error("Error loading profile:", error);
+      showToast("Could not load profile data.");
     }
   });
 
-  /* ══════════════════════════════════════════
-     RENDER PROFILE CARD
-  ══════════════════════════════════════════ */
-  function renderProfileCard() {
-    const nameEl = document.querySelector(".info-value");
-    if (nameEl) nameEl.textContent = profileData.name;
-    const smEls = document.querySelectorAll(".info-value-sm");
-    if (smEls[0]) smEls[0].textContent = profileData.email;
-    if (smEls[1]) smEls[1].textContent = profileData.department;
-    if (smEls[2]) smEls[2].textContent = profileData.major;
+  const editProfileBtn = document.getElementById("editProfileBtn");
+
+  if (editProfileBtn) {
+    editProfileBtn.addEventListener("click", () => {
+      document.getElementById("inputName").value = profileData.name || "";
+      document.getElementById("inputEmail").value = profileData.email || "";
+      document.getElementById("inputDept").value = profileData.department || "";
+      document.getElementById("inputMajor").value = profileData.major || "";
+      openModal("editModal");
+    });
   }
 
-  /* ══════════════════════════════════════════
-     EDIT PROFILE
-  ══════════════════════════════════════════ */
-  document.getElementById("editProfileBtn").addEventListener("click", () => {
-    document.getElementById("inputName").value  = profileData.name;
-    document.getElementById("inputEmail").value = profileData.email;
-    document.getElementById("inputDept").value  = profileData.department;
-    document.getElementById("inputMajor").value = profileData.major;
-    openModal("editModal");
-  });
-
-  document.getElementById("closeEditBtn").addEventListener("click",  () => closeModal("editModal"));
+  document.getElementById("closeEditBtn").addEventListener("click", () => closeModal("editModal"));
   document.getElementById("cancelEditBtn").addEventListener("click", () => closeModal("editModal"));
 
-  document.getElementById("saveEditBtn").addEventListener("click", () => {
-    const name  = document.getElementById("inputName").value.trim();
+  document.getElementById("saveEditBtn").addEventListener("click", async () => {
+    const name = document.getElementById("inputName").value.trim();
     const email = document.getElementById("inputEmail").value.trim();
-    const dept  = document.getElementById("inputDept").value.trim();
+    const department = document.getElementById("inputDept").value.trim();
     const major = document.getElementById("inputMajor").value.trim();
 
-    if (!name || !email) { showToast("⚠️ Name and email are required."); return; }
+    if (!name || !email) {
+      showToast("Name and email are required.");
+      return;
+    }
 
-    profileData.name       = name;
-    profileData.email      = email;
-    profileData.department = dept;
-    profileData.major      = major;
+    profileData = {
+      ...profileData,
+      name,
+      email,
+      department,
+      major
+    };
 
-    renderProfileCard();
-    closeModal("editModal");
-    showToast("Profile updated successfully!");
+    try {
+      await updateDoc(doc(db, "users", currentUserId), {
+        name,
+        email,
+        department,
+        major
+      });
+
+      renderProfileCard();
+      closeModal("editModal");
+      showToast("Changes saved successfully.");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      showToast("Could not save changes.");
+    }
   });
 
-  /* ══════════════════════════════════════════
-     ACADEMIC RECORD
-  ══════════════════════════════════════════ */
   const academicBtn = document.querySelector(".primary-btn");
+
   if (academicBtn) {
     academicBtn.addEventListener("click", () => {
-      document.getElementById("rec-id").textContent      = profileData.id;
-      document.getElementById("rec-name").textContent    = profileData.name;
-      document.getElementById("rec-gpa").textContent     = profileData.gpa + " / 5.00";
-      document.getElementById("rec-credits").textContent = profileData.credits + " / " + profileData.totalCredits;
-      document.getElementById("rec-dept").textContent    = profileData.department;
-      document.getElementById("rec-major").textContent   = profileData.major;
+      document.getElementById("rec-id").textContent = profileData.studentId || "N/A";
+      document.getElementById("rec-name").textContent = profileData.name || "N/A";
+      document.getElementById("rec-email").textContent = profileData.email || "N/A";
+      document.getElementById("rec-dept").textContent = profileData.department || "N/A";
+      document.getElementById("rec-major").textContent = profileData.major || "N/A";
+      document.getElementById("rec-gpa").textContent = `${profileData.gpa || "0.00"} / 5.00`;
+      document.getElementById("rec-credits").textContent =
+        `${profileData.credits || 0} / ${profileData.totalCredits || 132}`;
+
       openModal("recordModal");
     });
   }
 
   document.getElementById("closeRecordBtn").addEventListener("click", () => closeModal("recordModal"));
+
   document.getElementById("printRecordBtn").addEventListener("click", () => {
     closeModal("recordModal");
     setTimeout(() => window.print(), 200);
   });
 
-  /* ══════════════════════════════════════════
-     COURSE CARDS → DETAIL MODAL
-  ══════════════════════════════════════════ */
-  const courseIconsMap = {
-    "CS301": "fa-microchip",
-    "CS312": "fa-database",
-    "CS450": "fa-shield-halved",
-    "CS208": "fa-network-wired"
-  };
-
-  document.querySelectorAll(".course-card").forEach((card, idx) => {
-    card.style.cursor = "pointer";
-    card.addEventListener("click", () => {
-      const course = coursesData[idx];
-      if (!course) return;
-
-      document.getElementById("cm-icon").innerHTML =
-        `<i class="fa-solid ${courseIconsMap[course.code] || "fa-book-open"}"></i>`;
-
-      document.getElementById("cm-code").textContent     = course.code;
-      document.getElementById("cm-name").textContent     = course.name;
-      document.getElementById("cm-doctor").textContent   = course.doctor;
-      document.getElementById("cm-location").textContent = course.location;
-      document.getElementById("cm-schedule").textContent = course.schedule;
-      document.getElementById("cm-section").textContent  = `${course.section}  •  ${course.credits} Credits`;
-
-      const statusEl = document.getElementById("cm-status");
-      statusEl.textContent = course.status;
-      statusEl.className   = "cm-status-badge " + course.statusClass;
-
-      const pct = Math.min((course.absences / course.maxAbsences) * 100, 100);
-      const bar = document.getElementById("cm-absence-bar");
-      bar.style.width = pct + "%";
-      bar.style.background =
-        pct >= 75 ? "linear-gradient(90deg,#b91c1c,#ef4444)" :
-        pct >= 50 ? "linear-gradient(90deg,#a05b10,#f59e0b)" :
-                    "linear-gradient(90deg,#173a76,#2b58a8)";
-
-      document.getElementById("cm-abs-count").textContent =
-        `${course.absences} / ${course.maxAbsences} absences`;
-
-      const remaining = course.maxAbsences - course.absences;
-      document.getElementById("cm-abs-note").textContent =
-        remaining > 0
-          ? `You have ${remaining} absence${remaining > 1 ? "s" : ""} remaining before academic warning.`
-          : "⚠️ You have reached the maximum allowed absences. Please contact your advisor.";
-
-      openModal("courseModal");
+  document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeModal(overlay.id);
     });
   });
 
-  document.getElementById("closeCourseBtn").addEventListener("click", () => closeModal("courseModal"));
-
-  /* ══════════════════════════════════════════
-     SOCIAL BUTTONS
-  ══════════════════════════════════════════ */
-  const socialActions = {
-    "Instagram": () => window.open("https://instagram.com", "_blank"),
-    "Phone":     () => window.open("tel:+966500000000"),
-    "Message":   () => window.open("mailto:" + profileData.email),
-  };
-  document.querySelectorAll(".social-btn").forEach(btn => {
-    const label = btn.getAttribute("aria-label");
-    if (socialActions[label]) btn.addEventListener("click", socialActions[label]);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeModal("editModal");
+      closeModal("recordModal");
+      closeModal("logoutModal");
+    }
   });
 
-  /* ══════════════════════════════════════════
-     LOGOUT — Confirm Dialog
-  ══════════════════════════════════════════ */
-  document.querySelectorAll(".nav-item, .sidebar-bottom a").forEach(link => {
+  document.querySelectorAll(".logout, .sidebar-bottom a, .nav-item").forEach((link) => {
     const text = link.textContent.trim().toLowerCase();
+
     if (text.includes("logout")) {
-      link.addEventListener("click", e => {
+      link.addEventListener("click", (e) => {
         e.preventDefault();
         openModal("logoutModal");
       });
     }
   });
 
-  document.getElementById("closeLogoutBtn").addEventListener("click",  () => closeModal("logoutModal"));
+  document.getElementById("closeLogoutBtn").addEventListener("click", () => closeModal("logoutModal"));
   document.getElementById("cancelLogoutBtn").addEventListener("click", () => closeModal("logoutModal"));
 
-  document.getElementById("confirmLogoutBtn").addEventListener("click", () => {
-    localStorage.removeItem("studentName");
-    sessionStorage.clear();
-    window.location.href = "../login/login.html";
+  document.getElementById("confirmLogoutBtn").addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "../../Login/HTML/login.html";
+    } catch (error) {
+      console.error("Logout error:", error);
+      showToast("Logout failed. Try again.");
+    }
   });
-
-  /* ══════════════════════════════════════════
-     INIT
-  ══════════════════════════════════════════ */
-  renderProfileCard();
-
 });
