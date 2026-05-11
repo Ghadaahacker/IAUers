@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventDescriptionInput = document.getElementById("eventDescriptionInput");
   const eventDateTimeInput = document.getElementById("eventDateTimeInput");
   const buildingHallSelect = document.getElementById("buildingHall");
-const eventFileInput = document.getElementById("eventFileInput");
+  const eventFileInput = document.getElementById("eventFileInput");
 
   const announcementTitleInput = document.getElementById("announcementTitleInput");
   const announcementDescriptionInput = document.getElementById("announcementDescriptionInput");
@@ -116,39 +116,44 @@ const eventFileInput = document.getElementById("eventFileInput");
         building === "A7" ? "building2@iau.edu.sa" :
           "";
 
-try {
-  let fileUrl = "";
-  let fileType = "";
+    try {
+      let fileUrl = "";
+      let fileType = "";
 
-  const selectedFile = eventFileInput.files[0];
+      const selectedFile = eventFileInput.files[0];
 
-  if (selectedFile) {
-    fileType = selectedFile.type;
+      if (selectedFile) {
+        fileType = selectedFile.type;
 
-    const fileRef = ref(
-      storage,
-      `eventFiles/${Date.now()}-${selectedFile.name}`
-    );
+        const fileRef = ref(
+          storage,
+          `eventFiles/${Date.now()}-${selectedFile.name}`
+        );
 
-    await uploadBytes(fileRef, selectedFile);
-    fileUrl = await getDownloadURL(fileRef);
-  }
+        await uploadBytes(fileRef, selectedFile);
+        fileUrl = await getDownloadURL(fileRef);
+      }
 
-  await addDoc(collection(db, "bookingRequests"), {
-    title: eventTitleInput.value.trim(),
-    description: eventDescriptionInput.value.trim(),
-    dateTime: eventDateTimeInput.value,
-    hall: buildingHallSelect.value,
-    building: building,
-    capacity: Number(capacity),
-    assignedToEmail: buildingManagerEmail,
-    status: "Pending",
-    rejectionReason: "",
-    fileUrl: fileUrl,
-    fileType: fileType,
-    createdAt: serverTimestamp()
-  });
+      await addDoc(collection(db, "bookingRequests"), {
+        title: eventTitleInput.value.trim(),
+        description: eventDescriptionInput.value.trim(),
+        dateTime: eventDateTimeInput.value,
+        hall: buildingHallSelect.value,
+        building: building,
+        capacity: Number(capacity),
+        assignedToEmail: buildingManagerEmail,
+        status: "Pending",
+        rejectionReason: "",
+        fileUrl: fileUrl,
+        fileType: fileType,
+        draftId: editingEventId || "",
+        createdAt: serverTimestamp()
+      });
 
+      if (editingEventId) {
+        await deleteDoc(doc(db, "events", editingEventId));
+        editingEventId = null;
+      }
 
       alert(`Your request has been sent to ${buildingManagerEmail}.`);
 
@@ -247,12 +252,12 @@ try {
     const title = announcementTitleInput.value.trim();
     const description = announcementDescriptionInput.value.trim();
     const link = announcementLinkInput.value.trim();
-  
+
     if (!title || !description) {
       alert("Please fill announcement title and description.");
       return;
     }
-  
+
     try {
       const announcementData = {
         title,
@@ -264,7 +269,7 @@ try {
         createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
         updatedAt: serverTimestamp()
       };
-  
+
       if (editingEventId) {
         await updateDoc(doc(db, "events", editingEventId), announcementData);
         editingEventId = null;
@@ -274,7 +279,7 @@ try {
           createdAt: serverTimestamp()
         });
       }
-  
+
       await addDoc(collection(db, "activityLogs"), {
         message:
           status === "published"
@@ -283,17 +288,17 @@ try {
         type: status,
         createdAt: serverTimestamp()
       });
-  
+
       alert(
         status === "published"
           ? "Announcement published successfully."
           : "Announcement saved as draft."
       );
-  
+
       resetAnnouncementForm();
       closeModalFunc(announcementModal);
       loadEventsFromFirebase();
-  
+
     } catch (error) {
       console.error("Error saving announcement:", error);
       alert("Failed to save announcement. Check console.");
@@ -535,19 +540,19 @@ ${event.status === "Rejected" && event.rejectionReason
       if (editBtn) {
         editBtn.addEventListener("click", () => {
           editingEventId = event.id;
-      
+
           if (event.type === "announcement") {
             announcementTitleInput.value = event.title || "";
             announcementDescriptionInput.value = event.description || "";
             announcementLinkInput.value = event.link || "";
-      
+
             openModal(announcementModal);
           } else {
             eventTitleInput.value = event.title || "";
             eventDescriptionInput.value = event.description || "";
             eventDateTimeInput.value = event.dateTime || "";
             buildingHallSelect.value = event.hall || "";
-      
+
             openModal(eventModal);
           }
         });
@@ -556,8 +561,13 @@ ${event.status === "Rejected" && event.rejectionReason
       deleteBtn.addEventListener("click", async () => {
         const confirmDelete = confirm("Delete this content?");
         if (!confirmDelete) return;
-
-        await deleteDoc(doc(db, "events", event.id));
+      
+        if (event.sourceCollection === "bookingRequests") {
+          await deleteDoc(doc(db, "bookingRequests", event.id));
+        } else {
+          await deleteDoc(doc(db, "events", event.id));
+        }
+      
         loadEventsFromFirebase();
       });
 
@@ -596,7 +606,8 @@ ${event.status === "Rejected" && event.rejectionReason
         allEvents.push({
           id: requestDoc.id,
           ...requestDoc.data(),
-          type: "event"
+          type: "event",
+          sourceCollection: "bookingRequests"
         });
       });
 

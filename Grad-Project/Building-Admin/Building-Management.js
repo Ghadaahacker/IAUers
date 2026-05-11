@@ -166,7 +166,7 @@ filterButtons.forEach((button) => {
 });
 
 acceptBtn.addEventListener("click", async () => {
-alert("Accept button clicked");
+  alert("Accept button clicked");
   if (!selectedBookingId) {
     alert("Please select a request first.");
     return;
@@ -202,13 +202,12 @@ alert("Accept button clicked");
       createdAt: serverTimestamp()
     });
 
-await addDoc(collection(db, "activityLogs"), {
-  message: `Event "${selectedBooking.title}" was approved.`,
-  type: "approved",
-  createdAt: serverTimestamp()
-});
+    await addDoc(collection(db, "activityLogs"), {
+      message: `Event "${selectedBooking.title}" was approved.`,
+      type: "approved",
+      createdAt: serverTimestamp()
+    });
 
-alert("Activity log saved.");
 
     rejectBox.classList.remove("show");
 
@@ -239,35 +238,20 @@ submitRejectBtn.addEventListener("click", async () => {
   try {
     await updateDoc(doc(db, "bookingRequests", selectedBookingId), {
       status: "Rejected",
-      rejectionReason: reason
+      rejectionReason: reason,
+      reviewedAt: serverTimestamp()
     });
 
-    alert("Activity log saved.");
 
     const selectedBooking = bookings.find(
-  booking => booking.id === selectedBookingId
-);
+      booking => booking.id === selectedBookingId
+    );
 
-await addDoc(collection(db, "events"), {
-  title: selectedBooking.title || "",
-  description: selectedBooking.description || "",
-  dateTime: selectedBooking.dateTime || "",
-  location: selectedBooking.hall || "",
-  hall: selectedBooking.hall || "",
-  building: selectedBooking.building || "",
-  seatCapacity: selectedBooking.capacity || 0,
-  type: "event",
-  status: "Rejected",
-  rejectionReason: reason,
-  createdBy: selectedBooking.createdBy || "Admin",
-  createdAt: serverTimestamp()
-});
-
-await addDoc(collection(db, "activityLogs"), {
-  message: `Event "${selectedBooking.title}" was rejected. Reason: ${reason}`,
-  type: "rejected",
-  createdAt: serverTimestamp()
-});
+    await addDoc(collection(db, "activityLogs"), {
+      message: `Event "${selectedBooking.title}" was rejected. Reason: ${reason}`,
+      type: "rejected",
+      createdAt: serverTimestamp()
+    });
 
 
     rejectBox.classList.remove("show");
@@ -316,15 +300,15 @@ onAuthStateChanged(auth, (user) => {
     return;
   }
 
-profileEmail.textContent = currentUserEmail;
-profileName.textContent = currentUserEmail.split("@")[0];
+  profileEmail.textContent = currentUserEmail;
+  profileName.textContent = currentUserEmail.split("@")[0];
 
-const q = query(
-  collection(db, "bookingRequests"),
-  where("assignedToEmail", "==", currentUserEmail)
-);
+  const q = query(
+    collection(db, "bookingRequests"),
+    where("assignedToEmail", "==", currentUserEmail)
+  );
 
-console.log("Building page session email:", currentUserEmail);
+  console.log("Building page session email:", currentUserEmail);
 
   onSnapshot(q, (snapshot) => {
     bookings = [];
