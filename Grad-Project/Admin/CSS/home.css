@@ -148,30 +148,6 @@ body {
   color: #5f6e80;
 }
 
-.card-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 999px;
-}
-
-.card-badge.pending {
-  background: var(--warning);
-  color: #8a5a17;
-}
-
-.card-badge.active-badge {
-  background: #d9e8f7;
-  color: #4d79a5;
-}
-
-.card-badge.review {
-  background: var(--danger);
-  color: #9f2f2f;
-}
-
 .summary-card h3 {
   font-size: 52px;
   line-height: 1;
