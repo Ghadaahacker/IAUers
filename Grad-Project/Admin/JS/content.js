@@ -428,7 +428,13 @@ ${
       );
   
       const snapshot = await getDocs(q);
-  
+  const rejectedQ = query(
+  collection(db, "bookingRequests"),
+  where("status", "==", "Rejected")
+);
+
+const rejectedSnapshot = await getDocs(rejectedQ);
+
       allEvents = [];
   
       snapshot.forEach((eventDoc) => {
@@ -438,6 +444,14 @@ ${
           ...eventDoc.data()
         });
       });
+
+      rejectedSnapshot.forEach((requestDoc) => {
+  allEvents.push({
+    id: requestDoc.id,
+    ...requestDoc.data(),
+    type: "event"
+  });
+});
   
       updateStats();
       renderEventsPage();
