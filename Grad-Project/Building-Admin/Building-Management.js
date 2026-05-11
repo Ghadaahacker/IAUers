@@ -165,6 +165,53 @@ filterButtons.forEach((button) => {
   });
 });
 
+acceptBtn.addEventListener("click", async () => {
+
+  if (!selectedBookingId) {
+    alert("Please select a request first.");
+    return;
+  }
+
+  const selectedBooking = bookings.find(
+    booking => booking.id === selectedBookingId
+  );
+
+  console.log(selectedBooking);
+
+  try {
+
+    await updateDoc(doc(db, "bookingRequests", selectedBookingId), {
+      status: "Accepted",
+      adminVisible: true,
+      published: true,
+      reviewedAt: serverTimestamp(),
+      rejectionReason: ""
+    });
+
+    await addDoc(collection(db, "events"), {
+      title: selectedBooking.title || "",
+      description: selectedBooking.description || "",
+      dateTime: selectedBooking.dateTime || "",
+      location: selectedBooking.hall || "",
+      hall: selectedBooking.hall || "",
+      building: selectedBooking.building || "",
+      seatCapacity: selectedBooking.capacity || 0,
+      type: "event",
+      status: "published",
+      createdBy: selectedBooking.createdBy || "Admin",
+      createdAt: serverTimestamp()
+    });
+
+    rejectBox.classList.remove("show");
+
+    alert("Request accepted successfully.");
+
+  } catch (error) {
+    console.error("Error accepting request:", error);
+    alert("Could not accept request.");
+  }
+
+});
 
 rejectBtn.addEventListener("click", () => {
   if (!selectedBookingId) return;
