@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,15 +8,11 @@
 
   <link rel="stylesheet" href="../CSS/settings.css" />
   <link rel="stylesheet" href="../../Shared/CSS/admin-sidebar.css" />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
+
 <body>
   <div class="dashboard-container">
     <div id="admin-sidebar"></div>
@@ -42,12 +39,12 @@
 
           <div class="profile-layout">
             <div class="profile-avatar-box">
-                <div class="avatar-wrapper">
-                    <div class="avatar-placeholder">J</div>
-                    <button class="avatar-edit-btn" type="button">
-                      <i class="fa-solid fa-pen"></i>
-                    </button>
-                  </div>
+              <div class="avatar-wrapper">
+                <div class="avatar-placeholder">J</div>
+                <button class="avatar-edit-btn" type="button">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              </div>
             </div>
 
             <div class="profile-form">
@@ -99,8 +96,8 @@
 
               <div class="toggle-item">
                 <div>
-                  <h4>New Student Enrollment</h4>
-                  <p>Notify when a new student completes registration.</p>
+                  <h4>Student Event Registration</h4>
+                  <p>Receive notifications when students register for events.</p>
                 </div>
                 <label class="switch">
                   <input type="checkbox" checked />
@@ -110,37 +107,11 @@
 
               <div class="toggle-item">
                 <div>
-                  <h4>Course Approval Requests</h4>
-                  <p>Receive updates about course approvals.</p>
+                  <h4>Venue Request Updates</h4>
+                  <p>Receive updates when venue requests are approved or rejected.</p>
                 </div>
                 <label class="switch">
                   <input type="checkbox" checked />
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="notification-column">
-              <h3>Dashboard Alerts</h3>
-
-              <div class="toggle-item">
-                <div>
-                  <h4>System Status Updates</h4>
-                  <p>Show important portal status notifications.</p>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" checked />
-                  <span class="slider"></span>
-                </label>
-              </div>
-
-              <div class="toggle-item">
-                <div>
-                  <h4>Weekly Summary</h4>
-                  <p>Summary of engagement and activity insights.</p>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" />
                   <span class="slider"></span>
                 </label>
               </div>
@@ -171,23 +142,7 @@
                 <i class="fa-regular fa-envelope"></i>
                 <div>
                   <h4>Support Email</h4>
-                  <p>admin-support@iau.edu</p>
-                </div>
-              </div>
-
-              <div class="info-item">
-                <i class="fa-solid fa-phone"></i>
-                <div>
-                  <h4>Office Phone</h4>
-                  <p>+1 (555) 924-1000</p>
-                </div>
-              </div>
-
-              <div class="info-item">
-                <i class="fa-solid fa-location-dot"></i>
-                <div>
-                  <h4>Office Location</h4>
-                  <p>Central Admin Tower, Level 4</p>
+                  <p>organg67@gmail.com</p>
                 </div>
               </div>
             </div>
@@ -212,31 +167,12 @@
             </div>
           </div>
         </section>
-
-        <!-- Danger Zone -->
-        <section class="danger-card">
-          <div class="danger-left">
-            <div class="danger-icon">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <div>
-              <h3>Danger Zone</h3>
-              <p>Deactivate Administrative Account</p>
-              <small>
-                Closing your account will remove your access to institutional resources.
-              </small>
-            </div>
-          </div>
-
-          <button class="danger-btn" type="button" id="deactivateBtn">
-            Deactivate Account
-          </button>
-        </section>
       </section>
     </main>
   </div>
 
   <script src="../../Shared/JS/admin-sidebar.js"></script>
-  <script src="../JS/settings.js"></script>
+  <script type="module" src="../JS/settings.js"></script>
 </body>
+
 </html>
