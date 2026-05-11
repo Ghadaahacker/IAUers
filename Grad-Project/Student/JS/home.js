@@ -6,7 +6,9 @@ import {
   query,
   where,
   doc,
-  getDoc
+  getDoc,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 import {
@@ -26,12 +28,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalEventDate = document.getElementById("modalEventDate");
   const modalEventLocation = document.getElementById("modalEventLocation");
   const modalEventCapacity = document.getElementById("modalEventCapacity");
+  const registerBtn = document.querySelector(".register-btn");
+
+  let currentUser = null;
+  let selectedEvent = null;
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "../../Login/HTML/login.html";
       return;
     }
+
+    currentUser = user;
 
     await loadStudentGreeting(user.uid);
     await loadPublishedEventsForStudents();
@@ -60,35 +68,14 @@ document.addEventListener("DOMContentLoaded", function () {
         studentName = userData.name || "Student";
       }
 
-      if (greetingText) {
-        greetingText.textContent = `${greeting}, ${studentName}`;
-      }
-
+      greetingText.textContent = `${greeting}, ${studentName}`;
     } catch (error) {
       console.error("Error loading student name:", error);
-
-      if (greetingText) {
-        greetingText.textContent = `${greeting}, Student`;
-      }
+      greetingText.textContent = `${greeting}, Student`;
     }
   }
 
-  const currentPage = window.location.pathname.split("/").pop() || "home.html";
-  const navItems = document.querySelectorAll(".nav-menu .nav-item, .sidebar-bottom .nav-item");
-
-  navItems.forEach(link => {
-    const href = link.getAttribute("href");
-
-    if (href === currentPage) {
-      link.classList.add("active");
-    } else if (href !== "home.html") {
-      link.classList.remove("active");
-    }
-  });
-
   async function loadPublishedEventsForStudents() {
-    if (!studentEventsList) return;
-
     studentEventsList.innerHTML = "";
 
     try {
@@ -111,6 +98,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       snapshot.forEach((eventDoc) => {
         const event = eventDoc.data();
+
+        const eventWithId = {
+          id: eventDoc.id,
+          ...event
+        };
 
         const card = document.createElement("article");
         card.className = "event-card";
@@ -135,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
         card.addEventListener("click", () => {
-          openEventModal(event);
+          openEventModal(eventWithId);
         });
 
         studentEventsList.appendChild(card);
@@ -154,6 +146,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function openEventModal(event) {
+    selectedEvent = event;
+
     modalEventImage.src = event.imageUrl || "../../images/campus.jpg";
     modalEventTitle.textContent = event.title || "Untitled Event";
     modalEventDescription.textContent = event.description || "No description available.";
@@ -166,22 +160,61 @@ document.addEventListener("DOMContentLoaded", function () {
       modalEventCapacity.textContent = `${event.seatCapacity || 0} seats available`;
     }
 
+    registerBtn.textContent = "Register";
+    registerBtn.disabled = false;
+
     eventDetailsModal.style.display = "flex";
   }
 
-  if (closeEventModal) {
-    closeEventModal.addEventListener("click", () => {
-      eventDetailsModal.style.display = "none";
-    });
-  }
+  registerBtn.addEventListener("click", async () => {
+    if (!currentUser || !selectedEvent) return;
 
-  if (eventDetailsModal) {
-    eventDetailsModal.addEventListener("click", (e) => {
-      if (e.target === eventDetailsModal) {
-        eventDetailsModal.style.display = "none";
+    try {
+      const duplicateQuery = query(
+        collection(db, "eventRegistrations"),
+        where("studentId", "==", currentUser.uid),
+        where("eventId", "==", selectedEvent.id)
+      );
+
+      const duplicateSnapshot = await getDocs(duplicateQuery);
+
+      if (!duplicateSnapshot.empty) {
+        alert("You already registered for this event.");
+        return;
       }
-    });
-  }
+
+      await addDoc(collection(db, "eventRegistrations"), {
+        studentId: currentUser.uid,
+        studentEmail: currentUser.email,
+        eventId: selectedEvent.id,
+        eventTitle: selectedEvent.title || "Untitled Event",
+        eventDateTime: selectedEvent.dateTime || "",
+        eventLocation: selectedEvent.location || "IAU Campus",
+        description: selectedEvent.description || "",
+        status: "approved",
+        createdAt: serverTimestamp()
+      });
+
+      alert("Registered successfully. This event is now added to your schedule.");
+
+      registerBtn.textContent = "Registered";
+      registerBtn.disabled = true;
+
+    } catch (error) {
+      console.error("Error registering event:", error);
+      alert("Failed to register. Please try again.");
+    }
+  });
+
+  closeEventModal.addEventListener("click", () => {
+    eventDetailsModal.style.display = "none";
+  });
+
+  eventDetailsModal.addEventListener("click", (e) => {
+    if (e.target === eventDetailsModal) {
+      eventDetailsModal.style.display = "none";
+    }
+  });
 
   function formatDateTime(value) {
     if (!value) return "Date not set";
