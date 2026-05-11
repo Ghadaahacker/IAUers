@@ -172,6 +172,15 @@ saveEventDraftBtn.addEventListener("click", () => {
         createdAt: serverTimestamp()
       });
   
+      await addDoc(collection(db, "activityLogs"), {
+  message:
+    status === "published"
+      ? `Announcement "${title}" was published.`
+      : `Announcement "${title}" was saved as draft.`,
+  type: status,
+  createdAt: serverTimestamp()
+});
+
       alert(
         status === "published"
           ? "Announcement published successfully."
@@ -392,16 +401,24 @@ ${
             </span>
           </div>
         </div>
-  
-        <div class="content-actions">
-          <button class="icon-btn analytics-btn" title="Analytics" type="button">
-            <span class="material-symbols-outlined">bar_chart</span>
-          </button>
-  
-          <button class="icon-btn delete-event-btn" title="Delete" type="button">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
-        </div>
+
+<div class="content-actions">
+
+  ${
+    event.status !== "Rejected"
+      ? `
+      <button class="icon-btn analytics-btn" title="Analytics" type="button">
+        <span class="material-symbols-outlined">bar_chart</span>
+      </button>
+      `
+      : ""
+  }
+
+  <button class="icon-btn delete-event-btn" title="Delete" type="button">
+    <span class="material-symbols-outlined">delete</span>
+  </button>
+
+</div>
       `;
   
       const deleteBtn = card.querySelector(".delete-event-btn");

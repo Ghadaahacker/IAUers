@@ -2,7 +2,11 @@ import { db } from "../../Shared/JS/firebase-config.js";
 
 import {
   collection,
-  getDocs
+  getDocs,
+  query,
+  orderBy,
+  limit,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const addEventBtn = document.getElementById("addEventBtn");
@@ -69,3 +73,35 @@ async function loadDashboardStats() {
 }
 
 loadDashboardStats();
+const recentActivityList = document.getElementById("recentActivityList");
+
+function loadRecentActivity() {
+  const q = query(
+    collection(db, "activityLogs"),
+    orderBy("createdAt", "desc"),
+    limit(5)
+  );
+
+  onSnapshot(q, (snapshot) => {
+    recentActivityList.innerHTML = "";
+
+    snapshot.forEach((docSnap) => {
+      const activity = docSnap.data();
+
+      const item = document.createElement("div");
+      item.className = "activity-item";
+
+      item.innerHTML = `
+        <span class="activity-dot light"></span>
+        <div>
+          <p>${activity.message}</p>
+          <small>Latest update</small>
+        </div>
+      `;
+
+      recentActivityList.appendChild(item);
+    });
+  });
+}
+
+loadRecentActivity();

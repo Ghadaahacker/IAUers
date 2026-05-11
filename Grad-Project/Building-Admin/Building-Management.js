@@ -201,6 +201,11 @@ acceptBtn.addEventListener("click", async () => {
       createdBy: selectedBooking.createdBy || "Admin",
       createdAt: serverTimestamp()
     });
+await addDoc(collection(db, "activityLogs"), {
+  message: `Event "${selectedBooking.title}" was approved.`,
+  type: "approved",
+  createdAt: serverTimestamp()
+});
 
     rejectBox.classList.remove("show");
 
@@ -252,6 +257,13 @@ await addDoc(collection(db, "events"), {
   createdBy: selectedBooking.createdBy || "Admin",
   createdAt: serverTimestamp()
 });
+
+await addDoc(collection(db, "activityLogs"), {
+  message: `Event "${selectedBooking.title}" was rejected. Reason: ${reason}`,
+  type: "rejected",
+  createdAt: serverTimestamp()
+});
+
 
     rejectBox.classList.remove("show");
     rejectReasonInput.value = "";
