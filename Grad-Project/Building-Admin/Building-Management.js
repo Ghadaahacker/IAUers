@@ -234,6 +234,25 @@ submitRejectBtn.addEventListener("click", async () => {
       rejectionReason: reason
     });
 
+    const selectedBooking = bookings.find(
+  booking => booking.id === selectedBookingId
+);
+
+await addDoc(collection(db, "events"), {
+  title: selectedBooking.title || "",
+  description: selectedBooking.description || "",
+  dateTime: selectedBooking.dateTime || "",
+  location: selectedBooking.hall || "",
+  hall: selectedBooking.hall || "",
+  building: selectedBooking.building || "",
+  seatCapacity: selectedBooking.capacity || 0,
+  type: "event",
+  status: "Rejected",
+  rejectionReason: reason,
+  createdBy: selectedBooking.createdBy || "Admin",
+  createdAt: serverTimestamp()
+});
+
     rejectBox.classList.remove("show");
     rejectReasonInput.value = "";
 

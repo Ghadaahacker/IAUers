@@ -8,7 +8,8 @@ import {
   orderBy,
   deleteDoc,
   doc,
-  serverTimestamp
+  serverTimestamp,
+  where
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -331,7 +332,13 @@ saveEventDraftBtn.addEventListener("click", () => {
     }
   
     eventsToShow.forEach((event) => {
-      const statusClass = event.status === "published" ? "published" : "draft";
+const statusClass =
+  event.status === "published"
+    ? "published"
+    : event.status === "Rejected"
+    ? "rejected"
+    : "draft";
+
       const typeLabel = event.type === "announcement" ? "ANNOUNCEMENT" : "EVENT";
       const typeClass = event.type === "announcement" ? "announcement" : "event";
   
@@ -342,7 +349,20 @@ saveEventDraftBtn.addEventListener("click", () => {
         <div class="content-info">
           <div class="badges">
             <span class="badge type ${typeClass}">${typeLabel}</span>
-            <span class="badge status ${statusClass}">${event.status.toUpperCase()}</span>
+            <span class="badge status ${statusClass}">
+  ${event.status.toUpperCase()}
+</span>
+
+${
+  event.status === "Rejected" && event.rejectionReason
+    ? `
+      <div class="reject-reason">
+        <strong>Rejection Reason:</strong>
+        ${event.rejectionReason}
+      </div>
+    `
+    : ""
+}
           </div>
   
           <h3>${event.title}</h3>
