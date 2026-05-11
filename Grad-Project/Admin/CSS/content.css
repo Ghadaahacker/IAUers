@@ -111,32 +111,8 @@ body {
 .stat-card h2 {
   font-size: 52px;
   line-height: 1;
-  margin-bottom: 16px;
+  margin-bottom: 0;
   color: var(--navy-dark);
-}
-
-.stat-note {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.stat-note.success {
-  color: #5a9b6b;
-}
-
-.stat-note.neutral {
-  color: #4d79a5;
-}
-
-.stat-note.warning {
-  color: #9b6a2f;
-}
-
-.stat-inline-icon {
-  font-size: 16px !important;
-  vertical-align: middle;
-  margin-right: 6px;
-  color: #4d79a5;
 }
 
 /* Action buttons */
