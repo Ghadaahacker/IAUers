@@ -20,136 +20,95 @@
   <link rel="stylesheet" href="../CSS/home.css" />
   <link rel="stylesheet" href="../../Shared/CSS/student-sidebar.css" />
 </head>
+
 <body>
   <div class="layout">
-
     <div id="student-sidebar"></div>
 
-    <!-- Main -->
     <main class="main-content">
-
-      <!-- Page content -->
       <section class="page-content">
-        <div class="content-left">
-          <div class="welcome-block">
-            <h1 id="greetingText">Welcome Student</h1>
-            <p>Manage your university life from your personal dashboard.</p>
-          </div>
 
-          <!-- Summary Cards -->
-          <section class="stats-grid">
-            <div class="stat-card">
-              <div class="card-top">
-                <div class="card-icon light-blue">
-                  <i class="fa-regular fa-calendar"></i>
-                </div>
-                <span class="status-badge badge-gold">2 today</span>
-              </div>
-              <h2>05</h2>
-              <p>My Schedule</p>
-            </div>
+        <div class="welcome-block">
+          <h1 id="greetingText">Welcome, Student</h1>
+          <p>Manage your university life from your personal dashboard.</p>
+        </div>
 
-            <div class="stat-card">
-              <div class="card-top">
-                <div class="card-icon light-blue">
-                  <i class="fa-solid fa-ticket"></i>
-                </div>
-                <span class="status-badge badge-blue">3 active</span>
-              </div>
-              <h2>03</h2>
-              <p>My Tickets</p>
-            </div>
-
-            <div class="stat-card">
-              <div class="card-top">
-                <div class="card-icon light-gray">
-                  <i class="fa-solid fa-tag"></i>
-                </div>
-                <span class="status-badge badge-pink">4 available</span>
-              </div>
-              <h2>04</h2>
-              <p>My Benefits</p>
-            </div>
-          </section>
-
-          <!-- Quick Actions -->
-          <section class="quick-actions">
-            <div class="section-title">
-              <span class="title-line"></span>
-              <h2>Quick Actions</h2>
-            </div>
-
-            <div class="action-buttons">
-              <a href="tickets.html" class="action-btn primary-action">
-                <i class="fa-solid fa-plus"></i>
-                <span>My Tickets</span>
-              </a>
-
-              <a href="schedule.html" class="action-btn secondary-action">
-                <i class="fa-regular fa-calendar"></i>
-                <span>View Schedule</span>
-              </a>
-            </div>
-
-            <a href="profile.html" class="edit-link">
-              <i class="fa-solid fa-pen-to-square"></i>
-              <span>Open My Profile</span>
-            </a>
-          </section>
-
-          <!-- Feed / Student Content -->
-          <section class="feed-section">
+        <section class="events-section">
+          <div class="section-header">
             <div class="section-title">
               <span class="title-line"></span>
               <h2>Available Events</h2>
             </div>
-          
-            <div id="studentEventsList" class="feed-card"></div>
-          </section>
-        </div>
 
-        <!-- Right Panel -->
-        <aside class="activity-panel">
-          <h2>Recent Activity</h2>
-
-          <div class="activity-list">
-            <div class="activity-item">
-              <div class="activity-dot dark-dot"></div>
-              <div class="activity-info">
-                <p>You registered for <strong>"Hackathon Bootcamp"</strong>.</p>
-                <span>2 hours ago</span>
-              </div>
-            </div>
-
-            <div class="activity-item">
-              <div class="activity-dot soft-dot"></div>
-              <div class="activity-info">
-                <p>You updated your <strong>student profile</strong>.</p>
-                <span>Yesterday, 4:15 PM</span>
-              </div>
-            </div>
-
-            <div class="activity-item">
-              <div class="activity-dot soft-dot"></div>
-              <div class="activity-info">
-                <p>Your ticket for <strong>"BIS Gathering"</strong> was generated.</p>
-                <span>3 days ago</span>
-              </div>
-            </div>
-
-            <div class="activity-item">
-              <div class="activity-dot soft-dot"></div>
-              <div class="activity-info">
-                <p>You received feedback updates for <strong>"Faculty Workshop"</strong>.</p>
-                <span>Monday, 9:30 AM</span>
-              </div>
-            </div>
+            <button class="show-all-btn" type="button">
+              Show all
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
           </div>
 
-          <a href="journey.html" class="view-log-link">View Full Activity Log</a>
-        </aside>
+          <div id="studentEventsList" class="events-slider"></div>
+        </section>
+
+        <section class="events-section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="title-line"></span>
+              <h2>Announcements</h2>
+            </div>
+
+            <button class="show-all-btn" type="button">
+              Show all
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <div id="announcementsList" class="events-slider">
+            <div class="announcement-card">
+              <div class="announcement-top">Coming Soon</div>
+              <h3>Student Announcements</h3>
+              <p>Announcements will be connected to Firebase later.</p>
+            </div>
+          </div>
+        </section>
+
       </section>
     </main>
+  </div>
+
+  <div id="eventDetailsModal" class="event-modal">
+    <div class="event-modal-content">
+      <button id="closeEventModal" class="close-event-btn" type="button">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <img id="modalEventImage" class="modal-event-image" src="" alt="Event Image" />
+
+      <div class="modal-event-body">
+        <div class="modal-event-top">
+          <h2 id="modalEventTitle"></h2>
+          <button class="register-btn" type="button">Register</button>
+        </div>
+
+        <p id="modalEventDescription"></p>
+
+        <div class="modal-event-info">
+          <div class="info-row">
+            <i class="fa-regular fa-calendar"></i>
+            <span id="modalEventDate"></span>
+          </div>
+
+          <div class="info-row">
+            <i class="fa-solid fa-location-dot"></i>
+            <span id="modalEventLocation"></span>
+          </div>
+
+          <div class="info-row">
+            <i class="fa-solid fa-chair"></i>
+            <span id="modalEventCapacity"></span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="../../Shared/JS/student-sidebar.js"></script>
