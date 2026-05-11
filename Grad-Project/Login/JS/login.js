@@ -6,7 +6,9 @@ import {
 
 import {
   doc,
-  getDoc
+  getDoc,
+  updateDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const loginForm = document.getElementById("loginForm");
@@ -51,6 +53,9 @@ loginForm.addEventListener("submit", async function (e) {
     }
 
     const userData = userSnap.data();
+    await updateDoc(userRef, {
+      lastLogin: serverTimestamp()
+    });
 
 sessionStorage.setItem("userRole", userData.role);
 sessionStorage.setItem("userEmail", email);
