@@ -1,4 +1,4 @@
-import { auth, db } from "../../Shared/JS/firebase-config.js";
+import { auth, db, storage } from "../../Shared/JS/firebase-config.js";
 
 import {
   collection,
@@ -12,6 +12,12 @@ import {
   where,
   updateDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const eventModal = document.getElementById("eventModal");
@@ -32,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventDescriptionInput = document.getElementById("eventDescriptionInput");
   const eventDateTimeInput = document.getElementById("eventDateTimeInput");
   const buildingHallSelect = document.getElementById("buildingHall");
+const eventFileInput = document.getElementById("eventFileInput");
 
   const announcementTitleInput = document.getElementById("announcementTitleInput");
   const announcementDescriptionInput = document.getElementById("announcementDescriptionInput");
@@ -50,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     eventDescriptionInput.value = "";
     eventDateTimeInput.value = "";
     buildingHallSelect.value = "";
+    eventFileInput.value = "";
   }
 
   function resetAnnouncementForm() {
@@ -108,19 +116,39 @@ document.addEventListener("DOMContentLoaded", () => {
         building === "A7" ? "building2@iau.edu.sa" :
           "";
 
-    try {
-      await addDoc(collection(db, "bookingRequests"), {
-        title: eventTitleInput.value.trim(),
-        description: eventDescriptionInput.value.trim(),
-        dateTime: eventDateTimeInput.value,
-        hall: buildingHallSelect.value,
-        building: building,
-        capacity: Number(capacity),
-        assignedToEmail: buildingManagerEmail,
-        status: "Pending",
-        rejectionReason: "",
-        createdAt: serverTimestamp()
-      });
+try {
+  let fileUrl = "";
+  let fileType = "";
+
+  const selectedFile = eventFileInput.files[0];
+
+  if (selectedFile) {
+    fileType = selectedFile.type;
+
+    const fileRef = ref(
+      storage,
+      `eventFiles/${Date.now()}-${selectedFile.name}`
+    );
+
+    await uploadBytes(fileRef, selectedFile);
+    fileUrl = await getDownloadURL(fileRef);
+  }
+
+  await addDoc(collection(db, "bookingRequests"), {
+    title: eventTitleInput.value.trim(),
+    description: eventDescriptionInput.value.trim(),
+    dateTime: eventDateTimeInput.value,
+    hall: buildingHallSelect.value,
+    building: building,
+    capacity: Number(capacity),
+    assignedToEmail: buildingManagerEmail,
+    status: "Pending",
+    rejectionReason: "",
+    fileUrl: fileUrl,
+    fileType: fileType,
+    createdAt: serverTimestamp()
+  });
+
 
       alert(`Your request has been sent to ${buildingManagerEmail}.`);
 
