@@ -1,6 +1,17 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const STORAGE_KEY = "studentTickets";
+import { auth, db } from "../../Shared/JS/firebase-config.js";
 
+import {
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+document.addEventListener("DOMContentLoaded", function () {
   const confirmedCount = document.getElementById("confirmedCount");
   const pendingCount = document.getElementById("pendingCount");
   const confirmedListCount = document.getElementById("confirmedListCount");
@@ -9,8 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const confirmedTicketsList = document.getElementById("confirmedTicketsList");
   const pendingTicketsList = document.getElementById("pendingTicketsList");
 
-  const ticketSearch = document.getElementById("ticketSearch");
-  
   const ticketModal = document.getElementById("ticketModal");
   const modalOverlay = document.getElementById("modalOverlay");
   const closeModalBtn = document.getElementById("closeModalBtn");
@@ -24,8 +33,85 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalEventCategory = document.getElementById("modalEventCategory");
   const qrCodeContainer = document.getElementById("qrCodeContainer");
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
+  let tickets = [];
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "../../Login/HTML/login.html";
+      return;
+    }
+
+    await loadTicketsFromFirebase(user.uid);
+    renderTickets();
+  });
+
+  async function loadTicketsFromFirebase(uid) {
+    tickets = [];
+
+    const collectionsToCheck = ["registrations", "eventRegistrations"];
+    const userFieldsToCheck = ["userId", "studentId"];
+
+    for (const collectionName of collectionsToCheck) {
+      for (const userField of userFieldsToCheck) {
+        try {
+          const q = query(
+            collection(db, collectionName),
+            where(userField, "==", uid)
+          );
+
+          const snapshot = await getDocs(q);
+
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+
+            const ticket = normalizeTicket(docSnap.id, data);
+
+            if (!tickets.some(t => t.ticketId === ticket.ticketId)) {
+              tickets.push(ticket);
+            }
+          });
+
+        } catch (error) {
+          console.warn(`Could not read ${collectionName} by ${userField}:`, error);
+        }
+      }
+    }
+  }
+
+  function normalizeTicket(id, data) {
+    const rawStatus = (data.status || "registered").toLowerCase();
+
+    let status = "confirmed";
+
+    if (rawStatus.includes("pending") || rawStatus.includes("request")) {
+      status = "pending";
+    }
+
+    if (rawStatus.includes("approved") || rawStatus.includes("confirmed") || rawStatus.includes("registered")) {
+      status = "confirmed";
+    }
+
+    return {
+      ticketId: data.ticketId || `TKT-${id.slice(0, 6).toUpperCase()}`,
+      registrationId: id,
+      eventId: data.eventId || "",
+      studentId: data.studentId || data.userId || "",
+      eventTitle: data.eventTitle || data.title || "Untitled Event",
+      eventDate: data.eventDate || data.eventDateTime || data.dateTime || data.date || "",
+      eventTime: data.eventTime || getTimeOnly(data.eventDateTime || data.dateTime || data.eventDate),
+      eventLocation: data.eventLocation || data.location || "IAU Campus",
+      category: data.category || "University Event",
+      status
+    };
+  }
+
+  function formatDate(value) {
+    if (!value) return "Date not available";
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) return value;
+
     return date.toLocaleDateString("en-US", {
       weekday: "long",
       month: "long",
@@ -34,26 +120,23 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function loadTickets() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+  function getTimeOnly(value) {
+    if (!value) return "Time not available";
 
-    try {
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-      console.error("Failed to parse studentTickets:", error);
-      return [];
-    }
-  }
+    const date = new Date(value);
 
-  function saveTickets(tickets) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+    if (isNaN(date.getTime())) return "Time not available";
+
+    return date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   }
 
   function generateQrPayload(ticket) {
     return JSON.stringify({
       ticketId: ticket.ticketId,
+      registrationId: ticket.registrationId,
       studentId: ticket.studentId,
       eventId: ticket.eventId,
       eventTitle: ticket.eventTitle,
@@ -68,12 +151,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function openTicketModal(ticket) {
     modalStatusTag.textContent = ticket.status === "confirmed" ? "Confirmed" : "Pending";
     modalStatusTag.className = `modal-status-tag ${ticket.status}`;
+
     modalEventTitle.textContent = ticket.eventTitle;
-    modalTicketId.textContent = ticket.ticketId || "No Ticket ID";
+    modalTicketId.textContent = ticket.ticketId;
     modalEventDate.textContent = formatDate(ticket.eventDate);
     modalEventTime.textContent = ticket.eventTime || "Time not available";
     modalEventLocation.textContent = ticket.eventLocation || "Location not available";
-    modalEventCategory.textContent = ticket.category || "Uncategorized";
+    modalEventCategory.textContent = ticket.category || "University Event";
 
     clearQrCode();
 
@@ -86,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       qrCodeContainer.innerHTML = `
         <div style="text-align:center; color:#65728d; line-height:1.8;">
-          QR code is available only after confirmation.
+          QR code will be available after confirmation.
         </div>
       `;
     }
@@ -109,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="ticket-card-head">
         <div class="ticket-id">
           <i class="fa-solid fa-ticket"></i>
-          <span>${ticket.ticketId || "Request Pending"}</span>
+          <span>${ticket.ticketId}</span>
         </div>
 
         <span class="status-badge ${ticket.status}">
@@ -138,24 +222,31 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
 
         <div class="ticket-footer">
-          <span class="ticket-category">${ticket.category || "Uncategorized"}</span>
+          <span class="ticket-category">${ticket.category || "University Event"}</span>
 
           <div class="ticket-actions">
-            <button class="ticket-btn secondary view-details-btn" type="button">View Details</button>
-            ${isConfirmed ? `<button class="ticket-btn primary show-qr-btn" type="button">Show QR</button>` : ""}
+            <button class="ticket-btn secondary view-details-btn" type="button">
+              View Details
+            </button>
+
+            ${isConfirmed ? `
+              <button class="ticket-btn primary show-qr-btn" type="button">
+                Show QR
+              </button>
+            ` : ""}
           </div>
         </div>
       </div>
     `;
 
-    const viewDetailsBtn = card.querySelector(".view-details-btn");
-    viewDetailsBtn.addEventListener("click", function () {
+    card.querySelector(".view-details-btn").addEventListener("click", () => {
       openTicketModal(ticket);
     });
 
     const showQrBtn = card.querySelector(".show-qr-btn");
+
     if (showQrBtn) {
-      showQrBtn.addEventListener("click", function () {
+      showQrBtn.addEventListener("click", () => {
         openTicketModal(ticket);
       });
     }
@@ -164,40 +255,20 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderEmptyState(container, message) {
-    container.innerHTML = `
-      <div class="empty-state">${message}</div>
-    `;
+    container.innerHTML = `<div class="empty-state">${message}</div>`;
   }
 
   function renderTickets() {
-    const searchValue = ticketSearch ? ticketSearch.value.trim().toLowerCase() : "";
-    const tickets = loadTickets();
-
-    const filteredTickets = tickets.filter(ticket => {
-      const haystack = [
-        ticket.ticketId,
-        ticket.eventTitle,
-        ticket.eventLocation,
-        ticket.category,
-        ticket.status
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      return haystack.includes(searchValue);
-    });
-
-    const confirmedTickets = filteredTickets
+    const confirmedTickets = tickets
       .filter(ticket => ticket.status === "confirmed")
       .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
 
-    const pendingTickets = filteredTickets
+    const pendingTickets = tickets
       .filter(ticket => ticket.status === "pending")
       .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
 
-    confirmedCount.textContent = tickets.filter(ticket => ticket.status === "confirmed").length;
-    pendingCount.textContent = tickets.filter(ticket => ticket.status === "pending").length;
+    confirmedCount.textContent = confirmedTickets.length;
+    pendingCount.textContent = pendingTickets.length;
 
     confirmedListCount.textContent = `${confirmedTickets.length} ${confirmedTickets.length === 1 ? "ticket" : "tickets"}`;
     pendingListCount.textContent = `${pendingTickets.length} ${pendingTickets.length === 1 ? "request" : "requests"}`;
@@ -208,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!confirmedTickets.length) {
       renderEmptyState(
         confirmedTicketsList,
-        "No confirmed tickets yet. Once your registration is approved, your ticket will appear here."
+        "No confirmed tickets yet. Registered events will appear here once confirmed."
       );
     } else {
       confirmedTickets.forEach(ticket => {
@@ -228,10 +299,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  if (ticketSearch) {
-    ticketSearch.addEventListener("input", renderTickets);
-  }
-
   closeModalBtn.addEventListener("click", closeTicketModal);
   modalOverlay.addEventListener("click", closeTicketModal);
 
@@ -240,6 +307,4 @@ document.addEventListener("DOMContentLoaded", function () {
       closeTicketModal();
     }
   });
-
-  renderTickets();
 });
