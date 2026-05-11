@@ -566,3 +566,17 @@ body {
     flex-direction: column;
   }
 }
+.badge.status.rejected {
+  background: #f6d7d7;
+  color: #b42318;
+}
+
+.reject-reason {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff1f1;
+  border: 1px solid #f3c7c7;
+  color: #7a1c1c;
+  font-size: 14px;
+}
