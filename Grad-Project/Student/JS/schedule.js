@@ -92,10 +92,47 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error loading registered events:", error);
     }
 
-    // Reserved for later: courses / quizzes / tasks from Firebase
-    // Example later:
-    // courses collection
-    // tasks collection
+    try {
+  const tasksQuery = query(
+    collection(db, "tasks"),
+    where("studentId", "==", user.uid)
+  );
+
+  const tasksSnapshot = await getDocs(tasksQuery);
+
+  tasksSnapshot.forEach((docSnap) => {
+    const task = docSnap.data();
+
+    const taskDate = getDateOnly(task.dueDateTime);
+    const taskTime = getTimeOnly(task.dueDateTime);
+
+    let colorClass = "task-purple";
+
+    if (task.type === "Assignment") {
+      colorClass = "task-yellow";
+    } else if (task.type === "Exam") {
+      colorClass = "task-orange";
+    } else if (task.type === "Quiz") {
+      colorClass = "task-purple";
+    }
+
+    allItems.push({
+      id: docSnap.id,
+      type: "task",
+      title: task.title || "Untitled Task",
+      category: task.type || "Task",
+      date: taskDate,
+      startTime: taskTime,
+      endTime: "",
+      location: task.courseName || "Course",
+      description: `${task.type || "Task"} for ${task.courseName || "your course"}.`,
+      colorClass: colorClass
+    });
+  });
+
+} catch (error) {
+  console.error("Error loading tasks:", error);
+}
   }
 
   function formatDateKey(date) {
