@@ -130,38 +130,13 @@ sendBuildingRequestBtn.addEventListener("click", async () => {
     alert("Request was not sent. Check console.");
   }
 });
-    const building = selectedHall.dataset.building;
-    const capacity = selectedHall.dataset.capacity;
+  
+saveEventDraftBtn.addEventListener("click", () => {
+  alert("Event saved as draft.");
+  resetEventForm();
+  closeModalFunc(eventModal);
+});
 
-    const buildingManager =
-      building === "D3" ? "D3 Building Manager" :
-      building === "A7" ? "A7 Building Manager" :
-      "Building Manager";
-
-    const requestData = {
-      title: eventTitleInput.value.trim(),
-      description: eventDescriptionInput.value.trim(),
-      dateTime: eventDateTimeInput.value,
-      hall: buildingHallSelect.value,
-      building: building,
-      capacity: capacity,
-      status: "Pending Building Approval",
-      sentTo: buildingManager
-    };
-
-    console.log("Booking Request:", requestData);
-
-    alert(`Your event request has been sent to ${buildingManager} for approval.`);
-
-    resetEventForm();
-    closeModalFunc(eventModal);
-  });
-
-  saveEventDraftBtn.addEventListener("click", () => {
-    alert("Event saved as draft.");
-    resetEventForm();
-    closeModalFunc(eventModal);
-  });
 
   const saveAnnouncementDraftBtn = document.getElementById("saveAnnouncementDraftBtn");
   const publishAnnouncementBtn = document.getElementById("publishAnnouncementBtn");
@@ -474,3 +449,4 @@ sendBuildingRequestBtn.addEventListener("click", async () => {
   }
   
   loadEventsFromFirebase();
+  });
