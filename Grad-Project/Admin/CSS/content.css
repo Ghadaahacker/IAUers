@@ -96,8 +96,8 @@ body {
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 18px 18px 16px;
-  min-height: 136px;
+  padding: 18px;
+  min-height: 110px;
   box-shadow: var(--shadow);
 }
 
