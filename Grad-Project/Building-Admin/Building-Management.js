@@ -195,13 +195,14 @@ acceptBtn.addEventListener("click", async () => {
       location: selectedBooking.hall || "",
       hall: selectedBooking.hall || "",
       building: selectedBooking.building || "",
-      seatCapacity: selectedBooking.capacity || 0,
+      capacity: Number(selectedBooking.capacity) || 0,
+      image: selectedBooking.image || "",
       type: "event",
       status: "published",
       createdBy: selectedBooking.createdBy || "Admin",
       createdAt: serverTimestamp()
     });
-
+    
     await addDoc(collection(db, "activityLogs"), {
       message: `Event "${selectedBooking.title}" was approved.`,
       type: "approved",
