@@ -23,6 +23,7 @@
 </head>
 
 <body>
+
   <div class="layout">
 
     <div id="student-sidebar"></div>
@@ -30,12 +31,14 @@
     <main class="main-content">
 
       <section class="page-header-bar">
+
         <div>
           <h1>My Profile</h1>
           <p>View and manage your personal and academic information.</p>
         </div>
 
         <div class="header-actions">
+
           <button class="header-btn secondary-btn" id="editProfileBtn">
             <i class="fa-solid fa-pen-to-square"></i>
             <span>Edit Profile</span>
@@ -45,13 +48,17 @@
             <i class="fa-solid fa-file-lines"></i>
             <span>Academic Record</span>
           </button>
+
         </div>
+
       </section>
 
       <section class="profile-layout">
 
         <aside class="profile-card">
+
           <div class="student-photo-block">
+
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAndem0I4Rrl05AGoEphJbj2AsPfwh8UObSg&s"
               alt="Student Photo"
@@ -59,6 +66,7 @@
             />
 
             <span class="student-id-badge"></span>
+
           </div>
 
           <div class="profile-info-block">
@@ -80,6 +88,7 @@
             <span class="info-label">MAJOR</span>
             <p class="info-value-sm"></p>
           </div>
+
         </aside>
 
         <div class="profile-right">
@@ -87,58 +96,124 @@
           <div class="stats-grid">
 
             <div class="stat-card">
+
               <div class="card-top">
+
                 <div class="card-icon light-blue">
                   <i class="fa-solid fa-graduation-cap"></i>
                 </div>
+
                 <span class="status-badge badge-gold">Current</span>
+
               </div>
 
               <h2>--</h2>
-              <p>Cumulative GPA <span class="stat-sub">/ 5.00</span></p>
+
+              <p>
+                Cumulative GPA
+                <span class="stat-sub">/ 5.00</span>
+              </p>
 
               <div class="progress-bar">
                 <div class="progress-fill" style="width: 0%;"></div>
               </div>
+
             </div>
 
             <div class="stat-card">
+
               <div class="card-top">
+
                 <div class="card-icon light-blue">
                   <i class="fa-solid fa-book"></i>
                 </div>
+
                 <span class="status-badge badge-blue">In Progress</span>
+
               </div>
 
               <h2>--</h2>
-              <p>Credits Earned <span class="stat-sub">/ 132</span></p>
+
+              <p>
+                Credits Earned
+                <span class="stat-sub">/ 132</span>
+              </p>
 
               <div class="progress-bar">
                 <div class="progress-fill" style="width: 0%;"></div>
               </div>
+
             </div>
 
             <div class="stat-card">
+
               <div class="card-top">
+
                 <div class="card-icon light-gray">
                   <i class="fa-solid fa-certificate"></i>
                 </div>
+
                 <span class="status-badge badge-pink">Available</span>
+
               </div>
 
               <h2>--</h2>
+
               <p>My Certificates</p>
+
             </div>
 
           </div>
 
+          <section class="interests-card">
+
+            <div class="interests-header">
+
+              <div>
+                <h2>My Interests</h2>
+
+                <p>
+                  Choose your interests to personalize your event recommendations.
+                </p>
+              </div>
+
+              <div class="interest-icon">
+                <i class="fa-solid fa-star"></i>
+              </div>
+
+            </div>
+
+            <div class="interests-chips" id="interestsContainer">
+
+              <button class="interest-chip active">AI</button>
+              <button class="interest-chip">Business</button>
+              <button class="interest-chip">Technology</button>
+              <button class="interest-chip">Sports</button>
+              <button class="interest-chip">Workshops</button>
+              <button class="interest-chip active">Career</button>
+              <button class="interest-chip">Research</button>
+              <button class="interest-chip">Art</button>
+              <button class="interest-chip">Health</button>
+              <button class="interest-chip">Volunteering</button>
+
+            </div>
+
+            <button class="save-interests-btn">
+              Save Interests
+            </button>
+
+          </section>
+
         </div>
+
       </section>
 
     </main>
+
   </div>
 
   <script type="module" src="../JS/profile.js"></script>
   <script src="../../Shared/JS/student-sidebar.js"></script>
+
 </body>
 </html>
