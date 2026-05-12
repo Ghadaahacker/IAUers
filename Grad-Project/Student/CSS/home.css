@@ -338,3 +338,72 @@ body {
     height: 240px;
   }
 }
+.event-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.recommended-event-card {
+  border: 1.5px solid rgba(43, 88, 168, 0.28);
+  box-shadow: 0 14px 34px rgba(43, 88, 168, 0.12);
+}
+
+.recommended-badge,
+.seats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.recommended-badge {
+  background: #eef4ff;
+  color: #2b58a8;
+}
+
+.seats-badge.available {
+  background: #e9f8ef;
+  color: #2f7d46;
+}
+
+.seats-badge.few-left {
+  background: #fff3d8;
+  color: #9a6400;
+}
+
+.seats-badge.sold-out {
+  background: #fdeaea;
+  color: #b42318;
+}
+
+.home-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #162044;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 12px 32px rgba(16, 24, 48, 0.22);
+  z-index: 2000;
+}
+
+.home-toast.hidden {
+  display: none;
+}
+
+.home-toast i {
+  color: #5dd08a;
+}

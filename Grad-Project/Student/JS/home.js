@@ -32,7 +32,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const registerBtn = document.querySelector(".register-btn");
 
   let currentUser = null;
+  let currentStudentInterests = [];
   let selectedEvent = null;
+
+  injectToast();
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -42,13 +45,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     currentUser = user;
 
-    await loadStudentGreeting(user.uid);
+    await loadStudentProfile(user.uid);
     await loadPublishedEventsForStudents();
     await loadPublishedAnnouncementsForStudents();
   });
 
-  async function loadStudentGreeting(uid) {
+  async function loadStudentProfile(uid) {
     const hour = new Date().getHours();
+
     let greeting = "";
 
     if (hour >= 5 && hour < 12) {
@@ -64,21 +68,32 @@ document.addEventListener("DOMContentLoaded", function () {
       const userSnap = await getDoc(userRef);
 
       let studentName = "Student";
+      currentStudentInterests = [];
 
       if (userSnap.exists()) {
         const userData = userSnap.data();
+
         studentName = userData.name || "Student";
+        currentStudentInterests = Array.isArray(userData.interests)
+          ? userData.interests
+          : [];
       }
 
       greetingText.textContent = `${greeting}, ${studentName}`;
     } catch (error) {
-      console.error("Error loading student name:", error);
+      console.error("Error loading student profile:", error);
       greetingText.textContent = `${greeting}, Student`;
+      currentStudentInterests = [];
     }
   }
 
   async function loadPublishedEventsForStudents() {
-    studentEventsList.innerHTML = "";
+    studentEventsList.innerHTML = `
+      <div class="empty-card">
+        <h3>Loading events...</h3>
+        <p>Please wait while we prepare available events.</p>
+      </div>
+    `;
 
     try {
       const q = query(
@@ -99,46 +114,121 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      const events = [];
+
       snapshot.forEach((eventDoc) => {
         const event = eventDoc.data();
 
-        const eventWithId = {
+        events.push({
           id: eventDoc.id,
-          ...event
-        };
-
-        const card = document.createElement("article");
-        card.className = "event-card";
-
-        card.innerHTML = `
-        ${
-  event.image
-    ? `<img src="${event.image}" class="event-image">`
-    : ""
-}
-
-          <h3 class="event-title">${event.title || "Untitled Event"}</h3>
-
-          <p class="event-location">
-            <i class="fa-solid fa-location-dot"></i>
-            ${event.location || event.hall || "IAU Campus"}
-          </p>
-
-          <p class="event-date">
-            ${formatDateRange(event.dateTime)}
-          </p>
-        `;
-
-        card.addEventListener("click", () => {
-          openEventModal(eventWithId);
+          ...event,
+          isRecommended: isRecommendedEvent(event)
         });
+      });
 
-        studentEventsList.appendChild(card);
+      events.sort((a, b) => {
+        if (a.isRecommended && !b.isRecommended) return -1;
+        if (!a.isRecommended && b.isRecommended) return 1;
+        return new Date(a.dateTime || 0) - new Date(b.dateTime || 0);
+      });
+
+      studentEventsList.innerHTML = "";
+
+      events.forEach((event) => {
+        studentEventsList.appendChild(createEventCard(event));
       });
 
     } catch (error) {
       console.error("Error loading student events:", error);
+
+      studentEventsList.innerHTML = `
+        <div class="empty-card">
+          <h3>Could not load events.</h3>
+          <p>Please refresh the page and try again.</p>
+        </div>
+      `;
     }
+  }
+
+  function isRecommendedEvent(event) {
+    const eventInterests = Array.isArray(event.interests)
+      ? event.interests
+      : [];
+
+    if (!currentStudentInterests.length || !eventInterests.length) {
+      return false;
+    }
+
+    return eventInterests.some((interest) =>
+      currentStudentInterests.includes(interest)
+    );
+  }
+
+  function createEventCard(event) {
+    const card = document.createElement("article");
+    card.className = event.isRecommended
+      ? "event-card recommended-event-card"
+      : "event-card";
+
+    const remainingSeats = getRemainingSeats(event);
+
+    card.innerHTML = `
+      ${
+        event.image
+          ? `<img src="${event.image}" class="event-image" alt="Event Image">`
+          : ""
+      }
+
+      <div class="event-card-badges">
+        ${
+          event.isRecommended
+            ? `<span class="recommended-badge"><i class="fa-solid fa-star"></i> Recommended for you</span>`
+            : ""
+        }
+
+        ${renderSeatsBadge(remainingSeats)}
+      </div>
+
+      <h3 class="event-title">${event.title || "Untitled Event"}</h3>
+
+      <p class="event-location">
+        <i class="fa-solid fa-location-dot"></i>
+        ${event.location || event.hall || "IAU Campus"}
+      </p>
+
+      <p class="event-date">
+        ${formatDateRange(event.dateTime)}
+      </p>
+    `;
+
+    card.addEventListener("click", () => {
+      openEventModal(event);
+    });
+
+    return card;
+  }
+
+  function getRemainingSeats(event) {
+    const capacity = Number(event.capacity || event.seatCapacity || 0);
+    const registeredCount = Number(event.registeredCount || 0);
+
+    if (!capacity) return null;
+
+    return capacity - registeredCount;
+  }
+
+  function renderSeatsBadge(remainingSeats) {
+    if (remainingSeats === null) return "";
+
+    if (remainingSeats <= 0) {
+      return `<span class="seats-badge sold-out">Sold out</span>`;
+    }
+
+    if (remainingSeats <= 5) {
+      return `<span class="seats-badge few-left">${remainingSeats} seats left</span>`;
+    }
+
+    return `<span class="seats-badge available">${remainingSeats} seats available</span>`;
   }
 
   async function loadPublishedAnnouncementsForStudents() {
@@ -192,15 +282,31 @@ document.addEventListener("DOMContentLoaded", function () {
   function openEventModal(event) {
     selectedEvent = event;
 
-    modalEventImage.src = event.imageUrl || "../../images/campus.jpg";
+    modalEventImage.src = event.image || event.imageUrl || "../../images/campus.jpg";
     modalEventTitle.textContent = event.title || "Untitled Event";
     modalEventDescription.textContent = event.description || "No description available.";
     modalEventDate.textContent = formatDateTime(event.dateTime);
     modalEventLocation.textContent = event.location || event.hall || "IAU Campus";
-    modalEventCapacity.textContent = `${event.seatCapacity || 0} seats available`;
 
-    registerBtn.textContent = "Register";
-    registerBtn.disabled = false;
+    const remainingSeats = getRemainingSeats(event);
+
+    if (remainingSeats === null) {
+      modalEventCapacity.textContent = `${event.capacity || event.seatCapacity || 0} seats`;
+    } else if (remainingSeats <= 0) {
+      modalEventCapacity.textContent = "Sold out";
+    } else if (remainingSeats <= 5) {
+      modalEventCapacity.textContent = `${remainingSeats} seats left`;
+    } else {
+      modalEventCapacity.textContent = `${remainingSeats} seats available`;
+    }
+
+    if (remainingSeats !== null && remainingSeats <= 0) {
+      registerBtn.textContent = "Sold Out";
+      registerBtn.disabled = true;
+    } else {
+      registerBtn.textContent = "Register";
+      registerBtn.disabled = false;
+    }
 
     eventDetailsModal.style.display = "flex";
   }
@@ -209,6 +315,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!currentUser || !selectedEvent) return;
 
     try {
+      registerBtn.disabled = true;
+      registerBtn.textContent = "Registering...";
+
       const duplicateQuery = query(
         collection(db, "eventRegistrations"),
         where("studentId", "==", currentUser.uid),
@@ -218,7 +327,18 @@ document.addEventListener("DOMContentLoaded", function () {
       const duplicateSnapshot = await getDocs(duplicateQuery);
 
       if (!duplicateSnapshot.empty) {
-        alert("You already registered for this event.");
+        showToast("You are already registered for this event.");
+        registerBtn.textContent = "Registered";
+        registerBtn.disabled = true;
+        return;
+      }
+
+      const remainingSeats = getRemainingSeats(selectedEvent);
+
+      if (remainingSeats !== null && remainingSeats <= 0) {
+        showToast("This event is fully booked.");
+        registerBtn.textContent = "Sold Out";
+        registerBtn.disabled = true;
         return;
       }
 
@@ -234,14 +354,16 @@ document.addEventListener("DOMContentLoaded", function () {
         createdAt: serverTimestamp()
       });
 
-      alert("Registered successfully. This event is now added to your schedule.");
+      showToast("You are registered successfully. Your ticket is now available in My Tickets.");
 
       registerBtn.textContent = "Registered";
       registerBtn.disabled = true;
 
     } catch (error) {
       console.error("Error registering event:", error);
-      alert("Failed to register. Please try again.");
+      showToast("Failed to register. Please try again.");
+      registerBtn.textContent = "Register";
+      registerBtn.disabled = false;
     }
   });
 
@@ -259,6 +381,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!value) return "Date not set";
 
     const date = new Date(value);
+
     if (isNaN(date.getTime())) return value;
 
     return date.toLocaleString("en-GB", {
@@ -274,6 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!value) return "Date not set";
 
     const date = new Date(value);
+
     if (isNaN(date.getTime())) return value;
 
     return date.toLocaleDateString("en-GB", {
@@ -281,5 +405,28 @@ document.addEventListener("DOMContentLoaded", function () {
       day: "numeric",
       month: "short"
     });
+  }
+
+  function injectToast() {
+    document.body.insertAdjacentHTML("beforeend", `
+      <div id="homeToast" class="home-toast hidden">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="homeToastMessage"></span>
+      </div>
+    `);
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("homeToast");
+    const toastMessage = document.getElementById("homeToastMessage");
+
+    toastMessage.textContent = message;
+    toast.classList.remove("hidden");
+
+    clearTimeout(showToast.timer);
+
+    showToast.timer = setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 3200);
   }
 });

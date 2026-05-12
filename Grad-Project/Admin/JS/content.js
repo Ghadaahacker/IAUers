@@ -13,8 +13,6 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-
-
 const currentUserRole = sessionStorage.getItem("userRole");
 
 if (currentUserRole !== "admin") {
@@ -43,13 +41,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventFileInput = document.getElementById("eventFileInput");
   const fileNameText = document.getElementById("fileNameText");
 
+  const eventInterestChips = document.querySelectorAll(".admin-interest-chip");
+
+  eventInterestChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      chip.classList.toggle("active");
+    });
+  });
+
+  function getSelectedEventInterests() {
+    const selectedInterests = [];
+
+    document.querySelectorAll(".admin-interest-chip.active").forEach((chip) => {
+      selectedInterests.push(chip.textContent.trim());
+    });
+
+    return selectedInterests;
+  }
+
+  function resetEventInterests() {
+    eventInterestChips.forEach((chip) => {
+      chip.classList.remove("active");
+    });
+  }
+
+  function setEventInterests(interests = []) {
+    eventInterestChips.forEach((chip) => {
+      const chipText = chip.textContent.trim();
+
+      if (interests.includes(chipText)) {
+        chip.classList.add("active");
+      } else {
+        chip.classList.remove("active");
+      }
+    });
+  }
+
   eventFileInput.addEventListener("change", () => {
     fileNameText.textContent =
       eventFileInput.files.length > 0
         ? eventFileInput.files[0].name
         : "No file selected";
   });
-
 
   const announcementTitleInput = document.getElementById("announcementTitleInput");
   const announcementDescriptionInput = document.getElementById("announcementDescriptionInput");
@@ -70,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     buildingHallSelect.value = "";
     eventFileInput.value = "";
     fileNameText.textContent = "No file selected";
+    resetEventInterests();
   }
 
   function resetAnnouncementForm() {
@@ -77,6 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
     announcementDescriptionInput.value = "";
     announcementLinkInput.value = "";
   }
+
+  let editingEventId = null;
 
   openModalBtn.addEventListener("click", () => {
     editingEventId = null;
@@ -105,8 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
   cancelAnnouncementModal.addEventListener("click", () => {
     closeModalFunc(announcementModal);
   });
-  let editingEventId = null;
-
 
   sendBuildingRequestBtn.addEventListener("click", async () => {
     const selectedHall = buildingHallSelect.options[buildingHallSelect.selectedIndex];
@@ -126,13 +160,20 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const selectedInterests = getSelectedEventInterests();
+
+    if (selectedInterests.length === 0) {
+      alert("Please select at least one event interest.");
+      return;
+    }
+
     const building = selectedHall.dataset.building;
     const capacity = selectedHall.dataset.capacity;
 
     const buildingManagerEmail =
       building === "D3" ? "building@iau.edu.sa" :
-        building === "A7" ? "building2@iau.edu.sa" :
-          "";
+      building === "A7" ? "building2@iau.edu.sa" :
+      "";
 
     try {
       sendBuildingRequestBtn.disabled = true;
@@ -153,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hall: buildingHallSelect.value,
         building: building,
         capacity: Number(capacity),
+        interests: selectedInterests,
         assignedToEmail: buildingManagerEmail,
         status: "Pending",
         rejectionReason: "",
@@ -173,13 +215,9 @@ document.addEventListener("DOMContentLoaded", () => {
       closeModalFunc(eventModal);
 
     } catch (error) {
-
       console.error("Error sending request:", error);
-
       alert(error.message);
-
     } finally {
-
       sendBuildingRequestBtn.disabled = false;
       sendBuildingRequestBtn.textContent = "Send to Building Manager";
     }
@@ -198,6 +236,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const selectedInterests = getSelectedEventInterests();
+
+    if (selectedInterests.length === 0) {
+      alert("Please select at least one event interest.");
+      return;
+    }
+
     const building = buildingHallSelect.value
       ? selectedHall.dataset.building
       : "";
@@ -207,7 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
       : 0;
 
     try {
-
       const eventData = {
         title: eventTitleInput.value.trim(),
         description: eventDescriptionInput.value.trim(),
@@ -215,6 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hall: buildingHallSelect.value || "",
         building,
         capacity: Number(capacity),
+        interests: selectedInterests,
         type: "event",
         status: "draft",
         createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
@@ -222,21 +267,17 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       if (editingEventId) {
-
         await updateDoc(
           doc(db, "events", editingEventId),
           eventData
         );
 
         editingEventId = null;
-
       } else {
-
         await addDoc(collection(db, "events"), {
           ...eventData,
           createdAt: serverTimestamp()
         });
-
       }
 
       alert("Event saved as draft.");
@@ -247,13 +288,10 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadEventsFromFirebase();
 
     } catch (error) {
-
       console.error("Error saving draft:", error);
       alert("Draft was not saved. Check console.");
-
     }
   });
-
 
   const saveAnnouncementDraftBtn = document.getElementById("saveAnnouncementDraftBtn");
   const publishAnnouncementBtn = document.getElementById("publishAnnouncementBtn");
@@ -343,7 +381,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function updateStats() {
-
     const totalContentCount = document.getElementById("totalContentCount");
     const activeEventsCount = document.getElementById("activeEventsCount");
     const pendingDraftsCount = document.getElementById("pendingDraftsCount");
@@ -477,6 +514,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const typeLabel = event.type === "announcement" ? "ANNOUNCEMENT" : "EVENT";
       const typeClass = event.type === "announcement" ? "announcement" : "event";
 
+      const interestTags =
+        Array.isArray(event.interests) && event.interests.length
+          ? `
+            <div class="content-interest-tags">
+              ${event.interests.map(interest => `<span>${interest}</span>`).join("")}
+            </div>
+          `
+          : "";
+
       const card = document.createElement("article");
       card.className = "content-card";
 
@@ -485,72 +531,76 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="badges">
             <span class="badge type ${typeClass}">${typeLabel}</span>
             <span class="badge status ${statusClass}">
-  ${event.status.toUpperCase()}
-</span>
+              ${event.status.toUpperCase()}
+            </span>
 
-${event.status === "Rejected" && event.rejectionReason
-          ? `
-      <div class="reject-reason">
-        <strong>Rejection Reason:</strong>
-        ${event.rejectionReason}
-      </div>
-    `
-          : ""
-        }
+            ${
+              event.status === "Rejected" && event.rejectionReason
+                ? `
+                  <div class="reject-reason">
+                    <strong>Rejection Reason:</strong>
+                    ${event.rejectionReason}
+                  </div>
+                `
+                : ""
+            }
           </div>
-  
+
           <h3>${event.title}</h3>
           <p>${event.description}</p>
-  
+
+          ${interestTags}
+
           <div class="meta">
             <span>
               <span class="material-symbols-outlined small">calendar_month</span>
               ${new Date(event.dateTime).toLocaleString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        })}
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+              })}
             </span>
-  
+
             <span>
-            <span class="material-symbols-outlined small">
-             ${event.type === "announcement" ? "link" : "location_on"}
-            </span>
-              ${event.type === "announcement"
-          ? `<a href="${event.link}" target="_blank">${event.link}</a>`
-          : (event.location || event.hall || "")
-        }
+              <span class="material-symbols-outlined small">
+                ${event.type === "announcement" ? "link" : "location_on"}
+              </span>
+              ${
+                event.type === "announcement"
+                  ? `<a href="${event.link}" target="_blank">${event.link}</a>`
+                  : (event.location || event.hall || "")
+              }
             </span>
           </div>
         </div>
 
-<div class="content-actions">
+        <div class="content-actions">
+          ${
+            event.status === "draft"
+              ? `
+                <button class="icon-btn edit-event-btn" title="Edit" type="button">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              `
+              : ""
+          }
 
-  ${event.status === "draft"
-          ? `
-      <button class="icon-btn edit-event-btn" title="Edit" type="button">
-        <span class="material-symbols-outlined">edit</span>
-      </button>
-      `
-          : ""
-        }
+          ${
+            event.status !== "Rejected"
+              ? `
+                <button class="icon-btn analytics-btn" title="Analytics" type="button">
+                  <span class="material-symbols-outlined">bar_chart</span>
+                </button>
+              `
+              : ""
+          }
 
-  ${event.status !== "Rejected"
-          ? `
-      <button class="icon-btn analytics-btn" title="Analytics" type="button">
-        <span class="material-symbols-outlined">bar_chart</span>
-      </button>
-      `
-          : ""
-        }
-
-  <button class="icon-btn delete-event-btn" title="Delete" type="button">
-    <span class="material-symbols-outlined">delete</span>
-  </button>
-
-</div>
+          <button class="icon-btn delete-event-btn" title="Delete" type="button">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
       `;
 
       const deleteBtn = card.querySelector(".delete-event-btn");
@@ -571,6 +621,7 @@ ${event.status === "Rejected" && event.rejectionReason
             eventDescriptionInput.value = event.description || "";
             eventDateTimeInput.value = event.dateTime || "";
             buildingHallSelect.value = event.hall || "";
+            setEventInterests(event.interests || []);
 
             openModal(eventModal);
           }
@@ -601,29 +652,29 @@ ${event.status === "Rejected" && event.rejectionReason
     try {
       const adminEmail =
         (auth.currentUser?.email || sessionStorage.getItem("userEmail") || "").toLowerCase();
-  
+
       console.log("Current admin:", adminEmail);
-  
+
       const q = query(
         collection(db, "events"),
         orderBy("createdAt", "desc")
       );
-  
+
       const snapshot = await getDocs(q);
-  
+
       const rejectedQ = query(
         collection(db, "bookingRequests"),
         where("status", "==", "Rejected")
       );
-  
+
       const rejectedSnapshot = await getDocs(rejectedQ);
-  
+
       allEvents = [];
-  
+
       snapshot.forEach((eventDoc) => {
         const data = eventDoc.data();
         const createdBy = (data.createdBy || "").toLowerCase();
-  
+
         if (createdBy === adminEmail) {
           allEvents.push({
             id: eventDoc.id,
@@ -631,11 +682,11 @@ ${event.status === "Rejected" && event.rejectionReason
           });
         }
       });
-  
+
       rejectedSnapshot.forEach((requestDoc) => {
         const data = requestDoc.data();
         const createdBy = (data.createdBy || "").toLowerCase();
-  
+
         if (createdBy === adminEmail) {
           allEvents.push({
             id: requestDoc.id,
@@ -645,22 +696,19 @@ ${event.status === "Rejected" && event.rejectionReason
           });
         }
       });
-  
+
       updateStats();
       renderEventsPage();
       renderPagination();
-  
+
     } catch (error) {
       console.error("Error loading events:", error);
     }
   }
 
   if (sortFilter) {
-
     sortFilter.addEventListener("change", () => {
-
       currentPage = 1;
-
       renderEventsPage();
       renderPagination();
     });
@@ -673,6 +721,7 @@ ${event.status === "Rejected" && event.rejectionReason
       renderPagination();
     });
   }
+
   function convertToBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -681,8 +730,8 @@ ${event.status === "Rejected" && event.rejectionReason
 
       reader.onload = () => resolve(reader.result);
       reader.onerror = error => reject(error);
-
     });
   }
+
   loadEventsFromFirebase();
 });

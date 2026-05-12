@@ -97,48 +97,69 @@
 
       <div class="modal-body">
         <label>Title</label>
-       <input type="text" id="eventTitleInput" placeholder="Enter event title" />
+        <input type="text" id="eventTitleInput" placeholder="Enter event title" />
 
         <label>Description</label>
         <textarea id="eventDescriptionInput" placeholder="Enter event description"></textarea>
-      
-        <label>Date & Time</label>  
+
+        <label>Event Interests</label>
+        <div class="admin-interests-box" id="eventInterestsBox">
+          <button class="admin-interest-chip" type="button">AI</button>
+          <button class="admin-interest-chip" type="button">Business</button>
+          <button class="admin-interest-chip" type="button">Technology</button>
+          <button class="admin-interest-chip" type="button">Sports</button>
+          <button class="admin-interest-chip" type="button">Workshops</button>
+          <button class="admin-interest-chip" type="button">Career</button>
+          <button class="admin-interest-chip" type="button">Research</button>
+          <button class="admin-interest-chip" type="button">Art</button>
+          <button class="admin-interest-chip" type="button">Health</button>
+          <button class="admin-interest-chip" type="button">Volunteering</button>
+        </div>
+
+        <p class="field-note">
+          Select the interests that match this event so students can receive personalized recommendations.
+        </p>
+
+        <label>Date & Time</label>
         <input type="datetime-local" id="eventDateTimeInput" />
 
         <label for="buildingHall">Building / Hall</label>
         <select id="buildingHall">
-
           <option value="">Select building and hall</option>
+
           <option value="D3-Audit Room" data-building="D3" data-capacity="300">
             D3 - Audit Room, Capacity 300 seats
           </option>
+
           <option value="D3-Second Floor Room" data-building="D3" data-capacity="200">
             D3 - Second Floor Room, Capacity 200 seats
           </option>
+
           <option value="A7-1056 Hall" data-building="A7" data-capacity="50">
             A7 - 1056 Hall, Capacity 50 seats
           </option>
+
           <option value="A7-1057" data-building="A7" data-capacity="30">
             A7 - 1057, Capacity 30 seats
           </option>
         </select>
 
         <label>Event Attachment Optional</label>
-<div class="file-upload-box">
-  <label for="eventFileInput" class="file-upload-label">
-    <i class="fa-solid fa-paperclip"></i>
-    Choose Image or PDF
-  </label>
+        <div class="file-upload-box">
+          <label for="eventFileInput" class="file-upload-label">
+            <i class="fa-solid fa-paperclip"></i>
+            Choose Image or PDF
+          </label>
 
-  <input
-    type="file"
-    id="eventFileInput"
-    accept="image/*,application/pdf"
-    hidden
-  />
+          <input
+            type="file"
+            id="eventFileInput"
+            accept="image/*,application/pdf"
+            hidden
+          />
 
-  <p class="file-upload-name" id="fileNameText">No file selected</p>
-</div>
+          <p class="file-upload-name" id="fileNameText">No file selected</p>
+        </div>
 
         <div class="approval-note">
           <i class="fa-solid fa-circle-info"></i>
@@ -169,16 +190,16 @@
       <div class="modal-body">
         <label>Title</label>
         <input type="text" id="announcementTitleInput" placeholder="Enter announcement title" />
-      
+
         <label>Description</label>
         <textarea id="announcementDescriptionInput" placeholder="Enter announcement description"></textarea>
-      
+
         <label>External Link (Optional)</label>
         <input type="url" id="announcementLinkInput" placeholder="https://example.com" />
-      
+
         <p class="field-note">Add a link for students to access additional information.</p>
       </div>
-      
+
       <div class="modal-footer">
         <button class="cancel-btn" id="cancelAnnouncementModal" type="button">Cancel</button>
         <button class="draft-btn" id="saveAnnouncementDraftBtn" type="button">Save as Draft</button>
