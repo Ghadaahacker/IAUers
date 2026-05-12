@@ -9,6 +9,12 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
+const currentUserRole = sessionStorage.getItem("userRole");
+
+if (currentUserRole !== "admin") {
+  window.location.href = "../../Login/HTML/login.html";
+}
+
 const addEventBtn = document.getElementById("addEventBtn");
 const addAnnouncementBtn = document.getElementById("addAnnouncementBtn");
 const editContentBtn = document.getElementById("editContentBtn");

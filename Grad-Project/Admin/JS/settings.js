@@ -6,6 +6,12 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
+const currentUserRole = sessionStorage.getItem("userRole");
+
+if (currentUserRole !== "admin") {
+  window.location.href = "../../Login/HTML/login.html";
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const saveProfileBtn = document.getElementById("saveProfileBtn");
   const discardBtn = document.getElementById("discardBtn");

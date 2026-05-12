@@ -1,3 +1,9 @@
+const currentUserRole = sessionStorage.getItem("userRole");
+
+if (currentUserRole !== "admin") {
+  window.location.href = "../../Login/HTML/login.html";
+}
+
 const analyticsSummary = {
     engagement: 72.3,
     responses: 487,
