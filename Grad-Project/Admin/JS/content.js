@@ -19,6 +19,12 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 
+const currentUserRole = sessionStorage.getItem("userRole");
+
+if (currentUserRole !== "admin") {
+  window.location.href = "../../Login/HTML/login.html";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const eventModal = document.getElementById("eventModal");
   const announcementModal = document.getElementById("announcementModal");
