@@ -79,6 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   openModalBtn.addEventListener("click", () => {
+    editingEventId = null;
+    resetEventForm();
     openModal(eventModal);
   });
 
@@ -91,6 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   openAnnouncementModalBtn.addEventListener("click", () => {
+    editingEventId = null;
+    resetAnnouncementForm();
     openModal(announcementModal);
   });
 
