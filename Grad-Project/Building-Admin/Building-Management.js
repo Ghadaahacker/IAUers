@@ -200,6 +200,7 @@ acceptBtn.addEventListener("click", async () => {
       type: "event",
       status: "published",
       createdBy: selectedBooking.createdBy || "Admin",
+      bookingRequestId: selectedBookingId,
       createdAt: serverTimestamp()
     });
     
