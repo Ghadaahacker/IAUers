@@ -300,31 +300,44 @@ onAuthStateChanged(auth, (user) => {
     return;
   }
 
-  profileEmail.textContent = currentUserEmail;
-  profileName.textContent = currentUserEmail.split("@")[0];
+  const realEmail = user.email.toLowerCase();
+
+  profileEmail.textContent = realEmail;
+  profileName.textContent = realEmail.split("@")[0];
 
   const q = query(
     collection(db, "bookingRequests"),
-    where("assignedToEmail", "==", currentUserEmail)
+    where("assignedToEmail", "==", realEmail)
   );
 
-  console.log("Building page session email:", currentUserEmail);
+  console.log("Building manager email:", realEmail);
 
   onSnapshot(q, (snapshot) => {
     bookings = [];
-
+  
     snapshot.forEach((docSnap) => {
-      bookings.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
+  
+      const data = docSnap.data();
+  
+      if (data.status !== "Deleted") {
+  
+        bookings.push({
+          id: docSnap.id,
+          ...data
+        });
+  
+      }
+  
     });
-
+  
     updateStats();
 
-    if (bookings.length > 0 && !selectedBookingId) {
+    if (bookings.length > 0) {
       selectedBookingId = bookings[0].id;
       renderDetails(bookings[0]);
+    } else {
+      selectedBookingId = null;
+      renderDetails(null);
     }
 
     renderRequests();
