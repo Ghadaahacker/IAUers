@@ -363,6 +363,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (statLabels[2]) statLabels[2].textContent = "My Certificates";
   }
 
+  function renderSelectedInterests() {
+    const savedInterests = profileData.interests || [];
+    const interestChips = document.querySelectorAll(".interest-chip");
+
+    interestChips.forEach((chip) => {
+      const interestName = chip.textContent.trim();
+
+      if (savedInterests.includes(interestName)) {
+        chip.classList.add("active");
+      } else {
+        chip.classList.remove("active");
+      }
+    });
+  }
+
   async function loadProfileFromFirebase(user) {
     currentUserId = user.uid;
 
@@ -375,12 +390,11 @@ document.addEventListener("DOMContentLoaded", () => {
         ...userSnap.data()
       };
     } else {
-      
-
       await setDoc(userRef, profileData);
     }
 
     renderProfileCard();
+    renderSelectedInterests();
   }
 
   onAuthStateChanged(auth, async (user) => {
@@ -511,4 +525,42 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("Logout failed. Try again.");
     }
   });
+
+  const interestChips = document.querySelectorAll(".interest-chip");
+
+  interestChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      chip.classList.toggle("active");
+    });
+  });
+
+  const saveInterestsBtn = document.querySelector(".save-interests-btn");
+
+  if (saveInterestsBtn) {
+    saveInterestsBtn.addEventListener("click", async () => {
+      try {
+        if (!currentUserId) {
+          showToast("User is not loaded yet.");
+          return;
+        }
+
+        const selectedInterests = [];
+
+        document.querySelectorAll(".interest-chip.active").forEach((chip) => {
+          selectedInterests.push(chip.textContent.trim());
+        });
+
+        profileData.interests = selectedInterests;
+
+        await updateDoc(doc(db, "users", currentUserId), {
+          interests: selectedInterests
+        });
+
+        showToast("Interests saved successfully.");
+      } catch (error) {
+        console.error("Error saving interests:", error);
+        showToast("Failed to save interests.");
+      }
+    });
+  }
 });
