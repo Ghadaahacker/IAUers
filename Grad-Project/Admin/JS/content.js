@@ -1,4 +1,4 @@
-import { auth, db, storage } from "../../Shared/JS/firebase-config.js";
+import { auth, db } from "../../Shared/JS/firebase-config.js";
 
 import {
   collection,
@@ -13,11 +13,7 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+
 
 const currentUserRole = sessionStorage.getItem("userRole");
 
@@ -45,6 +41,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventDateTimeInput = document.getElementById("eventDateTimeInput");
   const buildingHallSelect = document.getElementById("buildingHall");
   const eventFileInput = document.getElementById("eventFileInput");
+const fileNameText = document.getElementById("fileNameText");
+
+eventFileInput.addEventListener("change", () => {
+  fileNameText.textContent =
+    eventFileInput.files.length > 0
+      ? eventFileInput.files[0].name
+      : "No file selected";
+});
+
 
   const announcementTitleInput = document.getElementById("announcementTitleInput");
   const announcementDescriptionInput = document.getElementById("announcementDescriptionInput");
@@ -64,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     eventDateTimeInput.value = "";
     buildingHallSelect.value = "";
     eventFileInput.value = "";
+    fileNameText.textContent = "No file selected";
   }
 
   function resetAnnouncementForm() {
@@ -95,6 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
   cancelAnnouncementModal.addEventListener("click", () => {
     closeModalFunc(announcementModal);
   });
+let editingEventId = null;
+
 
   sendBuildingRequestBtn.addEventListener("click", async () => {
     const selectedHall = buildingHallSelect.options[buildingHallSelect.selectedIndex];
@@ -122,23 +130,17 @@ document.addEventListener("DOMContentLoaded", () => {
         building === "A7" ? "building2@iau.edu.sa" :
           "";
 
-    try {
-      let fileUrl = "";
-      let fileType = "";
+  try {
+  sendBuildingRequestBtn.disabled = true;
+  sendBuildingRequestBtn.textContent = "Sending...";
 
-      const selectedFile = eventFileInput.files[0];
+  let imageBase64 = "";
 
-      if (selectedFile) {
-        fileType = selectedFile.type;
+const selectedFile = eventFileInput.files[0];
 
-        const fileRef = ref(
-          storage,
-          `eventFiles/${Date.now()}-${selectedFile.name}`
-        );
-
-        await uploadBytes(fileRef, selectedFile);
-        fileUrl = await getDownloadURL(fileRef);
-      }
+if (selectedFile) {
+  imageBase64 = await convertToBase64(selectedFile);
+}
 
       await addDoc(collection(db, "bookingRequests"), {
         title: eventTitleInput.value.trim(),
@@ -150,8 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         assignedToEmail: buildingManagerEmail,
         status: "Pending",
         rejectionReason: "",
-        fileUrl: fileUrl,
-        fileType: fileType,
+        image: imageBase64,
         draftId: editingEventId || "",
         createdAt: serverTimestamp()
       });
@@ -166,10 +167,17 @@ document.addEventListener("DOMContentLoaded", () => {
       resetEventForm();
       closeModalFunc(eventModal);
 
-    } catch (error) {
-      console.error("Error sending request:", error);
-      alert("Request was not sent. Check console.");
-    }
+ } catch (error) {
+
+  console.error("Error sending request:", error);
+
+  alert(error.message);
+
+} finally {
+
+  sendBuildingRequestBtn.disabled = false;
+  sendBuildingRequestBtn.textContent = "Send to Building Manager";
+}
   });
 
   saveEventDraftBtn.addEventListener("click", async () => {
@@ -247,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let allEvents = [];
   let currentPage = 1;
-  let editingEventId = null;
+
   const eventsPerPage = 5;
 
   const contentList = document.getElementById("contentList");
@@ -645,6 +653,18 @@ ${event.status === "Rejected" && event.rejectionReason
       renderPagination();
     });
   }
+function convertToBase64(file) {
+  return new Promise((resolve, reject) => {
 
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = () => resolve(reader.result);
+
+    reader.onerror = error => reject(error);
+
+  });
+}
   loadEventsFromFirebase();
 });
