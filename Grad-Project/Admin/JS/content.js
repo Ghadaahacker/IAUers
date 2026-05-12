@@ -41,14 +41,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventDateTimeInput = document.getElementById("eventDateTimeInput");
   const buildingHallSelect = document.getElementById("buildingHall");
   const eventFileInput = document.getElementById("eventFileInput");
-const fileNameText = document.getElementById("fileNameText");
+  const fileNameText = document.getElementById("fileNameText");
 
-eventFileInput.addEventListener("change", () => {
-  fileNameText.textContent =
-    eventFileInput.files.length > 0
-      ? eventFileInput.files[0].name
-      : "No file selected";
-});
+  eventFileInput.addEventListener("change", () => {
+    fileNameText.textContent =
+      eventFileInput.files.length > 0
+        ? eventFileInput.files[0].name
+        : "No file selected";
+  });
 
 
   const announcementTitleInput = document.getElementById("announcementTitleInput");
@@ -101,7 +101,7 @@ eventFileInput.addEventListener("change", () => {
   cancelAnnouncementModal.addEventListener("click", () => {
     closeModalFunc(announcementModal);
   });
-let editingEventId = null;
+  let editingEventId = null;
 
 
   sendBuildingRequestBtn.addEventListener("click", async () => {
@@ -130,17 +130,17 @@ let editingEventId = null;
         building === "A7" ? "building2@iau.edu.sa" :
           "";
 
-  try {
-  sendBuildingRequestBtn.disabled = true;
-  sendBuildingRequestBtn.textContent = "Sending...";
+    try {
+      sendBuildingRequestBtn.disabled = true;
+      sendBuildingRequestBtn.textContent = "Sending...";
 
-  let imageBase64 = "";
+      let imageBase64 = "";
 
-const selectedFile = eventFileInput.files[0];
+      const selectedFile = eventFileInput.files[0];
 
-if (selectedFile) {
-  imageBase64 = await convertToBase64(selectedFile);
-}
+      if (selectedFile) {
+        imageBase64 = await convertToBase64(selectedFile);
+      }
 
       await addDoc(collection(db, "bookingRequests"), {
         title: eventTitleInput.value.trim(),
@@ -154,6 +154,7 @@ if (selectedFile) {
         rejectionReason: "",
         image: imageBase64,
         draftId: editingEventId || "",
+        createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
         createdAt: serverTimestamp()
       });
 
@@ -167,17 +168,17 @@ if (selectedFile) {
       resetEventForm();
       closeModalFunc(eventModal);
 
- } catch (error) {
+    } catch (error) {
 
-  console.error("Error sending request:", error);
+      console.error("Error sending request:", error);
 
-  alert(error.message);
+      alert(error.message);
 
-} finally {
+    } finally {
 
-  sendBuildingRequestBtn.disabled = false;
-  sendBuildingRequestBtn.textContent = "Send to Building Manager";
-}
+      sendBuildingRequestBtn.disabled = false;
+      sendBuildingRequestBtn.textContent = "Send to Building Manager";
+    }
   });
 
   saveEventDraftBtn.addEventListener("click", async () => {
@@ -575,7 +576,7 @@ ${event.status === "Rejected" && event.rejectionReason
       deleteBtn.addEventListener("click", async () => {
         const confirmDelete = confirm("Delete this content?");
         if (!confirmDelete) return;
-      
+
         if (event.sourceCollection === "bookingRequests") {
           await updateDoc(doc(db, "bookingRequests", event.id), {
             status: "Deleted",
@@ -584,7 +585,7 @@ ${event.status === "Rejected" && event.rejectionReason
         } else {
           await deleteDoc(doc(db, "events", event.id));
         }
-      
+
         loadEventsFromFirebase();
       });
 
@@ -593,47 +594,59 @@ ${event.status === "Rejected" && event.rejectionReason
   }
 
   async function loadEventsFromFirebase() {
-
     try {
-
+      const adminEmail =
+        (auth.currentUser?.email || sessionStorage.getItem("userEmail") || "").toLowerCase();
+  
+      console.log("Current admin:", adminEmail);
+  
       const q = query(
         collection(db, "events"),
         orderBy("createdAt", "desc")
       );
-
+  
       const snapshot = await getDocs(q);
+  
       const rejectedQ = query(
         collection(db, "bookingRequests"),
         where("status", "==", "Rejected")
       );
-
+  
       const rejectedSnapshot = await getDocs(rejectedQ);
-
+  
       allEvents = [];
-
+  
       snapshot.forEach((eventDoc) => {
-
-        allEvents.push({
-          id: eventDoc.id,
-          ...eventDoc.data()
-        });
+        const data = eventDoc.data();
+        const createdBy = (data.createdBy || "").toLowerCase();
+  
+        if (createdBy === adminEmail) {
+          allEvents.push({
+            id: eventDoc.id,
+            ...data
+          });
+        }
       });
-
+  
       rejectedSnapshot.forEach((requestDoc) => {
-        allEvents.push({
-          id: requestDoc.id,
-          ...requestDoc.data(),
-          type: "event",
-          sourceCollection: "bookingRequests"
-        });
+        const data = requestDoc.data();
+        const createdBy = (data.createdBy || "").toLowerCase();
+  
+        if (createdBy === adminEmail) {
+          allEvents.push({
+            id: requestDoc.id,
+            ...data,
+            type: "event",
+            sourceCollection: "bookingRequests"
+          });
+        }
       });
-
+  
       updateStats();
       renderEventsPage();
       renderPagination();
-
+  
     } catch (error) {
-
       console.error("Error loading events:", error);
     }
   }
@@ -656,16 +669,16 @@ ${event.status === "Rejected" && event.rejectionReason
       renderPagination();
     });
   }
-function convertToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+  function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
 
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
 
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
 
-  });
-}
+    });
+  }
   loadEventsFromFirebase();
 });
