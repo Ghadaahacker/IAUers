@@ -580,3 +580,41 @@ body {
   color: #7a1c1c;
   font-size: 14px;
 }
+
+/* File upload */
+.file-upload-box {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: #f8fafc;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--navy);
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+
+.file-upload-label:hover {
+  background: #eef4ff;
+  color: var(--blue);
+}
+
+.file-upload-label i {
+  color: var(--blue);
+}
+
+.file-upload-name {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}

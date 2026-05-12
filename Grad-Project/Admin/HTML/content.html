@@ -124,11 +124,21 @@
         </select>
 
         <label>Event Attachment Optional</label>
-<input
-  type="file"
-  id="eventFileInput"
-  accept="image/*,application/pdf"
-/>
+<div class="file-upload-box">
+  <label for="eventFileInput" class="file-upload-label">
+    <i class="fa-solid fa-paperclip"></i>
+    Choose Image or PDF
+  </label>
+
+  <input
+    type="file"
+    id="eventFileInput"
+    accept="image/*,application/pdf"
+    hidden
+  />
+
+  <p class="file-upload-name" id="fileNameText">No file selected</p>
+</div>
 
         <div class="approval-note">
           <i class="fa-solid fa-circle-info"></i>

@@ -111,11 +111,11 @@ document.addEventListener("DOMContentLoaded", function () {
         card.className = "event-card";
 
         card.innerHTML = `
-          <img
-            src="${event.imageUrl || "../../images/campus.jpg"}"
-            alt="${event.title || "Event"}"
-            class="event-image"
-          />
+        ${
+  event.image
+    ? `<img src="${event.image}" class="event-image">`
+    : ""
+}
 
           <h3 class="event-title">${event.title || "Untitled Event"}</h3>
 
