@@ -577,7 +577,10 @@ ${event.status === "Rejected" && event.rejectionReason
         if (!confirmDelete) return;
       
         if (event.sourceCollection === "bookingRequests") {
-          await deleteDoc(doc(db, "bookingRequests", event.id));
+          await updateDoc(doc(db, "bookingRequests", event.id), {
+            status: "Deleted",
+            deletedAt: serverTimestamp()
+          });
         } else {
           await deleteDoc(doc(db, "events", event.id));
         }
@@ -655,13 +658,11 @@ ${event.status === "Rejected" && event.rejectionReason
   }
 function convertToBase64(file) {
   return new Promise((resolve, reject) => {
-
     const reader = new FileReader();
 
     reader.readAsDataURL(file);
 
     reader.onload = () => resolve(reader.result);
-
     reader.onerror = error => reject(error);
 
   });
