@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalEventLocation = document.getElementById("modalEventLocation");
   const modalEventCategory = document.getElementById("modalEventCategory");
   const qrCodeContainer = document.getElementById("qrCodeContainer");
+  const qrSection = document.querySelector(".qr-section");
 
   let tickets = [];
 
@@ -41,75 +42,67 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    await loadTicketsFromFirebase(user.uid);
-    renderTickets();
+    showLoading();
+
+    try {
+      await loadTickets(user.uid);
+      renderTickets();
+    } catch (error) {
+      console.error("Error loading tickets:", error);
+      showError();
+    }
   });
 
-  async function loadTicketsFromFirebase(uid) {
+  async function loadTickets(uid) {
     tickets = [];
 
-    const collectionsToCheck = ["registrations", "eventRegistrations"];
-    const userFieldsToCheck = ["userId", "studentId"];
+    const q = query(
+      collection(db, "eventRegistrations"),
+      where("studentId", "==", uid)
+    );
 
-    for (const collectionName of collectionsToCheck) {
-      for (const userField of userFieldsToCheck) {
-        try {
-          const q = query(
-            collection(db, collectionName),
-            where(userField, "==", uid)
-          );
+    const snapshot = await getDocs(q);
 
-          const snapshot = await getDocs(q);
-
-          snapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-
-            const ticket = normalizeTicket(docSnap.id, data);
-
-            if (!tickets.some(t => t.ticketId === ticket.ticketId)) {
-              tickets.push(ticket);
-            }
-          });
-
-        } catch (error) {
-          console.warn(`Could not read ${collectionName} by ${userField}:`, error);
-        }
-      }
-    }
+    snapshot.forEach((docSnap) => {
+      tickets.push(normalizeTicket(docSnap.id, docSnap.data()));
+    });
   }
 
   function normalizeTicket(id, data) {
-    const rawStatus = (data.status || "registered").toLowerCase();
+    const rawStatus = (data.status || "approved").toLowerCase();
 
     let status = "confirmed";
 
-    if (rawStatus.includes("pending") || rawStatus.includes("request")) {
+    if (
+      rawStatus.includes("pending") ||
+      rawStatus.includes("waiting") ||
+      rawStatus.includes("request")
+    ) {
       status = "pending";
-    }
-
-    if (rawStatus.includes("approved") || rawStatus.includes("confirmed") || rawStatus.includes("registered")) {
-      status = "confirmed";
     }
 
     return {
       ticketId: data.ticketId || `TKT-${id.slice(0, 6).toUpperCase()}`,
       registrationId: id,
+      studentId: data.studentId || "",
       eventId: data.eventId || "",
-      studentId: data.studentId || data.userId || "",
-      eventTitle: data.eventTitle || data.title || "Untitled Event",
+      eventTitle: data.eventTitle || data.title || data.name || "Untitled Event",
       eventDate: data.eventDate || data.eventDateTime || data.dateTime || data.date || "",
-      eventTime: data.eventTime || getTimeOnly(data.eventDateTime || data.dateTime || data.eventDate),
-      eventLocation: data.eventLocation || data.location || "IAU Campus",
-      category: data.category || "University Event",
+      eventTime:
+        data.eventTime ||
+        getTimeOnly(data.eventDateTime || data.dateTime || data.eventDate || data.date),
+      eventLocation:
+        data.eventLocation || data.location || data.venue || "IAU Campus",
+      category: data.category || data.eventCategory || "University Event",
       status
     };
   }
 
   function formatDate(value) {
     if (!value) return "Date not available";
+    if (value.toDate) value = value.toDate();
 
     const date = new Date(value);
-
     if (isNaN(date.getTime())) return value;
 
     return date.toLocaleDateString("en-US", {
@@ -122,9 +115,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function getTimeOnly(value) {
     if (!value) return "Time not available";
+    if (value.toDate) value = value.toDate();
 
     const date = new Date(value);
-
     if (isNaN(date.getTime())) return "Time not available";
 
     return date.toLocaleTimeString("en-GB", {
@@ -144,12 +137,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function clearQrCode() {
-    qrCodeContainer.innerHTML = "";
-  }
+  function openTicketModal(ticket, showQr = false) {
+    modalStatusTag.textContent =
+      ticket.status === "confirmed" ? "Confirmed" : "Pending";
 
-  function openTicketModal(ticket) {
-    modalStatusTag.textContent = ticket.status === "confirmed" ? "Confirmed" : "Pending";
     modalStatusTag.className = `modal-status-tag ${ticket.status}`;
 
     modalEventTitle.textContent = ticket.eventTitle;
@@ -159,20 +150,23 @@ document.addEventListener("DOMContentLoaded", function () {
     modalEventLocation.textContent = ticket.eventLocation || "Location not available";
     modalEventCategory.textContent = ticket.category || "University Event";
 
-    clearQrCode();
+    qrCodeContainer.innerHTML = "";
 
-    if (ticket.status === "confirmed") {
-      new QRCode(qrCodeContainer, {
-        text: generateQrPayload(ticket),
-        width: 180,
-        height: 180
-      });
-    } else {
+    if (showQr) {
+      qrSection.style.display = "block";
+
+      const qrPayload = encodeURIComponent(generateQrPayload(ticket));
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrPayload}`;
+
       qrCodeContainer.innerHTML = `
-        <div style="text-align:center; color:#65728d; line-height:1.8;">
-          QR code will be available after confirmation.
-        </div>
+        <img
+          src="${qrImageUrl}"
+          alt="Ticket QR Code"
+          style="width:220px;height:220px;display:block;margin:0 auto;"
+        />
       `;
+    } else {
+      qrSection.style.display = "none";
     }
 
     ticketModal.classList.remove("hidden");
@@ -180,7 +174,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function closeTicketModal() {
     ticketModal.classList.add("hidden");
-    clearQrCode();
+    qrCodeContainer.innerHTML = "";
+    qrSection.style.display = "none";
   }
 
   function createTicketCard(ticket) {
@@ -229,29 +224,51 @@ document.addEventListener("DOMContentLoaded", function () {
               View Details
             </button>
 
-            ${isConfirmed ? `
-              <button class="ticket-btn primary show-qr-btn" type="button">
-                Show QR
-              </button>
-            ` : ""}
+            ${
+              isConfirmed
+                ? `
+                  <button class="ticket-btn primary show-qr-btn" type="button">
+                    Show QR
+                  </button>
+                `
+                : ""
+            }
           </div>
         </div>
       </div>
     `;
 
     card.querySelector(".view-details-btn").addEventListener("click", () => {
-      openTicketModal(ticket);
+      openTicketModal(ticket, false);
     });
 
     const showQrBtn = card.querySelector(".show-qr-btn");
 
     if (showQrBtn) {
       showQrBtn.addEventListener("click", () => {
-        openTicketModal(ticket);
+        openTicketModal(ticket, true);
       });
     }
 
     return card;
+  }
+
+  function showLoading() {
+    confirmedTicketsList.innerHTML = `<div class="empty-state">Loading tickets...</div>`;
+    pendingTicketsList.innerHTML = `<div class="empty-state">Loading requests...</div>`;
+    confirmedCount.textContent = "--";
+    pendingCount.textContent = "--";
+    confirmedListCount.textContent = "Loading";
+    pendingListCount.textContent = "Loading";
+  }
+
+  function showError() {
+    confirmedTicketsList.innerHTML = `<div class="empty-state">Could not load tickets.</div>`;
+    pendingTicketsList.innerHTML = `<div class="empty-state">Could not load requests.</div>`;
+    confirmedCount.textContent = "0";
+    pendingCount.textContent = "0";
+    confirmedListCount.textContent = "0 tickets";
+    pendingListCount.textContent = "0 requests";
   }
 
   function renderEmptyState(container, message) {
@@ -259,41 +276,33 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderTickets() {
-    const confirmedTickets = tickets
-      .filter(ticket => ticket.status === "confirmed")
-      .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
-
-    const pendingTickets = tickets
-      .filter(ticket => ticket.status === "pending")
-      .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
+    const confirmedTickets = tickets.filter((ticket) => ticket.status === "confirmed");
+    const pendingTickets = tickets.filter((ticket) => ticket.status === "pending");
 
     confirmedCount.textContent = confirmedTickets.length;
     pendingCount.textContent = pendingTickets.length;
 
-    confirmedListCount.textContent = `${confirmedTickets.length} ${confirmedTickets.length === 1 ? "ticket" : "tickets"}`;
-    pendingListCount.textContent = `${pendingTickets.length} ${pendingTickets.length === 1 ? "request" : "requests"}`;
+    confirmedListCount.textContent =
+      `${confirmedTickets.length} ${confirmedTickets.length === 1 ? "ticket" : "tickets"}`;
+
+    pendingListCount.textContent =
+      `${pendingTickets.length} ${pendingTickets.length === 1 ? "request" : "requests"}`;
 
     confirmedTicketsList.innerHTML = "";
     pendingTicketsList.innerHTML = "";
 
     if (!confirmedTickets.length) {
-      renderEmptyState(
-        confirmedTicketsList,
-        "No confirmed tickets yet. Registered events will appear here once confirmed."
-      );
+      renderEmptyState(confirmedTicketsList, "No confirmed tickets yet.");
     } else {
-      confirmedTickets.forEach(ticket => {
+      confirmedTickets.forEach((ticket) => {
         confirmedTicketsList.appendChild(createTicketCard(ticket));
       });
     }
 
     if (!pendingTickets.length) {
-      renderEmptyState(
-        pendingTicketsList,
-        "No pending requests right now."
-      );
+      renderEmptyState(pendingTicketsList, "No pending requests.");
     } else {
-      pendingTickets.forEach(ticket => {
+      pendingTickets.forEach((ticket) => {
         pendingTicketsList.appendChild(createTicketCard(ticket));
       });
     }
