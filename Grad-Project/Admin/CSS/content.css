@@ -391,6 +391,8 @@ body {
 
 .modal-content {
   width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
   background: white;
   border-radius: 20px;
   padding: 20px 24px;
