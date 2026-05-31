@@ -166,7 +166,6 @@ filterButtons.forEach((button) => {
 });
 
 acceptBtn.addEventListener("click", async () => {
-  alert("Accept button clicked");
   if (!selectedBookingId) {
     alert("Please select a request first.");
     return;
@@ -175,8 +174,6 @@ acceptBtn.addEventListener("click", async () => {
   const selectedBooking = bookings.find(
     booking => booking.id === selectedBookingId
   );
-
-  console.log(selectedBooking);
 
   try {
 
@@ -314,7 +311,6 @@ onAuthStateChanged(auth, (user) => {
     where("assignedToEmail", "==", realEmail)
   );
 
-  console.log("Building manager email:", realEmail);
 
   onSnapshot(q, (snapshot) => {
     bookings = [];
