@@ -628,6 +628,74 @@ body {
   background: #f0f4ff;
 }
 
+/* Notification card */
+.bm-notification {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 340px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 16px;
+  box-shadow: 0 12px 40px rgba(29, 30, 52, 0.14);
+  border-left: 5px solid #ef4444;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.bm-notification--conflict {
+  border-left-color: #ef4444;
+}
+
+.bm-notif-icon {
+  font-size: 22px;
+  color: #ef4444;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bm-notif-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.bm-notif-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1d1e34;
+  margin-bottom: 5px;
+}
+
+.bm-notif-message {
+  font-size: 13px;
+  color: #5f6e80;
+  line-height: 1.6;
+}
+
+.bm-notif-message strong {
+  color: #1d1e34;
+}
+
+.bm-notif-close {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bm-notif-close:hover {
+  color: #1d1e34;
+}
+
 /* Responsive */
 @media (max-width: 1000px) {
   .content-grid {

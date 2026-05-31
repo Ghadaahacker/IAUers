@@ -218,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
         rejectionReason: "",
         image: imageUrl,
         draftId: editingEventId || "",
-        createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
+        createdBy: (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "unknown-admin").toLowerCase(),
         createdAt: serverTimestamp()
       });
 
@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
         interests: selectedInterests,
         type: "event",
         status: "draft",
-        createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
+        createdBy: (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "unknown-admin").toLowerCase(),
         updatedAt: serverTimestamp(),
         image: imageUrl
       };
@@ -345,7 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
         type: "announcement",
         status,
         dateTime: new Date().toISOString(),
-        createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
+        createdBy: (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "unknown-admin").toLowerCase(),
         updatedAt: serverTimestamp()
       };
 
@@ -674,7 +674,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadEventsFromFirebase() {
     try {
       const adminEmail =
-        (auth.currentUser?.email || sessionStorage.getItem("userEmail") || "").toLowerCase();
+        (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "").toLowerCase();
 
       const [snapshot, rejectedSnapshot, pendingSnapshot] = await Promise.all([
         getDocs(query(collection(db, "events"), orderBy("createdAt", "desc"))),

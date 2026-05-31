@@ -346,10 +346,12 @@ acceptBtn.addEventListener("click", async () => {
     );
 
     if (conflict) {
-      alert(
-        `Cannot accept: "${selectedBooking.hall}" is already booked on ` +
-        `${requestedDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })} ` +
-        `for "${conflict.title}".`
+      showNotification(
+        "Booking Conflict",
+        `<strong>${selectedBooking.hall}</strong> is already booked on
+        <strong>${requestedDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</strong>
+        for <strong>"${conflict.title}"</strong>.`,
+        "conflict"
       );
       return;
     }
@@ -524,3 +526,36 @@ onAuthStateChanged(auth, (user) => {
     renderRequests();
   });
 });
+
+// ── Notification Card ─────────────────────────────────────────────────────────
+
+function showNotification(title, message, type = "conflict") {
+  const existing = document.getElementById("bm-notification");
+  if (existing) existing.remove();
+
+  const icon = type === "conflict"
+    ? `<i class="fa-solid fa-circle-exclamation"></i>`
+    : `<i class="fa-solid fa-circle-check"></i>`;
+
+  const card = document.createElement("div");
+  card.id = "bm-notification";
+  card.className = `bm-notification bm-notification--${type}`;
+  card.innerHTML = `
+    <div class="bm-notif-icon">${icon}</div>
+    <div class="bm-notif-body">
+      <p class="bm-notif-title">${title}</p>
+      <p class="bm-notif-message">${message}</p>
+    </div>
+    <button class="bm-notif-close" onclick="this.parentElement.remove()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  `;
+
+  document.body.appendChild(card);
+
+  setTimeout(() => {
+    card.style.opacity = "0";
+    card.style.transform = "translateY(12px)";
+    setTimeout(() => card.remove(), 400);
+  }, 6000);
+}
