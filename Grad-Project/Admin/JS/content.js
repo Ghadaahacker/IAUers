@@ -376,6 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const contentList = document.getElementById("contentList");
   const sortFilter = document.getElementById("sortFilter");
   const filterSelect = document.getElementById("contentTypeFilter");
+  const searchInput = document.getElementById("contentSearchInput");
 
   async function saveAnnouncementToFirebase(status) {
     const title = announcementTitleInput.value.trim();
@@ -468,17 +469,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getFilteredEvents() {
     const selectedType = filterSelect ? filterSelect.value : "all";
+    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
     return allEvents.filter((event) => {
-      if (selectedType === "all") return true;
-      if (selectedType === "event") return event.type === "event";
-      if (selectedType === "announcement") return event.type === "announcement";
-      if (selectedType === "draft") return event.status === "draft";
-      if (selectedType === "pending") {
-        return event.sourceCollection === "bookingRequests" &&
-          (event.status === "Pending" || event.status === "Pending Building Approval");
-      }
-      return true;
+      const matchesType = (() => {
+        if (selectedType === "all") return true;
+        if (selectedType === "event") return event.type === "event";
+        if (selectedType === "announcement") return event.type === "announcement";
+        if (selectedType === "draft") return event.status === "draft";
+        if (selectedType === "pending") {
+          return event.sourceCollection === "bookingRequests" &&
+            (event.status === "Pending" || event.status === "Pending Building Approval");
+        }
+        return true;
+      })();
+
+      const matchesSearch = !searchTerm ||
+        (event.title || "").toLowerCase().includes(searchTerm) ||
+        (event.description || "").toLowerCase().includes(searchTerm);
+
+      return matchesType && matchesSearch;
     });
   }
 
@@ -796,6 +806,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (filterSelect) {
     filterSelect.addEventListener("change", () => {
+      currentPage = 1;
+      renderEventsPage();
+      renderPagination();
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
       currentPage = 1;
       renderEventsPage();
       renderPagination();
