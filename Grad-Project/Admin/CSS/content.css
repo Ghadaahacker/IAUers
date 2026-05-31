@@ -630,6 +630,11 @@ body {
   color: #b42318;
 }
 
+.badge.status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .reject-reason {
   margin-top: 12px;
   padding: 12px;

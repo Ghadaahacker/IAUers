@@ -424,6 +424,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (selectedType === "event") return event.type === "event";
       if (selectedType === "announcement") return event.type === "announcement";
       if (selectedType === "draft") return event.status === "draft";
+      if (selectedType === "pending") {
+        return event.sourceCollection === "bookingRequests" &&
+          (event.status === "Pending" || event.status === "Pending Building Approval");
+      }
       return true;
     });
   }
@@ -521,12 +525,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     eventsToShow.forEach((event) => {
+      const isPending = event.status === "Pending" || event.status === "Pending Building Approval";
+
       const statusClass =
-        event.status === "published"
-          ? "published"
-          : event.status === "Rejected"
-            ? "rejected"
-            : "draft";
+        event.status === "published" ? "published"
+        : event.status === "Rejected" ? "rejected"
+        : isPending ? "pending"
+        : "draft";
+
+      const statusLabel = isPending ? "PENDING" : event.status.toUpperCase();
 
       const typeLabel = event.type === "announcement" ? "ANNOUNCEMENT" : "EVENT";
       const typeClass = event.type === "announcement" ? "announcement" : "event";
@@ -550,7 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="badges">
               <span class="badge type ${typeClass}">${typeLabel}</span>
               <span class="badge status ${statusClass}">
-                ${event.status.toUpperCase()}
+                ${statusLabel}
               </span>
               ${event.status === "Rejected" && event.rejectionReason
                 ? `
@@ -669,34 +676,36 @@ document.addEventListener("DOMContentLoaded", () => {
       const adminEmail =
         (auth.currentUser?.email || sessionStorage.getItem("userEmail") || "").toLowerCase();
 
-      const q = query(
-        collection(db, "events"),
-        orderBy("createdAt", "desc")
-      );
-
-      const snapshot = await getDocs(q);
-
-      const rejectedQ = query(
-        collection(db, "bookingRequests"),
-        where("status", "==", "Rejected")
-      );
-
-      const rejectedSnapshot = await getDocs(rejectedQ);
+      const [snapshot, rejectedSnapshot, pendingSnapshot] = await Promise.all([
+        getDocs(query(collection(db, "events"), orderBy("createdAt", "desc"))),
+        getDocs(query(collection(db, "bookingRequests"), where("status", "==", "Rejected"))),
+        getDocs(query(collection(db, "bookingRequests"), where("status", "in", ["Pending", "Pending Building Approval"])))
+      ]);
 
       allEvents = [];
 
       snapshot.forEach((eventDoc) => {
         const data = eventDoc.data();
-        const createdBy = (data.createdBy || "").toLowerCase();
-        if (createdBy === adminEmail) {
+        if ((data.createdBy || "").toLowerCase() === adminEmail) {
           allEvents.push({ id: eventDoc.id, ...data });
         }
       });
 
       rejectedSnapshot.forEach((requestDoc) => {
         const data = requestDoc.data();
-        const createdBy = (data.createdBy || "").toLowerCase();
-        if (createdBy === adminEmail) {
+        if ((data.createdBy || "").toLowerCase() === adminEmail) {
+          allEvents.push({
+            id: requestDoc.id,
+            ...data,
+            type: "event",
+            sourceCollection: "bookingRequests"
+          });
+        }
+      });
+
+      pendingSnapshot.forEach((requestDoc) => {
+        const data = requestDoc.data();
+        if ((data.createdBy || "").toLowerCase() === adminEmail) {
           allEvents.push({
             id: requestDoc.id,
             ...data,
