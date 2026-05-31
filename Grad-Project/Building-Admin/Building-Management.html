@@ -87,6 +87,10 @@
           <p><strong>Date:</strong> <span id="detail-date">—</span></p>
           <p><strong>Status:</strong> <span id="detail-status">—</span></p>
 
+          <button class="calendar-btn" id="view-calendar-btn" type="button" title="View hall calendar">
+            <i class="fa-regular fa-calendar"></i>
+          </button>
+
           <div class="actions">
             <button class="accept" id="accept-btn" type="button">Accept</button>
             <button class="reject" id="reject-btn" type="button">Reject</button>
@@ -99,6 +103,24 @@
         </div>
       </section>
     </main>
+
+    <!-- Calendar Modal -->
+    <div class="modal-overlay" id="calendar-modal">
+      <div class="modal-card">
+        <button class="modal-close" id="close-calendar" type="button">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="modal-icon">
+          <i class="fa-regular fa-calendar"></i>
+        </div>
+
+        <h2 id="calendar-modal-title">Hall Schedule</h2>
+        <p class="modal-subtitle" id="calendar-modal-subtitle">Accepted bookings for this hall</p>
+
+        <div id="calendar-bookings-list"></div>
+      </div>
+    </div>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settings-modal">

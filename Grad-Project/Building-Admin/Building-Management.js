@@ -42,6 +42,10 @@ const rejectBox = document.getElementById("reject-box");
 const rejectReasonInput = document.getElementById("reject-reason");
 const submitRejectBtn = document.getElementById("submit-reject");
 
+const viewCalendarBtn = document.getElementById("view-calendar-btn");
+const calendarModal = document.getElementById("calendar-modal");
+const closeCalendar = document.getElementById("close-calendar");
+
 const settingsBtn = document.getElementById("settings-btn");
 const profileBtn = document.getElementById("profile-btn");
 
@@ -165,6 +169,162 @@ filterButtons.forEach((button) => {
   });
 });
 
+// ── Calendar Modal ────────────────────────────────────────────────────────────
+
+function openCalendarModal(selectedBooking) {
+  const hall = selectedBooking.hall || "—";
+  const selectedDate = selectedBooking.dateTime ? new Date(selectedBooking.dateTime) : null;
+
+  // Accepted bookings for this hall (excluding the current request)
+  const hallBookings = bookings.filter(b =>
+    b.id !== selectedBooking.id &&
+    (b.hall || "").toLowerCase() === hall.toLowerCase() &&
+    normalizeStatus(b.status) === "Accepted"
+  );
+
+  // Map: "YYYY-M-D" -> full booking info
+  const bookedMap = {};
+  hallBookings.forEach(b => {
+    const d = new Date(b.dateTime);
+    bookedMap[`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`] = {
+      title: b.title || "Untitled Event",
+      dateTime: b.dateTime,
+      createdBy: b.createdBy || "Admin"
+    };
+  });
+
+  document.getElementById("calendar-modal-title").textContent = hall;
+  document.getElementById("calendar-modal-subtitle").textContent = "Venue schedule";
+
+  const container = document.getElementById("calendar-bookings-list");
+
+  let viewYear  = selectedDate ? selectedDate.getFullYear()  : new Date().getFullYear();
+  let viewMonth = selectedDate ? selectedDate.getMonth()     : new Date().getMonth();
+
+  const MONTHS   = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const WEEKDAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const today    = new Date();
+
+  function render() {
+    const firstDay    = new Date(viewYear, viewMonth, 1);
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const startDow    = firstDay.getDay();
+
+    let cells = "";
+
+    for (let i = 0; i < startDow; i++) {
+      cells += `<div class="cal-cell other-month"><div class="cal-num"></div><div class="cal-dots"></div></div>`;
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key        = `${viewYear}-${viewMonth}-${day}`;
+      const isToday    = today.getFullYear() === viewYear && today.getMonth() === viewMonth && today.getDate() === day;
+      const isSelected = selectedDate && selectedDate.getFullYear() === viewYear && selectedDate.getMonth() === viewMonth && selectedDate.getDate() === day;
+      const isBooked   = key in bookedMap;
+      const isConflict = isSelected && isBooked;
+
+      let cls = "cal-cell";
+      if (isToday)         cls += " is-today";
+      if (isConflict)      cls += " is-conflict";
+      else if (isSelected) cls += " is-selected";
+      if (isBooked)        cls += " is-booked";
+
+      let dots = "";
+      if (isConflict)      dots = `<div class="cal-dot dot-conflict"></div>`;
+      else if (isBooked)   dots = `<div class="cal-dot dot-booked"></div>`;
+      else if (isSelected) dots = `<div class="cal-dot dot-selected"></div>`;
+
+      cells += `
+        <div class="${cls}" ${isBooked ? `data-key="${key}"` : ""}>
+          <div class="cal-num">${day}</div>
+          <div class="cal-dots">${dots}</div>
+        </div>`;
+    }
+
+    container.innerHTML = `
+      <div class="cal-nav">
+        <button class="cal-nav-btn" id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
+        <span class="cal-month-label">${MONTHS[viewMonth]} ${viewYear}</span>
+        <button class="cal-nav-btn" id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <div class="cal-weekdays">
+        ${WEEKDAYS.map(d => `<div class="cal-weekday">${d}</div>`).join("")}
+      </div>
+      <div class="cal-grid" id="cal-grid">${cells}</div>
+      <div class="cal-booking-popup" id="cal-booking-popup">
+        <div class="cal-popup-title" id="cal-popup-title"></div>
+        <div class="cal-popup-meta">
+          <span id="cal-popup-date"></span>
+          <span id="cal-popup-organizer"></span>
+        </div>
+      </div>
+      <div class="cal-legend">
+        <div class="cal-legend-item">
+          <div class="cal-legend-dot" style="background:#1e3a8a;"></div>
+          <span>Selected request</span>
+        </div>
+        <div class="cal-legend-item">
+          <div class="cal-legend-dot" style="background:#ef4444;"></div>
+          <span>Already booked</span>
+        </div>
+        <div class="cal-legend-item">
+          <div class="cal-legend-dot" style="background:#f2f5f9; border:1px solid #ccc;"></div>
+          <span>Today</span>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("cal-prev").addEventListener("click", () => {
+      viewMonth--;
+      if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      render();
+    });
+
+    document.getElementById("cal-next").addEventListener("click", () => {
+      viewMonth++;
+      if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      render();
+    });
+
+    // Click a booked day to see booking details
+    document.getElementById("cal-grid").addEventListener("click", e => {
+      const cell = e.target.closest("[data-key]");
+      const popup = document.getElementById("cal-booking-popup");
+      if (!cell) { popup.style.display = "none"; return; }
+
+      const booking = bookedMap[cell.dataset.key];
+      if (!booking) return;
+
+      const d = new Date(booking.dateTime);
+      document.getElementById("cal-popup-title").textContent = booking.title;
+      document.getElementById("cal-popup-date").textContent =
+        d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) +
+        " at " + d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      document.getElementById("cal-popup-organizer").textContent = "Organizer: " + booking.createdBy;
+      popup.style.display = "block";
+    });
+  }
+
+  render();
+  calendarModal.classList.add("show");
+}
+
+viewCalendarBtn.addEventListener("click", () => {
+  if (!selectedBookingId) {
+    alert("Please select a request first.");
+    return;
+  }
+  const selectedBooking = bookings.find(b => b.id === selectedBookingId);
+  if (selectedBooking) openCalendarModal(selectedBooking);
+});
+
+closeCalendar.addEventListener("click", () => calendarModal.classList.remove("show"));
+calendarModal.addEventListener("click", e => {
+  if (e.target === calendarModal) calendarModal.classList.remove("show");
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 acceptBtn.addEventListener("click", async () => {
   if (!selectedBookingId) {
     alert("Please select a request first.");
@@ -174,6 +334,26 @@ acceptBtn.addEventListener("click", async () => {
   const selectedBooking = bookings.find(
     booking => booking.id === selectedBookingId
   );
+
+  // Block acceptance if same hall is already booked on the same day
+  if (selectedBooking && selectedBooking.dateTime) {
+    const requestedDate = new Date(selectedBooking.dateTime);
+    const conflict = bookings.find(b =>
+      b.id !== selectedBookingId &&
+      normalizeStatus(b.status) === "Accepted" &&
+      (b.hall || "").toLowerCase() === (selectedBooking.hall || "").toLowerCase() &&
+      new Date(b.dateTime).toDateString() === requestedDate.toDateString()
+    );
+
+    if (conflict) {
+      alert(
+        `Cannot accept: "${selectedBooking.hall}" is already booked on ` +
+        `${requestedDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })} ` +
+        `for "${conflict.title}".`
+      );
+      return;
+    }
+  }
 
   try {
 
