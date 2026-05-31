@@ -231,6 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       resetEventForm();
       closeModalFunc(eventModal);
+      await loadEventsFromFirebase();
 
     } catch (error) {
       console.error("Error sending request:", error);
