@@ -43,6 +43,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const eventInterestChips = document.querySelectorAll(".admin-interest-chip");
 
+  const imageLightbox = document.getElementById("imageLightbox");
+  const lightboxImg = document.getElementById("lightboxImg");
+  const closeLightbox = document.getElementById("closeLightbox");
+
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("card-image")) {
+      lightboxImg.src = e.target.src;
+      imageLightbox.classList.add("open");
+    }
+  });
+
+  closeLightbox.addEventListener("click", () => {
+    imageLightbox.classList.remove("open");
+  });
+
+  imageLightbox.addEventListener("click", (e) => {
+    if (e.target === imageLightbox) {
+      imageLightbox.classList.remove("open");
+    }
+  });
+
   eventInterestChips.forEach((chip) => {
     chip.addEventListener("click", () => {
       chip.classList.toggle("active");
@@ -51,11 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getSelectedEventInterests() {
     const selectedInterests = [];
-
     document.querySelectorAll(".admin-interest-chip.active").forEach((chip) => {
       selectedInterests.push(chip.textContent.trim());
     });
-
     return selectedInterests;
   }
 
@@ -68,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function setEventInterests(interests = []) {
     eventInterestChips.forEach((chip) => {
       const chipText = chip.textContent.trim();
-
       if (interests.includes(chipText)) {
         chip.classList.add("active");
       } else {
@@ -82,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
       eventFileInput.files.length > 0
         ? eventFileInput.files[0].name
         : "No file selected";
+    fileNameText.style.color = "";
   });
 
   const announcementTitleInput = document.getElementById("announcementTitleInput");
@@ -103,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     buildingHallSelect.value = "";
     eventFileInput.value = "";
     fileNameText.textContent = "No file selected";
+    fileNameText.style.color = "";
     resetEventInterests();
   }
 
@@ -172,19 +192,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const buildingManagerEmail =
       building === "D3" ? "building@iau.edu.sa" :
-        building === "A7" ? "building2@iau.edu.sa" :
-          "";
+      building === "A7" ? "building2@iau.edu.sa" :
+      "";
 
     try {
       sendBuildingRequestBtn.disabled = true;
       sendBuildingRequestBtn.textContent = "Sending...";
 
-      let imageBase64 = "";
-
+      let imageUrl = "";
       const selectedFile = eventFileInput.files[0];
-
       if (selectedFile) {
-        imageBase64 = await convertToBase64(selectedFile);
+        imageUrl = await compressAndConvertToBase64(selectedFile);
       }
 
       await addDoc(collection(db, "bookingRequests"), {
@@ -198,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
         assignedToEmail: buildingManagerEmail,
         status: "Pending",
         rejectionReason: "",
-        image: imageBase64,
+        image: imageUrl,
         draftId: editingEventId || "",
         createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
         createdAt: serverTimestamp()
@@ -251,16 +269,14 @@ document.addEventListener("DOMContentLoaded", () => {
       ? selectedHall.dataset.capacity
       : 0;
 
-    let imageBase64 = "";
+    let imageUrl = "";
     const selectedFile = eventFileInput.files[0];
     if (selectedFile) {
-      imageBase64 = await convertToBase64(selectedFile);
+      imageUrl = await compressAndConvertToBase64(selectedFile);
     } else if (editingEventId) {
-      // إذا ما اختارت صورة جديدة، احتفظي بالقديمة
       const existing = allEvents.find(e => e.id === editingEventId);
-      imageBase64 = existing?.image || "";
+      imageUrl = existing?.image || "";
     }
-
 
     try {
       const eventData = {
@@ -275,15 +291,11 @@ document.addEventListener("DOMContentLoaded", () => {
         status: "draft",
         createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
         updatedAt: serverTimestamp(),
-        image: imageBase64
+        image: imageUrl
       };
 
       if (editingEventId) {
-        await updateDoc(
-          doc(db, "events", editingEventId),
-          eventData
-        );
-
+        await updateDoc(doc(db, "events", editingEventId), eventData);
         editingEventId = null;
       } else {
         await addDoc(collection(db, "events"), {
@@ -296,12 +308,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       resetEventForm();
       closeModalFunc(eventModal);
-
       await loadEventsFromFirebase();
 
     } catch (error) {
       console.error("Error saving draft:", error);
-      alert("Draft was not saved. Check console.");
+      alert("Draft was not saved: " + error.message);
     }
   });
 
@@ -310,7 +321,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let allEvents = [];
   let currentPage = 1;
-
   const eventsPerPage = 5;
 
   const contentList = document.getElementById("contentList");
@@ -387,7 +397,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target === eventModal) {
       closeModalFunc(eventModal);
     }
-
     if (event.target === announcementModal) {
       closeModalFunc(announcementModal);
     }
@@ -399,12 +408,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const pendingDraftsCount = document.getElementById("pendingDraftsCount");
 
     const total = allEvents.length;
-
-    const published =
-      allEvents.filter(event => event.status === "published").length;
-
-    const drafts =
-      allEvents.filter(event => event.status === "draft").length;
+    const published = allEvents.filter(event => event.status === "published").length;
+    const drafts = allEvents.filter(event => event.status === "draft").length;
 
     totalContentCount.textContent = total;
     activeEventsCount.textContent = published;
@@ -504,7 +509,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const start = (currentPage - 1) * eventsPerPage;
     const end = start + eventsPerPage;
-
     const eventsToShow = filteredEvents.slice(start, end);
 
     if (eventsToShow.length === 0) {
@@ -539,81 +543,76 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("article");
       card.className = event.image ? "content-card has-image" : "content-card";
 
-
       card.innerHTML = `
-      ${event.image ? `<img src="${event.image}" class="card-image" alt="Event Image">` : ""}
-      <div class="card-body-row">
-        <div class="content-info">    
-          <div class="badges">
-            <span class="badge type ${typeClass}">${typeLabel}</span>
-            <span class="badge status ${statusClass}">
-              ${event.status.toUpperCase()}
-            </span>
-
-            ${event.status === "Rejected" && event.rejectionReason
-          ? `
+        ${event.image ? `<img src="${event.image}" class="card-image" alt="Event Image">` : ""}
+        <div class="card-body-row">
+          <div class="content-info">
+            <div class="badges">
+              <span class="badge type ${typeClass}">${typeLabel}</span>
+              <span class="badge status ${statusClass}">
+                ${event.status.toUpperCase()}
+              </span>
+              ${event.status === "Rejected" && event.rejectionReason
+                ? `
                   <div class="reject-reason">
                     <strong>Rejection Reason:</strong>
                     ${event.rejectionReason}
                   </div>
                 `
-          : ""
-        }
-          </div>
+                : ""
+              }
+            </div>
 
-          <h3>${event.title}</h3>
-          <p>${event.description}</p>
+            <h3>${event.title}</h3>
+            <p>${event.description}</p>
 
-          ${interestTags}
+            ${interestTags}
 
-          <div class="meta">
-            <span>
-              <span class="material-symbols-outlined small">calendar_month</span>
-              ${new Date(event.dateTime).toLocaleString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        })}
-            </span>
-
-            <span>
-              <span class="material-symbols-outlined small">
-                ${event.type === "announcement" ? "link" : "location_on"}
+            <div class="meta">
+              <span>
+                <span class="material-symbols-outlined small">calendar_month</span>
+                ${new Date(event.dateTime).toLocaleString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
               </span>
-              ${event.type === "announcement"
-          ? `<a href="${event.link}" target="_blank">${event.link}</a>`
-          : (event.location || event.hall || "")
-        }
-            </span>
+              <span>
+                <span class="material-symbols-outlined small">
+                  ${event.type === "announcement" ? "link" : "location_on"}
+                </span>
+                ${event.type === "announcement"
+                  ? `<a href="${event.link}" target="_blank">${event.link}</a>`
+                  : (event.location || event.hall || "")
+                }
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div class="content-actions">
-          ${event.status === "draft"
-          ? `
+          <div class="content-actions">
+            ${event.status === "draft"
+              ? `
                 <button class="icon-btn edit-event-btn" title="Edit" type="button">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
               `
-          : ""
-        }
-
-          ${event.status !== "Rejected"
-          ? `
+              : ""
+            }
+            ${event.status !== "Rejected"
+              ? `
                 <button class="icon-btn analytics-btn" title="Analytics" type="button">
                   <span class="material-symbols-outlined">bar_chart</span>
                 </button>
               `
-          : ""
-        }
-
-          <button class="icon-btn delete-event-btn" title="Delete" type="button">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
+              : ""
+            }
+            <button class="icon-btn delete-event-btn" title="Delete" type="button">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
         </div>
-      </div>
       `;
 
       const deleteBtn = card.querySelector(".delete-event-btn");
@@ -627,7 +626,6 @@ document.addEventListener("DOMContentLoaded", () => {
             announcementTitleInput.value = event.title || "";
             announcementDescriptionInput.value = event.description || "";
             announcementLinkInput.value = event.link || "";
-
             openModal(announcementModal);
           } else {
             eventTitleInput.value = event.title || "";
@@ -674,8 +672,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const adminEmail =
         (auth.currentUser?.email || sessionStorage.getItem("userEmail") || "").toLowerCase();
 
-      console.log("Current admin:", adminEmail);
-
       const q = query(
         collection(db, "events"),
         orderBy("createdAt", "desc")
@@ -695,19 +691,14 @@ document.addEventListener("DOMContentLoaded", () => {
       snapshot.forEach((eventDoc) => {
         const data = eventDoc.data();
         const createdBy = (data.createdBy || "").toLowerCase();
-
         if (createdBy === adminEmail) {
-          allEvents.push({
-            id: eventDoc.id,
-            ...data
-          });
+          allEvents.push({ id: eventDoc.id, ...data });
         }
       });
 
       rejectedSnapshot.forEach((requestDoc) => {
         const data = requestDoc.data();
         const createdBy = (data.createdBy || "").toLowerCase();
-
         if (createdBy === adminEmail) {
           allEvents.push({
             id: requestDoc.id,
@@ -743,14 +734,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function convertToBase64(file) {
-    return new Promise((resolve, reject) => {
+  function compressAndConvertToBase64(file) {
+    return new Promise((resolve) => {
       const reader = new FileReader();
-
       reader.readAsDataURL(file);
-
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxWidth = 800;
+          const scale = Math.min(1, maxWidth / img.width);
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.6));
+        };
+      };
     });
   }
 

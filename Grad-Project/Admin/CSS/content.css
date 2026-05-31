@@ -525,6 +525,41 @@ body {
   width: 100%;
 }
 
+.card-image {
+  cursor: pointer;
+}
+
+.image-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-lightbox.open {
+  display: flex;
+}
+
+.image-lightbox img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  color: white;
+  font-size: 36px;
+  cursor: pointer;
+  line-height: 1;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .stats-grid {

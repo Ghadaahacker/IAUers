@@ -194,6 +194,7 @@ acceptBtn.addEventListener("click", async () => {
       building: selectedBooking.building || "",
       capacity: Number(selectedBooking.capacity) || 0,
       image: selectedBooking.image || "",
+      interests: selectedBooking.interests || [],
       type: "event",
       status: "published",
       createdBy: selectedBooking.createdBy || "Admin",

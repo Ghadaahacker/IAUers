@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -151,12 +152,7 @@
             Choose Image or PDF
           </label>
 
-          <input
-            type="file"
-            id="eventFileInput"
-            accept="image/*,application/pdf"
-            hidden
-          />
+          <input type="file" id="eventFileInput" accept="image/*,application/pdf" hidden />
 
           <p class="file-upload-name" id="fileNameText">No file selected</p>
         </div>
@@ -164,7 +160,8 @@
         <div class="approval-note">
           <i class="fa-solid fa-circle-info"></i>
           <span>
-            This event requires venue approval. Your request will be sent to the responsible Building Manager before publishing.
+            This event requires venue approval. Your request will be sent to the responsible Building Manager before
+            publishing.
           </span>
         </div>
       </div>
@@ -208,7 +205,14 @@
     </div>
   </div>
 
+  <div class="image-lightbox" id="imageLightbox">
+    <span class="lightbox-close" id="closeLightbox">&times;</span>
+    <img id="lightboxImg" src="" alt="Event Image" />
+  </div>
+
+
   <script src="../../Shared/JS/admin-sidebar.js"></script>
   <script type="module" src="../JS/content.js"></script>
 </body>
+
 </html>
