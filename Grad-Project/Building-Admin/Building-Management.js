@@ -383,7 +383,7 @@ acceptBtn.addEventListener("click", async () => {
       bookingRequestId: selectedBookingId,
       createdAt: serverTimestamp()
     });
-    
+
     await addDoc(collection(db, "activityLogs"), {
       message: `Event "${selectedBooking.title}" was approved.`,
       type: "approved",

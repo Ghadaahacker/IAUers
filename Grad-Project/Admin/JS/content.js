@@ -38,6 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventDescriptionInput = document.getElementById("eventDescriptionInput");
   const eventDateTimeInput = document.getElementById("eventDateTimeInput");
   const buildingHallSelect = document.getElementById("buildingHall");
+
+  // Prevent selecting a past date — set min to current date and time
+  const nowLocal = new Date();
+  nowLocal.setSeconds(0, 0);
+  eventDateTimeInput.min = nowLocal.toISOString().slice(0, 16);
   const eventFileInput = document.getElementById("eventFileInput");
   const fileNameText = document.getElementById("fileNameText");
 
@@ -660,26 +665,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
           if (event.sourceCollection === "bookingRequests") {
+            // Pending or rejected — doc lives directly in bookingRequests
             await deleteDoc(doc(db, "bookingRequests", event.id));
           } else {
+            // Published event — delete from events
             await deleteDoc(doc(db, "events", event.id));
 
+            // Delete the exact linked bookingRequest using the stored ID
             if (event.bookingRequestId) {
               await deleteDoc(doc(db, "bookingRequests", event.bookingRequestId));
-            } else {
-              const brSnap = await getDocs(query(
-                collection(db, "bookingRequests"),
-                where("createdBy", "==", event.createdBy)
-              ));
-              for (const brDoc of brSnap.docs) {
-                const brData = brDoc.data();
-                if (
-                  brData.status === "Accepted" &&
-                  (brData.title || "").toLowerCase() === (event.title || "").toLowerCase()
-                ) {
-                  await deleteDoc(doc(db, "bookingRequests", brDoc.id));
-                }
-              }
             }
           }
         } catch (err) {
