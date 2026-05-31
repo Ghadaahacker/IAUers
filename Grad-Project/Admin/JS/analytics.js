@@ -11,6 +11,8 @@ if (currentUserRole !== "admin") {
   window.location.href = "../../Login/HTML/login.html";
 }
 
+const adminEmail = (sessionStorage.getItem("userEmail") || "").toLowerCase();
+
 async function loadAnalytics() {
   const [eventsSnap, registrationsSnap, feedbackSnap] = await Promise.all([
     getDocs(query(collection(db, "events"), where("status", "==", "published"))),
@@ -18,23 +20,29 @@ async function loadAnalytics() {
     getDocs(collection(db, "eventFeedback"))
   ]);
 
-  // Build events map
+  // Build events map — only this admin's events
   const eventsMap = {};
   let totalCapacity = 0;
 
   eventsSnap.forEach(docSnap => {
     const data = docSnap.data();
+    if ((data.createdBy || "").toLowerCase() !== adminEmail) return;
     eventsMap[docSnap.id] = { id: docSnap.id, ...data, registrationCount: 0 };
     totalCapacity += Number(data.capacity) || 0;
   });
 
-  // Process registrations
+  // Process registrations — only for this admin's events
   let totalRegistrations = 0;
   let confirmedCount = 0;
   const monthlyData = {};
 
   registrationsSnap.forEach(docSnap => {
     const reg = docSnap.data();
+    const eventId = reg.eventId;
+
+    // Skip registrations that don't belong to this admin's events
+    if (!eventId || !eventsMap[eventId]) return;
+
     totalRegistrations++;
 
     const status = reg.status || reg.ticketStatus || "";
@@ -48,11 +56,7 @@ async function loadAnalytics() {
       monthlyData[key] = (monthlyData[key] || 0) + 1;
     }
 
-    // Count per event
-    const eventId = reg.eventId;
-    if (eventId && eventsMap[eventId]) {
-      eventsMap[eventId].registrationCount++;
-    }
+    eventsMap[eventId].registrationCount++;
   });
 
   // KPI values
@@ -155,6 +159,8 @@ async function loadAnalytics() {
 
   feedbackSnap.forEach(docSnap => {
     const fb = docSnap.data();
+    // Only count feedback for this admin's events
+    if (!eventsMap[fb.eventId]) return;
     totalFeedback++;
     if (fb.wouldRecommend === true || (typeof fb.rating === "number" && fb.rating >= 4)) {
       wouldRecommend++;

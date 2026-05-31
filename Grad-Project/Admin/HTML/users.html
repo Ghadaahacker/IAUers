@@ -57,23 +57,41 @@
         <!-- Search -->
         <div class="users-search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Search users..." />
+          <input type="text" id="userSearch" placeholder="Search by name, email, or department..." />
         </div>
 
-        <!-- Placeholder -->
-        <div class="placeholder-card">
-          <div class="placeholder-icon">
-            <i class="fa-solid fa-users"></i>
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+          <button class="tab-btn active" data-filter="all">All</button>
+          <button class="tab-btn" data-filter="active">Active</button>
+          <button class="tab-btn" data-filter="inactive">Inactive</button>
+        </div>
+
+        <!-- Users Table -->
+        <div class="users-table-wrap">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Last Login</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+          <div id="usersEmptyState" class="users-empty-state" style="display:none;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p>No users found.</p>
           </div>
-          <h2>User Management</h2>
-          <p>User management features coming soon</p>
         </div>
       </section>
     </main>
   </div>
 
   <script src="../../Shared/JS/admin-sidebar.js"></script>
-  <script src="../JS/users.js"></script>
   <script type="module" src="../JS/users.js"></script>
 </body>
 </html>

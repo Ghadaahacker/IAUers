@@ -4,6 +4,7 @@ import {
   collection,
   getDocs,
   query,
+  where,
   orderBy,
   limit,
   onSnapshot
@@ -14,6 +15,8 @@ const currentUserRole = sessionStorage.getItem("userRole");
 if (currentUserRole !== "admin") {
   window.location.href = "../../Login/HTML/login.html";
 }
+
+const adminEmail = (sessionStorage.getItem("userEmail") || "").toLowerCase();
 
 const addEventBtn = document.getElementById("addEventBtn");
 const addAnnouncementBtn = document.getElementById("addAnnouncementBtn");
@@ -84,6 +87,7 @@ const recentActivityList = document.getElementById("recentActivityList");
 function loadRecentActivity() {
   const q = query(
     collection(db, "activityLogs"),
+    where("adminEmail", "==", adminEmail),
     orderBy("createdAt", "desc"),
     limit(5)
   );

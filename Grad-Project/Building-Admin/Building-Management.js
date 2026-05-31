@@ -207,6 +207,7 @@ acceptBtn.addEventListener("click", async () => {
     await addDoc(collection(db, "activityLogs"), {
       message: `Event "${selectedBooking.title}" was approved.`,
       type: "approved",
+      adminEmail: (selectedBooking.createdBy || "").toLowerCase(),
       createdAt: serverTimestamp()
     });
 
@@ -252,6 +253,7 @@ submitRejectBtn.addEventListener("click", async () => {
     await addDoc(collection(db, "activityLogs"), {
       message: `Event "${selectedBooking.title}" was rejected. Reason: ${reason}`,
       type: "rejected",
+      adminEmail: (selectedBooking.createdBy || "").toLowerCase(),
       createdAt: serverTimestamp()
     });
 

@@ -343,6 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ? `Announcement "${title}" was published.`
             : `Announcement "${title}" was saved as draft.`,
         type: status,
+        adminEmail: (auth.currentUser?.email || "").toLowerCase(),
         createdAt: serverTimestamp()
       });
 
