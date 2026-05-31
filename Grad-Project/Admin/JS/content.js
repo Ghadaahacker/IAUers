@@ -652,10 +652,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!confirmDelete) return;
 
         if (event.sourceCollection === "bookingRequests") {
-          await updateDoc(doc(db, "bookingRequests", event.id), {
-            status: "Deleted",
-            deletedAt: serverTimestamp()
-          });
+          await deleteDoc(doc(db, "bookingRequests", event.id));
         } else {
           await deleteDoc(doc(db, "events", event.id));
         }
