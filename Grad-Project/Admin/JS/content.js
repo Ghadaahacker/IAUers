@@ -172,8 +172,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const buildingManagerEmail =
       building === "D3" ? "building@iau.edu.sa" :
-      building === "A7" ? "building2@iau.edu.sa" :
-      "";
+        building === "A7" ? "building2@iau.edu.sa" :
+          "";
 
     try {
       sendBuildingRequestBtn.disabled = true;
@@ -251,6 +251,17 @@ document.addEventListener("DOMContentLoaded", () => {
       ? selectedHall.dataset.capacity
       : 0;
 
+    let imageBase64 = "";
+    const selectedFile = eventFileInput.files[0];
+    if (selectedFile) {
+      imageBase64 = await convertToBase64(selectedFile);
+    } else if (editingEventId) {
+      // إذا ما اختارت صورة جديدة، احتفظي بالقديمة
+      const existing = allEvents.find(e => e.id === editingEventId);
+      imageBase64 = existing?.image || "";
+    }
+
+
     try {
       const eventData = {
         title: eventTitleInput.value.trim(),
@@ -263,7 +274,8 @@ document.addEventListener("DOMContentLoaded", () => {
         type: "event",
         status: "draft",
         createdBy: auth.currentUser ? auth.currentUser.email : "unknown-admin",
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        image: imageBase64
       };
 
       if (editingEventId) {
@@ -525,26 +537,28 @@ document.addEventListener("DOMContentLoaded", () => {
           : "";
 
       const card = document.createElement("article");
-      card.className = "content-card";
+      card.className = event.image ? "content-card has-image" : "content-card";
+
 
       card.innerHTML = `
-        <div class="content-info">
+      ${event.image ? `<img src="${event.image}" class="card-image" alt="Event Image">` : ""}
+      <div class="card-body-row">
+        <div class="content-info">    
           <div class="badges">
             <span class="badge type ${typeClass}">${typeLabel}</span>
             <span class="badge status ${statusClass}">
               ${event.status.toUpperCase()}
             </span>
 
-            ${
-              event.status === "Rejected" && event.rejectionReason
-                ? `
+            ${event.status === "Rejected" && event.rejectionReason
+          ? `
                   <div class="reject-reason">
                     <strong>Rejection Reason:</strong>
                     ${event.rejectionReason}
                   </div>
                 `
-                : ""
-            }
+          : ""
+        }
           </div>
 
           <h3>${event.title}</h3>
@@ -556,52 +570,50 @@ document.addEventListener("DOMContentLoaded", () => {
             <span>
               <span class="material-symbols-outlined small">calendar_month</span>
               ${new Date(event.dateTime).toLocaleString("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-              })}
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        })}
             </span>
 
             <span>
               <span class="material-symbols-outlined small">
                 ${event.type === "announcement" ? "link" : "location_on"}
               </span>
-              ${
-                event.type === "announcement"
-                  ? `<a href="${event.link}" target="_blank">${event.link}</a>`
-                  : (event.location || event.hall || "")
-              }
+              ${event.type === "announcement"
+          ? `<a href="${event.link}" target="_blank">${event.link}</a>`
+          : (event.location || event.hall || "")
+        }
             </span>
           </div>
         </div>
 
         <div class="content-actions">
-          ${
-            event.status === "draft"
-              ? `
+          ${event.status === "draft"
+          ? `
                 <button class="icon-btn edit-event-btn" title="Edit" type="button">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
               `
-              : ""
-          }
+          : ""
+        }
 
-          ${
-            event.status !== "Rejected"
-              ? `
+          ${event.status !== "Rejected"
+          ? `
                 <button class="icon-btn analytics-btn" title="Analytics" type="button">
                   <span class="material-symbols-outlined">bar_chart</span>
                 </button>
               `
-              : ""
-          }
+          : ""
+        }
 
           <button class="icon-btn delete-event-btn" title="Delete" type="button">
             <span class="material-symbols-outlined">delete</span>
           </button>
         </div>
+      </div>
       `;
 
       const deleteBtn = card.querySelector(".delete-event-btn");
@@ -623,6 +635,14 @@ document.addEventListener("DOMContentLoaded", () => {
             eventDateTimeInput.value = event.dateTime || "";
             buildingHallSelect.value = event.hall || "";
             setEventInterests(event.interests || []);
+
+            if (event.image) {
+              fileNameText.textContent = "Current image saved";
+              fileNameText.style.color = "#3a5a96";
+            } else {
+              fileNameText.textContent = "No file selected";
+              fileNameText.style.color = "";
+            }
 
             openModal(eventModal);
           }
