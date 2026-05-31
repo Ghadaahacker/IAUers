@@ -658,10 +658,33 @@ document.addEventListener("DOMContentLoaded", () => {
         const confirmDelete = confirm("Delete this content?");
         if (!confirmDelete) return;
 
-        if (event.sourceCollection === "bookingRequests") {
-          await deleteDoc(doc(db, "bookingRequests", event.id));
-        } else {
-          await deleteDoc(doc(db, "events", event.id));
+        try {
+          if (event.sourceCollection === "bookingRequests") {
+            await deleteDoc(doc(db, "bookingRequests", event.id));
+          } else {
+            await deleteDoc(doc(db, "events", event.id));
+
+            if (event.bookingRequestId) {
+              await deleteDoc(doc(db, "bookingRequests", event.bookingRequestId));
+            } else {
+              const brSnap = await getDocs(query(
+                collection(db, "bookingRequests"),
+                where("createdBy", "==", event.createdBy)
+              ));
+              for (const brDoc of brSnap.docs) {
+                const brData = brDoc.data();
+                if (
+                  brData.status === "Accepted" &&
+                  (brData.title || "").toLowerCase() === (event.title || "").toLowerCase()
+                ) {
+                  await deleteDoc(doc(db, "bookingRequests", brDoc.id));
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Delete error:", err);
+          alert("Delete error: " + err.message);
         }
 
         loadEventsFromFirebase();
