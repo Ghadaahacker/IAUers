@@ -648,9 +648,6 @@ body {
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-.bm-notification--conflict {
-  border-left-color: #ef4444;
-}
 
 .bm-notif-icon {
   font-size: 22px;

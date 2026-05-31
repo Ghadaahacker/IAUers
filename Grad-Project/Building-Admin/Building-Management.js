@@ -311,7 +311,7 @@ function openCalendarModal(selectedBooking) {
 
 viewCalendarBtn.addEventListener("click", () => {
   if (!selectedBookingId) {
-    alert("Please select a request first.");
+    showNotification("No Request Selected", "Please select a request from the list first.", "error");
     return;
   }
   const selectedBooking = bookings.find(b => b.id === selectedBookingId);
@@ -327,7 +327,7 @@ calendarModal.addEventListener("click", e => {
 
 acceptBtn.addEventListener("click", async () => {
   if (!selectedBookingId) {
-    alert("Please select a request first.");
+    showNotification("No Request Selected", "Please select a request from the list first.", "error");
     return;
   }
 
@@ -394,11 +394,11 @@ acceptBtn.addEventListener("click", async () => {
 
     rejectBox.classList.remove("show");
 
-    alert("Request accepted successfully.");
+    showNotification("Request Accepted", "The event has been approved and published.", "success");
 
   } catch (error) {
     console.error("Error accepting request:", error);
-    alert("Could not accept request.");
+    showNotification("Accept Failed", "Could not accept the request. Please try again.", "error");
   }
 
 });
@@ -414,7 +414,7 @@ submitRejectBtn.addEventListener("click", async () => {
   const reason = rejectReasonInput.value.trim();
 
   if (reason === "") {
-    alert("Please enter a reason for rejection.");
+    showNotification("Reason Required", "Please enter a reason for rejection.", "error");
     return;
   }
 
@@ -443,7 +443,7 @@ submitRejectBtn.addEventListener("click", async () => {
 
   } catch (error) {
     console.error("Error rejecting request:", error);
-    alert("Could not reject request.");
+    showNotification("Reject Failed", "Could not reject the request. Please try again.", "error");
   }
 });
 
@@ -479,7 +479,7 @@ profileModal.addEventListener("click", (e) => {
 /* Firebase live requests */
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    alert("Please login first.");
+    showNotification("Session Expired", "Please log in again to continue.", "error");
     window.location.href = "../Login/HTML/login.html";
     return;
   }
@@ -529,22 +529,29 @@ onAuthStateChanged(auth, (user) => {
 
 // ── Notification Card ─────────────────────────────────────────────────────────
 
-function showNotification(title, message, type = "conflict") {
+function showNotification(title, message, type = "error") {
   const existing = document.getElementById("bm-notification");
   if (existing) existing.remove();
 
-  const icon = type === "conflict"
-    ? `<i class="fa-solid fa-circle-exclamation"></i>`
-    : `<i class="fa-solid fa-circle-check"></i>`;
+  const config = {
+    success:  { icon: "fa-circle-check",       color: "#22a24d" },
+    error:    { icon: "fa-circle-exclamation",  color: "#ef4444" },
+    conflict: { icon: "fa-circle-exclamation",  color: "#ef4444" },
+    info:     { icon: "fa-circle-info",         color: "#3a5a96" }
+  };
+  const { icon, color } = config[type] || config.error;
 
   const card = document.createElement("div");
   card.id = "bm-notification";
-  card.className = `bm-notification bm-notification--${type}`;
+  card.className = `bm-notification`;
+  card.style.borderLeftColor = color;
   card.innerHTML = `
-    <div class="bm-notif-icon">${icon}</div>
+    <div class="bm-notif-icon" style="color:${color};">
+      <i class="fa-solid ${icon}"></i>
+    </div>
     <div class="bm-notif-body">
       <p class="bm-notif-title">${title}</p>
-      <p class="bm-notif-message">${message}</p>
+      ${message ? `<p class="bm-notif-message">${message}</p>` : ""}
     </div>
     <button class="bm-notif-close" onclick="this.parentElement.remove()">
       <i class="fa-solid fa-xmark"></i>
@@ -557,5 +564,5 @@ function showNotification(title, message, type = "conflict") {
     card.style.opacity = "0";
     card.style.transform = "translateY(12px)";
     setTimeout(() => card.remove(), 400);
-  }, 6000);
+  }, 5000);
 }

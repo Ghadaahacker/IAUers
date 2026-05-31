@@ -19,6 +19,50 @@ if (currentUserRole !== "admin") {
   window.location.href = "../../Login/HTML/login.html";
 }
 
+function showToast(message, type = "success") {
+  const existing = document.getElementById("content-toast");
+  if (existing) existing.remove();
+
+  const colors = {
+    success: { bg: "#22a24d", icon: "✓" },
+    error:   { bg: "#c84a2f", icon: "✕" },
+    info:    { bg: "#3a5a96", icon: "ℹ" }
+  };
+  const { bg, icon } = colors[type] || colors.info;
+
+  const toast = document.createElement("div");
+  toast.id = "content-toast";
+  toast.style.cssText = `
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    display: flex; align-items: center; gap: 12px;
+    background: #fff; border-radius: 14px; padding: 14px 20px;
+    box-shadow: 0 8px 32px rgba(29,30,52,0.14);
+    border-left: 5px solid ${bg};
+    max-width: 360px; opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    transform: translateY(10px);
+    font-family: Arial, sans-serif;
+  `;
+  toast.innerHTML = `
+    <div style="width:28px;height:28px;border-radius:50%;background:${bg};
+      color:#fff;display:flex;align-items:center;justify-content:center;
+      font-size:14px;font-weight:700;flex-shrink:0;">${icon}</div>
+    <p style="margin:0;font-size:14px;color:#1d1e34;font-weight:500;line-height:1.5;">${message}</p>
+  `;
+
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  });
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(10px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const eventModal = document.getElementById("eventModal");
   const announcementModal = document.getElementById("announcementModal");
@@ -171,24 +215,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedHall = buildingHallSelect.options[buildingHallSelect.selectedIndex];
 
     if (!eventTitleInput.value.trim()) {
-      alert("Please enter the event title.");
+      showToast("Please enter the event title.", "error");
       return;
     }
 
     if (!eventDateTimeInput.value) {
-      alert("Please select date and time.");
+      showToast("Please select date and time.", "error");
       return;
     }
 
     if (!buildingHallSelect.value) {
-      alert("Please select a building / hall.");
+      showToast("Please select a building / hall.", "error");
       return;
     }
 
     const selectedInterests = getSelectedEventInterests();
 
     if (selectedInterests.length === 0) {
-      alert("Please select at least one event interest.");
+      showToast("Please select at least one event interest.", "error");
       return;
     }
 
@@ -232,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
         editingEventId = null;
       }
 
-      alert(`Your request has been sent to ${buildingManagerEmail}.`);
+      showToast(`Request sent to ${buildingManagerEmail}.`, "success");
 
       resetEventForm();
       closeModalFunc(eventModal);
@@ -240,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (error) {
       console.error("Error sending request:", error);
-      alert(error.message);
+      showToast(error.message, "error");
     } finally {
       sendBuildingRequestBtn.disabled = false;
       sendBuildingRequestBtn.textContent = "Send to Building Manager";
@@ -251,19 +295,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedHall = buildingHallSelect.options[buildingHallSelect.selectedIndex];
 
     if (!eventTitleInput.value.trim()) {
-      alert("Please enter the event title.");
+      showToast("Please enter the event title.", "error");
       return;
     }
 
     if (!eventDateTimeInput.value) {
-      alert("Please select date and time.");
+      showToast("Please select date and time.", "error");
       return;
     }
 
     const selectedInterests = getSelectedEventInterests();
 
     if (selectedInterests.length === 0) {
-      alert("Please select at least one event interest.");
+      showToast("Please select at least one event interest.", "error");
       return;
     }
 
@@ -310,7 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      alert("Event saved as draft.");
+      showToast("Event saved as draft.", "success");
 
       resetEventForm();
       closeModalFunc(eventModal);
@@ -318,7 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (error) {
       console.error("Error saving draft:", error);
-      alert("Draft was not saved: " + error.message);
+      showToast("Draft was not saved: " + error.message, "error");
     }
   });
 
@@ -339,7 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const link = announcementLinkInput.value.trim();
 
     if (!title || !description) {
-      alert("Please fill announcement title and description.");
+      showToast("Please fill in the title and description.", "error");
       return;
     }
 
@@ -375,7 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
         createdAt: serverTimestamp()
       });
 
-      alert(
+      showToast(
         status === "published"
           ? "Announcement published successfully."
           : "Announcement saved as draft."
@@ -387,7 +431,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (error) {
       console.error("Error saving announcement:", error);
-      alert("Failed to save announcement. Check console.");
+      showToast("Failed to save announcement.", "error");
     }
   }
 
@@ -679,7 +723,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } catch (err) {
           console.error("Delete error:", err);
-          alert("Delete error: " + err.message);
+          showToast("Delete error: " + err.message, "error");
         }
 
         loadEventsFromFirebase();
