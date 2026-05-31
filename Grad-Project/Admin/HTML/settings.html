@@ -40,7 +40,7 @@
           <div class="profile-layout">
             <div class="profile-avatar-box">
               <div class="avatar-wrapper">
-                <div class="avatar-placeholder">J</div>
+                <div class="avatar-placeholder" id="avatarInitial">?</div>
                 <button class="avatar-edit-btn" type="button">
                   <i class="fa-solid fa-pen"></i>
                 </button>
@@ -100,7 +100,7 @@
                   <p>Receive notifications when students register for events.</p>
                 </div>
                 <label class="switch">
-                  <input type="checkbox" checked />
+                  <input type="checkbox" id="notifEventRegistration" />
                   <span class="slider"></span>
                 </label>
               </div>
@@ -111,7 +111,7 @@
                   <p>Receive updates when venue requests are approved or rejected.</p>
                 </div>
                 <label class="switch">
-                  <input type="checkbox" checked />
+                  <input type="checkbox" id="notifVenueRequest" />
                   <span class="slider"></span>
                 </label>
               </div>

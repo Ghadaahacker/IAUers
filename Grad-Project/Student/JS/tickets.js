@@ -3,8 +3,10 @@ import { auth, db } from "../../Shared/JS/firebase-config.js";
 import {
   collection,
   getDocs,
+  addDoc,
   query,
-  where
+  where,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 import {
@@ -35,6 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const qrSection = document.querySelector(".qr-section");
 
   let tickets = [];
+  let ratedEventIds = new Set();
+  let currentUserId = null;
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -42,10 +46,14 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    currentUserId = user.uid;
     showLoading();
 
     try {
-      await loadTickets(user.uid);
+      await Promise.all([
+        loadTickets(user.uid),
+        loadFeedbackStatus(user.uid)
+      ]);
       renderTickets();
     } catch (error) {
       console.error("Error loading tickets:", error);
@@ -66,6 +74,18 @@ document.addEventListener("DOMContentLoaded", function () {
     snapshot.forEach((docSnap) => {
       tickets.push(normalizeTicket(docSnap.id, docSnap.data()));
     });
+  }
+
+  async function loadFeedbackStatus(uid) {
+    ratedEventIds = new Set();
+
+    const q = query(
+      collection(db, "eventFeedback"),
+      where("studentId", "==", uid)
+    );
+
+    const snap = await getDocs(q);
+    snap.forEach(doc => ratedEventIds.add(doc.data().eventId));
   }
 
   function normalizeTicket(id, data) {
@@ -96,6 +116,14 @@ document.addEventListener("DOMContentLoaded", function () {
       category: data.category || data.eventCategory || "University Event",
       status
     };
+  }
+
+  // Returns true if the event date has already passed
+  function isEventPast(eventDate) {
+    if (!eventDate) return false;
+    const date = eventDate.toDate ? eventDate.toDate() : new Date(eventDate);
+    if (isNaN(date.getTime())) return false;
+    return date < new Date();
   }
 
   function formatDate(value) {
@@ -178,11 +206,163 @@ document.addEventListener("DOMContentLoaded", function () {
     qrSection.style.display = "none";
   }
 
+  // ── Rating Modal ─────────────────────────────────────────────────────────────
+
+  function openRatingModal(ticket) {
+    const existing = document.getElementById("ratingModalOverlay");
+    if (existing) existing.remove();
+
+    let selectedRating = 0;
+
+    const overlay = document.createElement("div");
+    overlay.id = "ratingModalOverlay";
+    overlay.style.cssText = `
+      position: fixed; inset: 0; background: rgba(29,30,52,0.45);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+    `;
+
+    overlay.innerHTML = `
+      <div id="ratingModalBox" style="
+        background: #fff; border-radius: 20px; padding: 36px 32px;
+        max-width: 460px; width: 92%; box-shadow: 0 20px 60px rgba(29,30,52,0.18);
+        display: flex; flex-direction: column; gap: 22px; position: relative;
+      ">
+        <button id="closeRatingBtn" style="
+          position: absolute; top: 16px; right: 18px; background: none;
+          border: none; font-size: 20px; cursor: pointer; color: #5f6e80;
+        ">✕</button>
+
+        <div>
+          <h2 style="font-size: 22px; color: #1d1e34; margin-bottom: 6px;">Rate This Event</h2>
+          <p style="font-size: 14px; color: #5f6e80;">${ticket.eventTitle}</p>
+        </div>
+
+        <div>
+          <p style="font-size: 15px; font-weight: 600; color: #32395a; margin-bottom: 14px;">
+            How would you rate this event? (1–5)
+          </p>
+          <div id="starRow" style="display: flex; gap: 10px;">
+            ${[1,2,3,4,5].map(n => `
+              <button class="star-btn" data-star="${n}" style="
+                background: none; border: none; font-size: 38px; cursor: pointer;
+                color: #d2dbe5; transition: color 0.15s ease; padding: 0;
+              ">★</button>
+            `).join("")}
+          </div>
+          <p id="ratingLabel" style="font-size: 13px; color: #5f6e80; margin-top: 10px; min-height: 18px;"></p>
+        </div>
+
+        <button id="submitRatingBtn" disabled style="
+          width: 100%; height: 48px; border: none; border-radius: 12px;
+          background: linear-gradient(90deg, #1d1e34, #3a5a96);
+          color: #fff; font-size: 16px; font-weight: 700; cursor: not-allowed;
+          opacity: 0.5; transition: opacity 0.2s;
+        ">Submit Rating</button>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const labels = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
+    const starBtns = overlay.querySelectorAll(".star-btn");
+    const submitBtn = overlay.querySelector("#submitRatingBtn");
+    const ratingLabel = overlay.querySelector("#ratingLabel");
+
+    function highlightStars(count) {
+      starBtns.forEach(btn => {
+        btn.style.color = Number(btn.dataset.star) <= count ? "#f4b400" : "#d2dbe5";
+      });
+    }
+
+    starBtns.forEach(btn => {
+      btn.addEventListener("mouseenter", () => highlightStars(Number(btn.dataset.star)));
+      btn.addEventListener("mouseleave", () => highlightStars(selectedRating));
+      btn.addEventListener("click", () => {
+        selectedRating = Number(btn.dataset.star);
+        highlightStars(selectedRating);
+        ratingLabel.textContent = labels[selectedRating];
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        submitBtn.style.cursor = "pointer";
+      });
+    });
+
+    function closeRatingModal() {
+      overlay.remove();
+    }
+
+    overlay.querySelector("#closeRatingBtn").addEventListener("click", closeRatingModal);
+    overlay.addEventListener("click", e => { if (e.target === overlay) closeRatingModal(); });
+
+    submitBtn.addEventListener("click", async () => {
+      if (!selectedRating) return;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting…";
+
+      try {
+        await addDoc(collection(db, "eventFeedback"), {
+          eventId: ticket.eventId,
+          eventTitle: ticket.eventTitle,
+          studentId: currentUserId,
+          rating: selectedRating,
+          wouldRecommend: selectedRating >= 4,
+          submittedAt: serverTimestamp()
+        });
+
+        ratedEventIds.add(ticket.eventId);
+        closeRatingModal();
+        showToast("Thank you for your feedback!");
+        renderTickets();
+      } catch (err) {
+        console.error(err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Rating";
+        showToast("Failed to submit. Please try again.", "error");
+      }
+    });
+  }
+
+  function showToast(message, type = "success") {
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed; bottom: 24px; right: 24px;
+      background: ${type === "success" ? "#22a24d" : "#c84a2f"};
+      color: #fff; padding: 14px 22px; border-radius: 12px;
+      font-size: 15px; font-weight: 600; z-index: 9999;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      opacity: 0; transition: opacity 0.25s;
+    `;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => { toast.style.opacity = "1"; });
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      setTimeout(() => toast.remove(), 300);
+    }, 300);
+  }
+
+  // ── Ticket Card ───────────────────────────────────────────────────────────────
+
   function createTicketCard(ticket) {
     const card = document.createElement("div");
     card.className = "ticket-card";
 
     const isConfirmed = ticket.status === "confirmed";
+    const eventPast = isEventPast(ticket.eventDate);
+    const alreadyRated = ratedEventIds.has(ticket.eventId);
+
+    // Rate button: only for confirmed tickets whose event has already passed
+    let rateBtn = "";
+    if (isConfirmed && eventPast) {
+      rateBtn = alreadyRated
+        ? `<button class="ticket-btn secondary" type="button" disabled
+             style="cursor:default; opacity:0.7;">
+             <i class="fa-solid fa-star" style="color:#f4b400;"></i> Rated
+           </button>`
+        : `<button class="ticket-btn secondary rate-event-btn" type="button">
+             <i class="fa-regular fa-star"></i> Rate Event
+           </button>`;
+    }
 
     card.innerHTML = `
       <div class="ticket-card-head">
@@ -224,15 +404,11 @@ document.addEventListener("DOMContentLoaded", function () {
               View Details
             </button>
 
-            ${
-              isConfirmed
-                ? `
-                  <button class="ticket-btn primary show-qr-btn" type="button">
-                    Show QR
-                  </button>
-                `
-                : ""
-            }
+            ${isConfirmed
+              ? `<button class="ticket-btn primary show-qr-btn" type="button">Show QR</button>`
+              : ""}
+
+            ${rateBtn}
           </div>
         </div>
       </div>
@@ -243,11 +419,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const showQrBtn = card.querySelector(".show-qr-btn");
-
     if (showQrBtn) {
-      showQrBtn.addEventListener("click", () => {
-        openTicketModal(ticket, true);
-      });
+      showQrBtn.addEventListener("click", () => openTicketModal(ticket, true));
+    }
+
+    const rateEventBtn = card.querySelector(".rate-event-btn");
+    if (rateEventBtn) {
+      rateEventBtn.addEventListener("click", () => openRatingModal(ticket));
     }
 
     return card;

@@ -30,8 +30,8 @@
               <i class="fa-solid fa-arrow-trend-up"></i>
             </div>
             <div>
-              <p class="kpi-label">Engagement</p>
-              <h3 id="engagementValue">72.3%</h3>
+              <p class="kpi-label">Confirmation Rate</p>
+              <h3 id="engagementValue">—</h3>
             </div>
           </div>
 
@@ -40,18 +40,18 @@
               <i class="fa-solid fa-users"></i>
             </div>
             <div>
-              <p class="kpi-label">Responses</p>
-              <h3 id="responsesValue">487</h3>
+              <p class="kpi-label">Total Registrations</p>
+              <h3 id="responsesValue">—</h3>
             </div>
           </div>
 
           <div class="kpi-card">
             <div class="kpi-icon yellow-bg">
-              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-chair"></i>
             </div>
             <div>
-              <p class="kpi-label">Satisfaction</p>
-              <h3 id="satisfactionValue">4.4/5</h3>
+              <p class="kpi-label">Seat Fill Rate</p>
+              <h3 id="satisfactionValue">—</h3>
             </div>
           </div>
 
@@ -60,24 +60,24 @@
               <i class="fa-regular fa-thumbs-up"></i>
             </div>
             <div>
-              <p class="kpi-label">Would Attend</p>
-              <h3 id="wouldAttendValue">89.7%</h3>
+              <p class="kpi-label">Recommend Rate</p>
+              <h3 id="wouldAttendValue">—</h3>
             </div>
           </div>
         </div>
 
         <div class="chart-card">
-          <h2>Engagement Over Time</h2>
+          <h2>Registrations Over Time</h2>
           <canvas id="engagementTrendChart"></canvas>
         </div>
 
         <div class="chart-card">
-          <h2>Event Comparison</h2>
+          <h2>Event Registrations vs Capacity</h2>
           <canvas id="eventComparisonChart"></canvas>
         </div>
 
         <div class="chart-card recommendation-card">
-          <h2>Overall Recommendation Rate</h2>
+          <h2>Recommendation Rate</h2>
           <div class="pie-wrapper">
             <canvas id="recommendationChart"></canvas>
           </div>
@@ -96,6 +96,6 @@
   </div>
 
   <script src="../../Shared/JS/admin-sidebar.js"></script>
-  <script src="../JS/analytics.js"></script>
+  <script type="module" src="../JS/analytics.js"></script>
 </body>
 </html>
