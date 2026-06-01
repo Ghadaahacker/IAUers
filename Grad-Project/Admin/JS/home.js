@@ -40,24 +40,21 @@ const myDraftsCount = document.getElementById("myDraftsCount");
 
 async function loadDashboardStats() {
 
-  const [eventsSnapshot, announcementsSnapshot] = await Promise.all([
-    getDocs(query(collection(db, "events"), where("createdBy", "==", adminEmail))),
-    getDocs(query(collection(db, "announcements"), where("createdBy", "==", adminEmail)))
-  ]);
+  const snapshot = await getDocs(
+    query(collection(db, "events"), where("createdBy", "==", adminEmail))
+  );
 
   let events = 0;
   let announcements = 0;
   let drafts = 0;
 
-  eventsSnapshot.forEach((doc) => {
+  snapshot.forEach((doc) => {
     const data = doc.data();
-    if (data.status === "published") events++;
-    if (data.status === "draft") drafts++;
-  });
+    const isAnnouncement = data.type === "announcement";
 
-  announcementsSnapshot.forEach((doc) => {
-    const data = doc.data();
-    if (data.status === "published") announcements++;
+    if (data.status === "published") {
+      isAnnouncement ? announcements++ : events++;
+    }
     if (data.status === "draft") drafts++;
   });
 
