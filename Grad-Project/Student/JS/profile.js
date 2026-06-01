@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="record-row"><span>Major</span><strong id="rec-major"></strong></div>
           <div class="record-row"><span>GPA</span><strong id="rec-gpa"></strong></div>
           <div class="record-row"><span>Credits</span><strong id="rec-credits"></strong></div>
-          <div class="record-row"><span>Academic Standing</span><strong class="record-badge-good">Excellent Standing</strong></div>
+          <div class="record-row"><span>Academic Standing</span><strong id="rec-standing" class="record-badge-good">Excellent Standing</strong></div>
         </div>
 
         <div class="modal-footer">
@@ -269,6 +269,20 @@ document.addEventListener("DOMContentLoaded", () => {
         border-radius: 999px;
       }
 
+      .record-badge-neutral {
+        background: #fff3d8;
+        color: #9a6400 !important;
+        padding: 4px 12px;
+        border-radius: 999px;
+      }
+
+      .record-badge-warn {
+        background: #fdeaea;
+        color: #b42318 !important;
+        padding: 4px 12px;
+        border-radius: 999px;
+      }
+
       .logout-body {
         align-items: center;
         text-align: center;
@@ -321,6 +335,15 @@ document.addEventListener("DOMContentLoaded", () => {
     </style>
   `);
 
+  function getAcademicStanding(gpa) {
+    const g = parseFloat(gpa) || 0;
+    if (g >= 4.5) return { text: "Excellent Standing", cls: "record-badge-good" };
+    if (g >= 3.75) return { text: "Very Good Standing", cls: "record-badge-good" };
+    if (g >= 3.0) return { text: "Good Standing", cls: "record-badge-neutral" };
+    if (g >= 2.0) return { text: "Satisfactory", cls: "record-badge-neutral" };
+    return { text: "Academic Probation", cls: "record-badge-warn" };
+  }
+
   function showToast(message) {
     const toast = document.getElementById("toast");
     const toastMsg = document.getElementById("toastMsg");
@@ -361,6 +384,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const statLabels = document.querySelectorAll(".stat-card p");
     if (statLabels[2]) statLabels[2].textContent = "My Certificates";
+
+    const gpa = parseFloat(profileData.gpa) || 0;
+    const credits = parseInt(profileData.credits) || 0;
+    const totalCredits = parseInt(profileData.totalCredits) || 132;
+    const progressFills = document.querySelectorAll(".progress-fill");
+    if (progressFills[0]) progressFills[0].style.width = `${Math.min((gpa / 5) * 100, 100).toFixed(1)}%`;
+    if (progressFills[1]) progressFills[1].style.width = `${Math.min((credits / totalCredits) * 100, 100).toFixed(1)}%`;
   }
 
   function renderSelectedInterests() {
@@ -474,6 +504,13 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("rec-gpa").textContent = `${profileData.gpa || "0.00"} / 5.00`;
       document.getElementById("rec-credits").textContent =
         `${profileData.credits || 0} / ${profileData.totalCredits || 132}`;
+
+      const standing = getAcademicStanding(profileData.gpa);
+      const standingEl = document.getElementById("rec-standing");
+      if (standingEl) {
+        standingEl.textContent = standing.text;
+        standingEl.className = standing.cls;
+      }
 
       openModal("recordModal");
     });

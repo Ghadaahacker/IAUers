@@ -8,6 +8,8 @@ import {
   doc,
   getDoc,
   addDoc,
+  updateDoc,
+  increment,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
@@ -36,6 +38,22 @@ document.addEventListener("DOMContentLoaded", function () {
   let selectedEvent = null;
 
   injectToast();
+
+  const showAllBtns = document.querySelectorAll(".show-all-btn");
+  if (showAllBtns[0]) {
+    showAllBtns[0].addEventListener("click", function () {
+      studentEventsList.classList.toggle("expanded");
+      this.querySelector("i").style.transform =
+        studentEventsList.classList.contains("expanded") ? "rotate(90deg)" : "";
+    });
+  }
+  if (showAllBtns[1]) {
+    showAllBtns[1].addEventListener("click", function () {
+      announcementsList.classList.toggle("expanded");
+      this.querySelector("i").style.transform =
+        announcementsList.classList.contains("expanded") ? "rotate(90deg)" : "";
+    });
+  }
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -353,6 +371,11 @@ document.addEventListener("DOMContentLoaded", function () {
         status: "approved",
         createdAt: serverTimestamp()
       });
+
+      await updateDoc(doc(db, "events", selectedEvent.id), {
+        registeredCount: increment(1)
+      });
+      selectedEvent.registeredCount = (selectedEvent.registeredCount || 0) + 1;
 
       showToast("You are registered successfully. Your ticket is now available in My Tickets.");
 

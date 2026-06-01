@@ -546,7 +546,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!item) return;
 
-    alert(`${item.type === "event" ? "Event" : "Item"} opened: ${item.title}`);
+    if (item.type === "event") {
+      window.location.href = "../HTML/tickets.html";
+    } else {
+      window.location.href = "../HTML/journey.html";
+    }
   });
 
   viewTabs.forEach(tab => {

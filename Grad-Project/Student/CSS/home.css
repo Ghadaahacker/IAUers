@@ -407,3 +407,8 @@ body {
 .home-toast i {
   color: #5dd08a;
 }
+
+.events-slider.expanded {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
