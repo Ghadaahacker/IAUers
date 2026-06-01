@@ -70,7 +70,7 @@ async function loadAnalytics() {
 
   document.getElementById("engagementValue").textContent = `${confirmationRate}%`;
   document.getElementById("responsesValue").textContent = totalRegistrations;
-  document.getElementById("satisfactionValue").textContent = `${fillRate}%`;
+  // satisfactionValue is set after feedback is processed below
   document.getElementById("wouldAttendValue").textContent = confirmedCount;
 
   // Last 6 months for the trend chart
@@ -153,19 +153,32 @@ async function loadAnalytics() {
     }
   });
 
-  // Recommendation Rate pie chart — from real student feedback (1–5 rating)
+  // Recommendation Rate + Satisfaction — from real student feedback
   let totalFeedback = 0;
   let wouldRecommend = 0;
+  let satisfactionSum = 0;
 
   feedbackSnap.forEach(docSnap => {
     const fb = docSnap.data();
-    // Only count feedback for this admin's events
     if (!eventsMap[fb.eventId]) return;
     totalFeedback++;
-    if (fb.wouldRecommend === true || (typeof fb.rating === "number" && fb.rating >= 4)) {
-      wouldRecommend++;
-    }
+
+    // Yes/No recommendation (explicit boolean field)
+    if (fb.wouldRecommend === true) wouldRecommend++;
+
+    // Satisfaction score (1-5); fall back to old rating field for legacy data
+    const score = typeof fb.satisfaction === "number" ? fb.satisfaction
+                : typeof fb.rating === "number" ? fb.rating : 0;
+    satisfactionSum += score;
   });
+
+  const avgSatisfaction = totalFeedback > 0
+    ? Math.round((satisfactionSum / totalFeedback) * 10) / 10
+    : 0;
+
+  // Update Satisfaction KPI (replaces Seat Fill Rate)
+  document.getElementById("satisfactionValue").textContent =
+    totalFeedback > 0 ? `${avgSatisfaction}/5` : "—";
 
   const wouldNotRecommend = totalFeedback - wouldRecommend;
   const recommendPct = totalFeedback > 0
@@ -185,8 +198,8 @@ async function loadAnalytics() {
       type: "pie",
       data: {
         labels: [
-          `Would Recommend (4–5★): ${wouldRecommend}`,
-          `Would Not Recommend (1–3★): ${wouldNotRecommend}`
+          `Yes — Would Recommend: ${wouldRecommend}`,
+          `No — Would Not Recommend: ${wouldNotRecommend}`
         ],
         datasets: [{
           data: [wouldRecommend, wouldNotRecommend],

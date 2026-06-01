@@ -212,7 +212,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const existing = document.getElementById("ratingModalOverlay");
     if (existing) existing.remove();
 
-    let selectedRating = 0;
+    let selectedSatisfaction = 0;
+    let selectedRecommend = null; // true = Yes, false = No
 
     const overlay = document.createElement("div");
     overlay.id = "ratingModalOverlay";
@@ -221,11 +222,17 @@ document.addEventListener("DOMContentLoaded", function () {
       z-index: 1000; display: flex; align-items: center; justify-content: center;
     `;
 
+    const ynBase = `
+      padding: 10px 28px; border-radius: 10px; font-size: 15px;
+      font-weight: 600; cursor: pointer; border: 2px solid #d2dbe5;
+      background: #f5f7fa; color: #32395a; transition: 0.15s ease;
+    `;
+
     overlay.innerHTML = `
       <div id="ratingModalBox" style="
         background: #fff; border-radius: 20px; padding: 36px 32px;
-        max-width: 460px; width: 92%; box-shadow: 0 20px 60px rgba(29,30,52,0.18);
-        display: flex; flex-direction: column; gap: 22px; position: relative;
+        max-width: 480px; width: 92%; box-shadow: 0 20px 60px rgba(29,30,52,0.18);
+        display: flex; flex-direction: column; gap: 26px; position: relative;
       ">
         <button id="closeRatingBtn" style="
           position: absolute; top: 16px; right: 18px; background: none;
@@ -233,13 +240,14 @@ document.addEventListener("DOMContentLoaded", function () {
         ">✕</button>
 
         <div>
-          <h2 style="font-size: 22px; color: #1d1e34; margin-bottom: 6px;">Rate This Event</h2>
+          <h2 style="font-size: 22px; color: #1d1e34; margin-bottom: 6px;">Event Feedback</h2>
           <p style="font-size: 14px; color: #5f6e80;">${ticket.eventTitle}</p>
         </div>
 
+        <!-- Q1: Satisfaction -->
         <div>
           <p style="font-size: 15px; font-weight: 600; color: #32395a; margin-bottom: 14px;">
-            How would you rate this event? (1–5)
+            How satisfied were you with this event? (1–5)
           </p>
           <div id="starRow" style="display: flex; gap: 10px;">
             ${[1,2,3,4,5].map(n => `
@@ -249,7 +257,18 @@ document.addEventListener("DOMContentLoaded", function () {
               ">★</button>
             `).join("")}
           </div>
-          <p id="ratingLabel" style="font-size: 13px; color: #5f6e80; margin-top: 10px; min-height: 18px;"></p>
+          <p id="satisfactionLabel" style="font-size: 13px; color: #5f6e80; margin-top: 8px; min-height: 18px;"></p>
+        </div>
+
+        <!-- Q2: Would recommend? -->
+        <div>
+          <p style="font-size: 15px; font-weight: 600; color: #32395a; margin-bottom: 14px;">
+            Would you recommend this event to others?
+          </p>
+          <div style="display: flex; gap: 12px;">
+            <button id="yesBtn" style="${ynBase}">👍 Yes</button>
+            <button id="noBtn"  style="${ynBase}">👎 No</button>
+          </div>
         </div>
 
         <button id="submitRatingBtn" disabled style="
@@ -257,16 +276,25 @@ document.addEventListener("DOMContentLoaded", function () {
           background: linear-gradient(90deg, #1d1e34, #3a5a96);
           color: #fff; font-size: 16px; font-weight: 700; cursor: not-allowed;
           opacity: 0.5; transition: opacity 0.2s;
-        ">Submit Rating</button>
+        ">Submit Feedback</button>
       </div>
     `;
 
     document.body.appendChild(overlay);
 
-    const labels = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
-    const starBtns = overlay.querySelectorAll(".star-btn");
-    const submitBtn = overlay.querySelector("#submitRatingBtn");
-    const ratingLabel = overlay.querySelector("#ratingLabel");
+    const satLabels = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
+    const starBtns       = overlay.querySelectorAll(".star-btn");
+    const submitBtn      = overlay.querySelector("#submitRatingBtn");
+    const satLabel       = overlay.querySelector("#satisfactionLabel");
+    const yesBtn         = overlay.querySelector("#yesBtn");
+    const noBtn          = overlay.querySelector("#noBtn");
+
+    function checkReady() {
+      const ready = selectedSatisfaction > 0 && selectedRecommend !== null;
+      submitBtn.disabled = !ready;
+      submitBtn.style.opacity = ready ? "1" : "0.5";
+      submitBtn.style.cursor  = ready ? "pointer" : "not-allowed";
+    }
 
     function highlightStars(count) {
       starBtns.forEach(btn => {
@@ -276,26 +304,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     starBtns.forEach(btn => {
       btn.addEventListener("mouseenter", () => highlightStars(Number(btn.dataset.star)));
-      btn.addEventListener("mouseleave", () => highlightStars(selectedRating));
+      btn.addEventListener("mouseleave", () => highlightStars(selectedSatisfaction));
       btn.addEventListener("click", () => {
-        selectedRating = Number(btn.dataset.star);
-        highlightStars(selectedRating);
-        ratingLabel.textContent = labels[selectedRating];
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = "1";
-        submitBtn.style.cursor = "pointer";
+        selectedSatisfaction = Number(btn.dataset.star);
+        highlightStars(selectedSatisfaction);
+        satLabel.textContent = satLabels[selectedSatisfaction];
+        checkReady();
       });
     });
 
-    function closeRatingModal() {
-      overlay.remove();
+    function selectYN(value) {
+      selectedRecommend = value;
+      yesBtn.style.cssText += value === true
+        ? "border-color:#22a24d; background:#dff6e7; color:#22a24d;"
+        : "border-color:#d2dbe5; background:#f5f7fa; color:#32395a;";
+      noBtn.style.cssText += value === false
+        ? "border-color:#c84a2f; background:#fde8e4; color:#c84a2f;"
+        : "border-color:#d2dbe5; background:#f5f7fa; color:#32395a;";
+      checkReady();
     }
+
+    yesBtn.addEventListener("click", () => selectYN(true));
+    noBtn.addEventListener("click",  () => selectYN(false));
+
+    function closeRatingModal() { overlay.remove(); }
 
     overlay.querySelector("#closeRatingBtn").addEventListener("click", closeRatingModal);
     overlay.addEventListener("click", e => { if (e.target === overlay) closeRatingModal(); });
 
     submitBtn.addEventListener("click", async () => {
-      if (!selectedRating) return;
+      if (selectedSatisfaction === 0 || selectedRecommend === null) return;
       submitBtn.disabled = true;
       submitBtn.textContent = "Submitting…";
 
@@ -304,8 +342,8 @@ document.addEventListener("DOMContentLoaded", function () {
           eventId: ticket.eventId,
           eventTitle: ticket.eventTitle,
           studentId: currentUserId,
-          rating: selectedRating,
-          wouldRecommend: selectedRating >= 4,
+          satisfaction: selectedSatisfaction,
+          wouldRecommend: selectedRecommend,
           submittedAt: serverTimestamp()
         });
 
@@ -316,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function () {
       } catch (err) {
         console.error(err);
         submitBtn.disabled = false;
-        submitBtn.textContent = "Submit Rating";
+        submitBtn.textContent = "Submit Feedback";
         showToast("Failed to submit. Please try again.", "error");
       }
     });
