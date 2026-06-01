@@ -35,9 +35,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let currentUser = null;
   let currentStudentInterests = [];
+  let currentStudentName = "Student";
   let selectedEvent = null;
+  let selectedCollege = "all";
+  let selectedSort = "all";
+  let allEvents = [];
 
   injectToast();
+
+  // Lightbox
+  const imgLightbox   = document.getElementById("imgLightbox");
+  const lightboxImg   = document.getElementById("lightboxImg");
+  const closeLightbox = document.getElementById("closeLightbox");
+
+  if (closeLightbox) closeLightbox.addEventListener("click", () => imgLightbox.classList.add("hidden"));
+  if (imgLightbox)   imgLightbox.addEventListener("click", (e) => { if (e.target === imgLightbox) imgLightbox.classList.add("hidden"); });
+
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") imgLightbox?.classList.add("hidden"); });
+
+  // Notification panel
+  const notifBtn      = document.getElementById("notifBtn");
+  const notifPanel    = document.getElementById("notifPanel");
+  const notifCloseBtn = document.getElementById("notifCloseBtn");
+  const notifBadge    = document.getElementById("notifBadge");
+  const notifList     = document.getElementById("notifList");
+
+  if (notifBtn) {
+    notifBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      notifPanel.classList.toggle("hidden");
+    });
+  }
+  if (notifCloseBtn) notifCloseBtn.addEventListener("click", () => notifPanel.classList.add("hidden"));
+  document.addEventListener("click", (e) => {
+    if (!notifPanel?.contains(e.target) && e.target !== notifBtn) notifPanel?.classList.add("hidden");
+  });
+
+  const motivationText = document.getElementById("motivationText");
+  const quotes = [
+    "Make today another step toward the future you want.",
+    "Every effort you make today shapes who you'll be tomorrow.",
+    "Stay focused, stay driven — your journey is worth it.",
+    "Small progress is still progress. Keep going.",
+    "You're building something great, one day at a time.",
+    "The best investment you can make is in yourself.",
+    "Today's dedication is tomorrow's achievement.",
+    "Believe in the work you're doing. It all adds up.",
+  ];
+  if (motivationText) {
+    let quoteIndex = 0;
+    setInterval(() => {
+      motivationText.classList.add("quote-fade-out");
+      setTimeout(() => {
+        quoteIndex = (quoteIndex + 1) % quotes.length;
+        motivationText.textContent = quotes[quoteIndex];
+        motivationText.classList.remove("quote-fade-out");
+      }, 450);
+    }, 5000);
+  }
 
   const showAllBtns = document.querySelectorAll(".show-all-btn");
   if (showAllBtns[0]) {
@@ -55,6 +110,61 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  document.querySelectorAll(".sort-tab").forEach(tab => {
+    tab.addEventListener("click", function () {
+      document.querySelectorAll(".sort-tab").forEach(t => t.classList.remove("active"));
+      this.classList.add("active");
+      selectedSort = this.dataset.sort;
+      renderFilteredEvents();
+    });
+  });
+
+  const filterTriggerBtn = document.getElementById("filterTriggerBtn");
+  const filterPanel = document.getElementById("filterPanel");
+  const filterSearch = document.getElementById("filterSearch");
+  const filterLabel = document.getElementById("filterLabel");
+
+  if (filterTriggerBtn && filterPanel) {
+    filterTriggerBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      filterPanel.classList.toggle("hidden");
+      filterTriggerBtn.classList.toggle("open");
+    });
+
+    filterPanel.addEventListener("click", function (e) {
+      e.stopPropagation();
+    });
+
+    document.querySelectorAll(".filter-option").forEach(option => {
+      option.addEventListener("click", function () {
+        document.querySelectorAll(".filter-option").forEach(o => o.classList.remove("active"));
+        this.classList.add("active");
+        selectedCollege = this.dataset.college;
+        filterLabel.textContent = this.textContent.trim();
+        filterPanel.classList.add("hidden");
+        filterTriggerBtn.classList.remove("open");
+        filterTriggerBtn.classList.toggle("active-filter", selectedCollege !== "all");
+        if (filterSearch) filterSearch.value = "";
+        document.querySelectorAll(".filter-option").forEach(o => o.style.display = "");
+        renderFilteredEvents();
+      });
+    });
+
+    if (filterSearch) {
+      filterSearch.addEventListener("input", function () {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll(".filter-option").forEach(option => {
+          option.style.display = option.textContent.toLowerCase().includes(q) ? "" : "none";
+        });
+      });
+    }
+
+    document.addEventListener("click", function () {
+      filterPanel.classList.add("hidden");
+      filterTriggerBtn.classList.remove("open");
+    });
+  }
+
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "../../Login/HTML/login.html";
@@ -66,6 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
     await loadStudentProfile(user.uid);
     await loadPublishedEventsForStudents();
     await loadPublishedAnnouncementsForStudents();
+    await loadNotifications();
   });
 
   async function loadStudentProfile(uid) {
@@ -92,12 +203,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const userData = userSnap.data();
 
         studentName = userData.name || "Student";
+        currentStudentName = studentName;
         currentStudentInterests = Array.isArray(userData.interests)
           ? userData.interests
           : [];
       }
 
-      greetingText.textContent = `${greeting}, ${studentName}`;
+      const emoji = hour >= 5 && hour < 12 ? "☀️" : hour >= 12 && hour < 18 ? "✨" : "🌙";
+      greetingText.textContent = `${greeting}, ${studentName} ${emoji}`;
     } catch (error) {
       console.error("Error loading student profile:", error);
       greetingText.textContent = `${greeting}, Student`;
@@ -150,11 +263,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return new Date(a.dateTime || 0) - new Date(b.dateTime || 0);
       });
 
-      studentEventsList.innerHTML = "";
-
-      events.forEach((event) => {
-        studentEventsList.appendChild(createEventCard(event));
-      });
+      allEvents = events;
+      renderFilteredEvents();
 
     } catch (error) {
       console.error("Error loading student events:", error);
@@ -218,6 +328,16 @@ document.addEventListener("DOMContentLoaded", function () {
         ${formatDateRange(event.dateTime)}
       </p>
     `;
+
+    const cardImg = card.querySelector(".event-image");
+    if (cardImg) {
+      cardImg.style.cursor = "zoom-in";
+      cardImg.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (lightboxImg) lightboxImg.src = cardImg.src;
+        imgLightbox?.classList.remove("hidden");
+      });
+    }
 
     card.addEventListener("click", () => {
       openEventModal(event);
@@ -363,6 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
       await addDoc(collection(db, "eventRegistrations"), {
         studentId: currentUser.uid,
         studentEmail: currentUser.email,
+        studentName: currentStudentName,
         eventId: selectedEvent.id,
         eventTitle: selectedEvent.title || "Untitled Event",
         eventDateTime: selectedEvent.dateTime || "",
@@ -399,6 +520,98 @@ document.addEventListener("DOMContentLoaded", function () {
       eventDetailsModal.style.display = "none";
     }
   });
+
+  async function loadNotifications() {
+    if (!notifList) return;
+    try {
+      const q = query(
+        collection(db, "events"),
+        where("status", "==", "published"),
+        where("type", "==", "announcement")
+      );
+      const snap = await getDocs(q);
+      const items = [];
+      snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+
+      if (!items.length) {
+        notifList.innerHTML = `<div class="notif-empty">No notifications yet.</div>`;
+        return;
+      }
+
+      notifBadge?.classList.remove("hidden");
+      if (notifBadge) notifBadge.textContent = items.length;
+
+      notifList.innerHTML = "";
+      items.slice(0, 8).forEach(item => {
+        const el = document.createElement("div");
+        el.className = "notif-item";
+        el.innerHTML = `
+          <div class="notif-dot"></div>
+          <div>
+            <div class="notif-item-title">${item.title || "Announcement"}</div>
+            <div class="notif-item-sub">${(item.description || "").slice(0, 60)}${(item.description || "").length > 60 ? "…" : ""}</div>
+          </div>`;
+        notifList.appendChild(el);
+      });
+    } catch (e) {
+      console.error("Error loading notifications:", e);
+    }
+  }
+
+  function renderFilteredEvents() {
+    if (!allEvents.length) {
+      studentEventsList.innerHTML = `
+        <div class="empty-card">
+          <h3>No events available right now.</h3>
+          <p>Check again later for new university events.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let filtered = selectedCollege === "all"
+      ? [...allEvents]
+      : allEvents.filter(e => (e.college || "CBA") === selectedCollege);
+
+    if (selectedSort === "recommended") {
+      filtered = filtered.filter(e => e.isRecommended);
+    } else if (selectedSort === "upcoming") {
+      const now = new Date();
+      filtered = filtered
+        .filter(e => new Date(e.dateTime || 0) >= now)
+        .sort((a, b) => new Date(a.dateTime || 0) - new Date(b.dateTime || 0));
+    } else if (selectedSort === "ending") {
+      filtered = filtered
+        .filter(e => {
+          const seats = getRemainingSeats(e);
+          return seats !== null && seats > 0 && seats <= 5;
+        })
+        .sort((a, b) => getRemainingSeats(a) - getRemainingSeats(b));
+    }
+
+    studentEventsList.innerHTML = "";
+
+    if (!filtered.length) {
+      const messages = {
+        recommended: { title: "No recommended events yet.", sub: "Update your interests in Profile to get personalized suggestions." },
+        upcoming:    { title: "No upcoming events.", sub: "Check back later for new events." },
+        ending:      { title: "No events ending soon.", sub: "All events still have plenty of seats available." },
+        all:         { title: "No events from this college yet.", sub: "Check back later for events." }
+      };
+      const msg = messages[selectedSort] || messages["all"];
+      studentEventsList.innerHTML = `
+        <div class="empty-card">
+          <h3>${msg.title}</h3>
+          <p>${msg.sub}</p>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach(event => {
+      studentEventsList.appendChild(createEventCard(event));
+    });
+  }
 
   function formatDateTime(value) {
     if (!value) return "Date not set";

@@ -52,15 +52,84 @@ body {
 }
 
 .top-header {
-  background: var(--white);
-  border-bottom: 1px solid var(--grey-light);
-  padding: 26px 30px;
+  background: linear-gradient(135deg, #0f1a38, #1a2f5e);
+  border-bottom: none;
+  padding: 18px 30px;
+  display: flex;
+  align-items: center;
 }
 
-.top-header h1 {
-  font-size: 22px;
-  color: var(--primary-dark);
-  font-weight: 700;
+/* ── Login Brand / Logo ── */
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.login-orbit-wrap {
+  position: relative;
+  width: 66px;
+  height: 66px;
+  flex-shrink: 0;
+}
+
+.lo-ring {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.lo-ring1 { width: 27px; height: 27px; border: 1px solid rgba(0,229,255,0.45); }
+.lo-ring2 { width: 42px; height: 42px; border: 1px solid rgba(0,229,255,0.25); }
+.lo-ring3 { width: 62px; height: 62px; border: 1px solid rgba(0,229,255,0.12); }
+
+.lo-planets { position: absolute; top: 50%; left: 50%; border-radius: 50%; }
+.lo-planets1 { width: 27px; height: 27px; margin: -13.5px 0 0 -13.5px; animation: lo-o1 3s linear infinite; }
+.lo-planets2 { width: 42px; height: 42px; margin: -21px 0 0 -21px;     animation: lo-o2 5.5s linear infinite; }
+.lo-planets3 { width: 62px; height: 62px; margin: -31px 0 0 -31px;     animation: lo-o3 9s linear infinite reverse; }
+
+@keyframes lo-o1 { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
+@keyframes lo-o2 { from{transform:rotate(100deg)}  to{transform:rotate(460deg)} }
+@keyframes lo-o3 { from{transform:rotate(220deg)}  to{transform:rotate(-140deg)} }
+
+.lo-planet { position: absolute; border-radius: 50%; top: 50%; left: 50%; }
+.lo-p1 { width: 6px;   height: 6px;   margin: -3px 0 0 9px;    background: #00E5FF; box-shadow: 0 0 7px #00E5FF; }
+.lo-p2 { width: 5px;   height: 5px;   margin: -2.5px 0 0 15px; background: #818CF8; box-shadow: 0 0 5px #818CF8; }
+.lo-p3 { width: 3px;   height: 3px;   margin: -1.5px 0 0 26px; background: #fff; opacity: 0.6; }
+
+.lo-center-i {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'DM Serif Display', serif;
+  font-size: 17px;
+  color: #ffffff;
+  font-style: italic;
+  line-height: 1;
+}
+
+.login-brand { gap: 18px; }
+.login-brand-text { display: flex; flex-direction: column; gap: 3px; }
+
+.login-wordmark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  line-height: 1;
+  letter-spacing: 1.5px;
+}
+
+.lb-iau  { color: #ffffff; }
+.lb-apos { color: #ffffff; opacity: 0.7; }
+.lb-ers  { color: #00E5FF; opacity: 0.75; }
+
+.lb-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(0,229,255,0.42);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 400;
 }
 
 .login-section {

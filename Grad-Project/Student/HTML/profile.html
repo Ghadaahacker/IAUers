@@ -59,11 +59,9 @@
 
           <div class="student-photo-block">
 
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAndem0I4Rrl05AGoEphJbj2AsPfwh8UObSg&s"
-              alt="Student Photo"
-              class="student-photo"
-            />
+            <div class="student-avatar" id="studentAvatar">
+              <span id="avatarInitials">?</span>
+            </div>
 
             <span class="student-id-badge"></span>
 
@@ -164,6 +162,32 @@
             </div>
 
           </div>
+
+          <section class="activity-summary-card">
+            <div class="activity-card-header">
+              <div class="card-icon light-blue">
+                <i class="fa-solid fa-chart-simple"></i>
+              </div>
+              <div>
+                <h2>Activity Summary</h2>
+                <p>Your engagement across the platform</p>
+              </div>
+            </div>
+            <div class="activity-stats-row">
+              <div class="activity-stat-item">
+                <span id="totalEventsRegistered">—</span>
+                <p>Events Registered</p>
+              </div>
+              <div class="activity-stat-item">
+                <span id="upcomingEventsCount">—</span>
+                <p>Upcoming Events</p>
+              </div>
+              <div class="activity-stat-item">
+                <span id="pendingTasksCount">—</span>
+                <p>Pending Tasks</p>
+              </div>
+            </div>
+          </section>
 
           <section class="interests-card">
 

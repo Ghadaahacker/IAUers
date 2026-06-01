@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU'ers Student - Settings</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <link rel="stylesheet" href="../CSS/settings.css" />
+  <link rel="stylesheet" href="../../Shared/CSS/student-sidebar.css" />
+</head>
+<body>
+  <div class="layout">
+    <div id="student-sidebar"></div>
+
+    <main class="main-content">
+
+      <section class="page-header-bar">
+        <div>
+          <h1>Settings</h1>
+          <p>Manage your account preferences and notifications.</p>
+        </div>
+      </section>
+
+      <div class="settings-layout">
+
+        <!-- Account -->
+        <section class="settings-card">
+          <div class="settings-card-header">
+            <div class="settings-icon-wrap">
+              <i class="fa-regular fa-user"></i>
+            </div>
+            <div>
+              <h2>Account</h2>
+              <p>Your profile and personal information</p>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-row-left">
+              <div class="avatar-mini" id="settingsAvatar">?</div>
+              <div>
+                <div class="settings-name" id="settingsName">Loading...</div>
+                <div class="settings-email" id="settingsEmail">—</div>
+              </div>
+            </div>
+            <a href="profile.html" class="settings-btn-outline">
+              <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+            </a>
+          </div>
+        </section>
+
+        <!-- Notifications -->
+        <section class="settings-card">
+          <div class="settings-card-header">
+            <div class="settings-icon-wrap">
+              <i class="fa-regular fa-bell"></i>
+            </div>
+            <div>
+              <h2>Notifications</h2>
+              <p>Control what you get notified about</p>
+            </div>
+          </div>
+
+          <div class="toggle-list">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">New Events</div>
+                <div class="toggle-sub">Get notified when new university events are published</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="notifNewEvents" checked />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Event Reminders</div>
+                <div class="toggle-sub">Reminders 24 hours before your registered events</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="notifReminders" checked />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Task Deadlines</div>
+                <div class="toggle-sub">Alerts when academic tasks are due soon</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="notifTasks" />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Announcements</div>
+                <div class="toggle-sub">University-wide announcements and news</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="notifAnnouncements" checked />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <button class="settings-save-btn" id="saveNotifBtn">
+            <i class="fa-solid fa-check"></i> Save Preferences
+          </button>
+        </section>
+
+        <!-- Quick Links -->
+        <section class="settings-card">
+          <div class="settings-card-header">
+            <div class="settings-icon-wrap">
+              <i class="fa-solid fa-link"></i>
+            </div>
+            <div>
+              <h2>Quick Links</h2>
+              <p>Shortcuts to important pages</p>
+            </div>
+          </div>
+
+          <div class="quick-links-grid">
+            <a href="profile.html" class="quick-link-card">
+              <i class="fa-regular fa-user"></i>
+              <span>My Profile</span>
+            </a>
+            <a href="tickets.html" class="quick-link-card">
+              <i class="fa-solid fa-ticket"></i>
+              <span>My Tickets</span>
+            </a>
+            <a href="journey.html" class="quick-link-card">
+              <i class="fa-regular fa-compass"></i>
+              <span>My Journey</span>
+            </a>
+            <a href="schedule.html" class="quick-link-card">
+              <i class="fa-regular fa-calendar"></i>
+              <span>Schedule</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- About -->
+        <section class="settings-card">
+          <div class="settings-card-header">
+            <div class="settings-icon-wrap">
+              <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <div>
+              <h2>About IAU'ers</h2>
+              <p>Application information</p>
+            </div>
+          </div>
+
+          <div class="about-rows">
+            <div class="about-row"><span>Version</span><strong>1.0.0</strong></div>
+            <div class="about-row"><span>University</span><strong>Imam Abdulrahman Bin Faisal University</strong></div>
+            <div class="about-row"><span>College</span><strong>College of Business Administration</strong></div>
+            <div class="about-row"><span>Platform</span><strong>Web Application</strong></div>
+          </div>
+        </section>
+
+        <!-- Danger Zone -->
+        <section class="settings-card danger-card">
+          <div class="settings-card-header">
+            <div class="settings-icon-wrap danger-icon">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <div>
+              <h2>Session</h2>
+              <p>Sign out of your account</p>
+            </div>
+          </div>
+
+          <button class="logout-btn" id="settingsLogoutBtn">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="settings-toast hidden">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Saved.</span>
+  </div>
+
+  <script src="../../Shared/JS/student-sidebar.js"></script>
+  <script type="module" src="../JS/settings.js"></script>
+</body>
+</html>

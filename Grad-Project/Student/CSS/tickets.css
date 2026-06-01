@@ -43,15 +43,53 @@ body {
 }
 
 .page-header-bar {
-  background: linear-gradient(90deg, #203a8a 0%, #1f3477 100%);
+  background:
+    radial-gradient(ellipse 35% 200% at 102% 50%, rgba(0,229,255,0.24)  0%, transparent 100%),
+    radial-gradient(ellipse 28% 150% at -2%  50%, rgba(139,92,246,0.20) 0%, transparent 100%),
+    radial-gradient(ellipse 55% 120% at 50%  50%, rgba(14,58,110,0.55)  0%, transparent 100%),
+    #07101f;
   color: white;
   padding: 28px 36px;
+  position: relative;
+  overflow: hidden;
 }
 
-.page-header-bar {
-  background: linear-gradient(90deg, #203a8a 0%, #1f3477 100%);
-  color: white;
-  padding: 28px 36px;
+.page-header-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 28px,
+    rgba(255,255,255,0.025) 28px,
+    rgba(255,255,255,0.025) 29px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-header-bar::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -90px;
+  transform: translateY(-50%);
+  width: 240px;
+  height: 240px;
+  border: 1.5px solid rgba(0,229,255,0.24);
+  border-radius: 50%;
+  box-shadow:
+    0 0 50px rgba(0,229,255,0.12),
+    0 0 0 42px rgba(0,229,255,0.05),
+    0 0 0 84px rgba(0,229,255,0.02);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-header-bar > * {
+  position: relative;
+  z-index: 1;
 }
 
 .page-header-bar h1 {

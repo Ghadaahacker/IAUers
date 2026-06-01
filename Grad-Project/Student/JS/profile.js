@@ -4,7 +4,11 @@ import {
   doc,
   getDoc,
   setDoc,
-  updateDoc
+  updateDoc,
+  collection,
+  getDocs,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 import {
@@ -335,6 +339,33 @@ document.addEventListener("DOMContentLoaded", () => {
     </style>
   `);
 
+  async function loadActivitySummary(userId) {
+    try {
+      const [regSnap, tasksSnap] = await Promise.all([
+        getDocs(query(collection(db, "eventRegistrations"), where("studentId", "==", userId))),
+        getDocs(query(collection(db, "tasks"), where("studentId", "==", userId)))
+      ]);
+
+      const registrations = regSnap.docs.map(d => d.data());
+      const now = new Date();
+      const upcoming = registrations.filter(r => new Date(r.eventDateTime || 0) >= now);
+      const pending = tasksSnap.docs.filter(d => {
+        const t = d.data();
+        return new Date(t.dueDateTime || 0) >= now;
+      });
+
+      const totalEl    = document.getElementById("totalEventsRegistered");
+      const upcomingEl = document.getElementById("upcomingEventsCount");
+      const pendingEl  = document.getElementById("pendingTasksCount");
+
+      if (totalEl)    totalEl.textContent    = registrations.length;
+      if (upcomingEl) upcomingEl.textContent = upcoming.length;
+      if (pendingEl)  pendingEl.textContent  = pending.length;
+    } catch (e) {
+      console.error("Error loading activity summary:", e);
+    }
+  }
+
   function getAcademicStanding(gpa) {
     const g = parseFloat(gpa) || 0;
     if (g >= 4.5) return { text: "Excellent Standing", cls: "record-badge-good" };
@@ -376,6 +407,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const idBadge = document.querySelector(".student-id-badge");
     if (idBadge) idBadge.textContent = `ID: ${profileData.studentId || "N/A"}`;
+
+    const avatarInitials = document.getElementById("avatarInitials");
+    if (avatarInitials && profileData.name) {
+      const parts = profileData.name.trim().split(" ").filter(Boolean);
+      avatarInitials.textContent = parts.length === 1
+        ? parts[0].slice(0, 2).toUpperCase()
+        : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
 
     const statNumbers = document.querySelectorAll(".stat-card h2");
     if (statNumbers[0]) statNumbers[0].textContent = profileData.gpa || "0.00";
@@ -435,6 +474,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       await loadProfileFromFirebase(user);
+      await loadActivitySummary(user.uid);
     } catch (error) {
       console.error("Error loading profile:", error);
       showToast("Could not load profile data.");

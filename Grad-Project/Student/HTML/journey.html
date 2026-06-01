@@ -32,6 +32,30 @@
         </div>
       </section>
 
+      <div class="journey-stats-bar">
+        <div class="stat-pill">
+          <div class="stat-pill-icon"><i class="fa-solid fa-book-open"></i></div>
+          <div class="stat-pill-text">
+            <span id="statsCoursesCount">0</span>
+            <p>Active Courses</p>
+          </div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-icon"><i class="fa-solid fa-list-check"></i></div>
+          <div class="stat-pill-text">
+            <span id="statsTasksCount">0</span>
+            <p>Total Tasks</p>
+          </div>
+        </div>
+        <div class="stat-pill stat-pill-accent">
+          <div class="stat-pill-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="stat-pill-text">
+            <span id="statsDueSoonCount">0</span>
+            <p>Due This Week</p>
+          </div>
+        </div>
+      </div>
+
       <section class="journey-layout">
         <!-- Quick Access -->
         <section class="content-section">
@@ -100,6 +124,15 @@
             </button>
           </div>
           
+          <div class="task-filter-tabs" id="taskFilterTabs">
+            <button class="task-filter-tab active" data-filter="all" type="button">All</button>
+            <button class="task-filter-tab" data-filter="high" type="button">🔴 High</button>
+            <button class="task-filter-tab" data-filter="medium" type="button">🟡 Medium</button>
+            <button class="task-filter-tab" data-filter="low" type="button">🟢 Low</button>
+            <button class="task-filter-tab" data-filter="nearest" type="button">📅 Nearest</button>
+            <button class="task-filter-tab" data-filter="done" type="button">✅ Done</button>
+          </div>
+
           <div id="tasksList" class="stack-list">
             <div class="empty-state">
               No academic tasks yet. Add quizzes, assignments, or exams and they will be ready for your calendar workflow.
@@ -140,6 +173,26 @@
           <button type="button" class="color-option" data-color="#6366f1"></button>
           <button type="button" class="color-option" data-color="#14b8a6"></button>
           <button type="button" class="color-option" data-color="#ff2d3a"></button>
+        </div>
+
+        <label class="form-label" for="instructorName">Instructor Name <span class="optional-tag">Optional</span></label>
+        <input id="instructorName" class="form-input" type="text" placeholder="e.g., Dr. Sarah Ahmed" />
+
+        <label class="form-label" for="classRoom">Classroom / Section <span class="optional-tag">Optional</span></label>
+        <input id="classRoom" class="form-input" type="text" placeholder="e.g., B2-201 / Section 3" />
+
+        <label class="form-label">Course Emoji <span class="optional-tag">Optional</span></label>
+        <div class="emoji-grid" id="courseEmojiOptions">
+          <button type="button" class="emoji-opt" data-emoji="📚">📚</button>
+          <button type="button" class="emoji-opt" data-emoji="💻">💻</button>
+          <button type="button" class="emoji-opt" data-emoji="🧮">🧮</button>
+          <button type="button" class="emoji-opt" data-emoji="📊">📊</button>
+          <button type="button" class="emoji-opt" data-emoji="🔬">🔬</button>
+          <button type="button" class="emoji-opt" data-emoji="🎯">🎯</button>
+          <button type="button" class="emoji-opt" data-emoji="✏️">✏️</button>
+          <button type="button" class="emoji-opt" data-emoji="🧠">🧠</button>
+          <button type="button" class="emoji-opt" data-emoji="🏆">🏆</button>
+          <button type="button" class="emoji-opt" data-emoji="📐">📐</button>
         </div>
 
         <button class="submit-btn" type="submit">Add Course</button>
@@ -188,7 +241,110 @@
           </div>
         </div>
 
+        <label class="form-label">Priority</label>
+        <div id="taskPriorityOptions" class="priority-grid">
+          <button type="button" class="priority-option" data-priority="high">🔴 High</button>
+          <button type="button" class="priority-option selected" data-priority="medium">🟡 Medium</button>
+          <button type="button" class="priority-option" data-priority="low">🟢 Low</button>
+        </div>
+
+        <label class="form-label">Task Emoji <span class="optional-tag">Optional</span></label>
+        <div class="emoji-grid" id="taskEmojiOptions">
+          <button type="button" class="emoji-opt" data-emoji="📝">📝</button>
+          <button type="button" class="emoji-opt" data-emoji="📖">📖</button>
+          <button type="button" class="emoji-opt" data-emoji="🧪">🧪</button>
+          <button type="button" class="emoji-opt" data-emoji="💡">💡</button>
+          <button type="button" class="emoji-opt" data-emoji="⏰">⏰</button>
+          <button type="button" class="emoji-opt" data-emoji="🎯">🎯</button>
+          <button type="button" class="emoji-opt" data-emoji="📐">📐</button>
+          <button type="button" class="emoji-opt" data-emoji="🏆">🏆</button>
+          <button type="button" class="emoji-opt" data-emoji="🔥">🔥</button>
+          <button type="button" class="emoji-opt" data-emoji="⚡">⚡</button>
+        </div>
+
         <button class="submit-btn" type="submit">Add Task</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Course Modal -->
+  <div id="editCourseModal" class="modal hidden">
+    <div class="modal-overlay" data-close="editCourse"></div>
+    <div class="modal-card">
+      <button id="closeEditCourseModalBtn" class="close-modal-btn" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="modal-header">
+        <h3>Edit Course</h3>
+      </div>
+      <form id="editCourseForm" class="modal-form">
+        <label class="form-label" for="editCourseName">Course Name</label>
+        <input id="editCourseName" class="form-input" type="text" placeholder="e.g., Data Structures" required />
+
+        <label class="form-label" for="editCourseCode">Course Code</label>
+        <input id="editCourseCode" class="form-input" type="text" placeholder="e.g., CS201" required />
+
+        <label class="form-label" for="editInstructorName">Instructor Name <span class="optional-tag">Optional</span></label>
+        <input id="editInstructorName" class="form-input" type="text" placeholder="e.g., Dr. Sarah Ahmed" />
+
+        <label class="form-label" for="editClassRoom">Classroom / Section <span class="optional-tag">Optional</span></label>
+        <input id="editClassRoom" class="form-input" type="text" placeholder="e.g., B2-201 / Section 3" />
+
+        <label class="form-label">Color</label>
+        <div id="editColorOptions" class="color-grid">
+          <button type="button" class="color-option" data-color="#3b82f6"></button>
+          <button type="button" class="color-option" data-color="#06c755"></button>
+          <button type="button" class="color-option" data-color="#a855f7"></button>
+          <button type="button" class="color-option" data-color="#ff7a00"></button>
+          <button type="button" class="color-option" data-color="#ec4899"></button>
+          <button type="button" class="color-option" data-color="#6366f1"></button>
+          <button type="button" class="color-option" data-color="#14b8a6"></button>
+          <button type="button" class="color-option" data-color="#ff2d3a"></button>
+        </div>
+
+        <button class="submit-btn enabled" type="submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Task Modal -->
+  <div id="editTaskModal" class="modal hidden">
+    <div class="modal-overlay" data-close="editTask"></div>
+    <div class="modal-card">
+      <button id="closeEditTaskModalBtn" class="close-modal-btn" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="modal-header">
+        <h3>Edit Task</h3>
+      </div>
+      <form id="editTaskForm" class="modal-form">
+        <label class="form-label">Task Type</label>
+        <div id="editTaskTypeOptions" class="type-grid">
+          <button type="button" class="type-option selected" data-type="Quiz">Quiz</button>
+          <button type="button" class="type-option" data-type="Assignment">Assignment</button>
+          <button type="button" class="type-option" data-type="Exam">Exam</button>
+        </div>
+
+        <label class="form-label" for="editTaskCourse">Course</label>
+        <select id="editTaskCourse" class="form-input" required>
+          <option value="">Select a course</option>
+        </select>
+
+        <label class="form-label" for="editTaskTitle">Title</label>
+        <input id="editTaskTitle" class="form-input" type="text" placeholder="e.g., Midterm Exam" required />
+
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label" for="editTaskDate">Date</label>
+            <input id="editTaskDate" class="form-input" type="date" required />
+          </div>
+          <div class="form-col">
+            <label class="form-label" for="editTaskTime">Time</label>
+            <input id="editTaskTime" class="form-input" type="time" required />
+          </div>
+        </div>
+
+        <button class="submit-btn enabled" type="submit">Save Changes</button>
       </form>
     </div>
   </div>

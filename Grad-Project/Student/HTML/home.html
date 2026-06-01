@@ -29,8 +29,66 @@
       <section class="page-content">
 
         <div class="welcome-block">
-          <h1 id="greetingText">Welcome, Student</h1>
-          <p>Make today another step toward the future you want.</p>
+          <div class="welcome-row">
+            <div>
+              <h1 id="greetingText">Welcome, Student</h1>
+              <p id="motivationText">Make today another step toward the future you want.</p>
+            </div>
+            <div class="notif-wrap">
+              <button class="notif-btn" id="notifBtn" type="button">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notif-badge hidden" id="notifBadge">0</span>
+              </button>
+              <div class="notif-panel hidden" id="notifPanel">
+                <div class="notif-panel-head">
+                  <h3>Notifications</h3>
+                  <button class="notif-close-btn" id="notifCloseBtn" type="button">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+                <div id="notifList" class="notif-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-ctrl">
+
+            <button class="filter-trigger" id="filterTriggerBtn" type="button">
+              <i class="fa-solid fa-sliders"></i>
+              <span id="filterLabel">All Colleges</span>
+              <i class="fa-solid fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-panel hidden" id="filterPanel">
+              <div class="filter-search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="filterSearch" class="filter-search" placeholder="Search college..." />
+              </div>
+              <div class="filter-list" id="filterList">
+                <button class="filter-option active" data-college="all" type="button">All Colleges</button>
+                <button class="filter-option" data-college="CBA" type="button">College of Business Administration</button>
+                <button class="filter-option" data-college="CSE" type="button">College of Computer Science</button>
+                <button class="filter-option" data-college="Engineering" type="button">College of Engineering</button>
+                <button class="filter-option" data-college="Medicine" type="button">College of Medicine</button>
+                <button class="filter-option" data-college="Law" type="button">College of Law</button>
+                <button class="filter-option" data-college="Education" type="button">College of Education</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sort-tabs" id="sortTabs">
+            <button class="sort-tab active" data-sort="all" type="button">All</button>
+            <button class="sort-tab" data-sort="recommended" type="button">
+              <i class="fa-solid fa-star"></i> Recommended
+            </button>
+            <button class="sort-tab" data-sort="upcoming" type="button">
+              <i class="fa-regular fa-calendar"></i> Upcoming
+            </button>
+            <button class="sort-tab" data-sort="ending" type="button">
+              <i class="fa-solid fa-fire"></i> Ending Soon
+            </button>
+          </div>
         </div>
 
         <section class="events-section">
@@ -111,6 +169,14 @@
     </div>
   </div>
 
+
+  <!-- Image Lightbox -->
+  <div id="imgLightbox" class="img-lightbox hidden">
+    <button id="closeLightbox" class="lightbox-close-btn" type="button">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <img id="lightboxImg" src="" alt="Full size event image" />
+  </div>
 
   <script src="../../Shared/JS/student-sidebar.js"></script>
   <script type="module" src="../JS/home.js"></script>

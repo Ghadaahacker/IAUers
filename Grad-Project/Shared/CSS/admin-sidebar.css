@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -40,34 +42,77 @@
   
   .brand {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     margin-bottom: 28px;
+    background: linear-gradient(135deg, #0f1a38, #1a2f5e);
+    border-radius: 18px;
+    padding: 13px 14px;
   }
-  
-  .brand-logo {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--navy-dark), var(--blue));
-    color: var(--white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
+
+  .sidebar-orbit-wrap {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
   }
-  
-  .brand h2 {
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 1.05;
-    color: var(--navy-dark);
+
+  .sb-ring {
+    position: absolute;
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
   }
-  
-  .brand p {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 6px;
+
+  .sb-ring1 { width: 18px; height: 18px; border: 1px solid rgba(0,229,255,0.4); }
+  .sb-ring2 { width: 28px; height: 28px; border: 1px solid rgba(0,229,255,0.22); }
+  .sb-ring3 { width: 41px; height: 41px; border: 1px solid rgba(0,229,255,0.1); }
+
+  .sb-planets { position: absolute; top: 50%; left: 50%; border-radius: 50%; }
+  .sb-planets1 { width: 18px; height: 18px; margin: -9px 0 0 -9px;   animation: sb-o1 3s linear infinite; }
+  .sb-planets2 { width: 28px; height: 28px; margin: -14px 0 0 -14px; animation: sb-o2 5.5s linear infinite; }
+  .sb-planets3 { width: 41px; height: 41px; margin: -20.5px 0 0 -20.5px; animation: sb-o3 9s linear infinite reverse; }
+
+  @keyframes sb-o1 { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
+  @keyframes sb-o2 { from{transform:rotate(100deg)}  to{transform:rotate(460deg)} }
+  @keyframes sb-o3 { from{transform:rotate(220deg)}  to{transform:rotate(-140deg)} }
+
+  .sb-planet { position: absolute; border-radius: 50%; top: 50%; left: 50%; }
+  .sb-p1 { width: 4px; height: 4px; margin: -2px 0 0 6px;   background: #00E5FF; box-shadow: 0 0 5px #00E5FF; }
+  .sb-p2 { width: 3px; height: 3px; margin: -1.5px 0 0 10px; background: #818CF8; box-shadow: 0 0 3px #818CF8; }
+  .sb-p3 { width: 2px; height: 2px; margin: -1px 0 0 17px;   background: #fff; opacity: 0.6; }
+
+  .sb-center-i {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'DM Serif Display', serif;
+    font-size: 11px;
+    color: #ffffff;
+    font-style: italic;
+    line-height: 1;
+  }
+
+  .brand-text { display: flex; flex-direction: column; gap: 2px; }
+
+  .brand-wordmark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+
+  .brand-iau  { color: #ffffff; }
+  .brand-apos { color: #ffffff; opacity: 0.7; }
+  .brand-ers  { color: #00E5FF; opacity: 0.75; }
+
+  .brand-sub {
+    font-size: 9px;
+    color: rgba(0,229,255,0.35);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 400;
+    margin-top: 1px;
   }
   
   .sidebar-nav {

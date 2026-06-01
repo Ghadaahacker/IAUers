@@ -48,13 +48,50 @@ body {
 
 /* ── Page Header Bar ── */
 .page-header-bar {
-  background: linear-gradient(90deg, #203a8a 0%, #1f3477 100%);
+  background:
+    radial-gradient(ellipse 35% 200% at 102% 50%, rgba(0,229,255,0.24)  0%, transparent 100%),
+    radial-gradient(ellipse 28% 150% at -2%  50%, rgba(139,92,246,0.20) 0%, transparent 100%),
+    radial-gradient(ellipse 55% 120% at 50%  50%, rgba(14,58,110,0.55)  0%, transparent 100%),
+    #07101f;
   color: white;
   padding: 28px 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.034) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.034) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-header-bar::after {
+  content: '';
+  position: absolute;
+  top: -55px;
+  right: -55px;
+  width: 210px;
+  height: 210px;
+  border: 1px solid rgba(0,229,255,0.18);
+  border-radius: 50%;
+  box-shadow: 0 0 0 42px rgba(0,229,255,0.05), 0 0 0 84px rgba(0,229,255,0.02);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-header-bar > * {
+  position: relative;
+  z-index: 1;
 }
 
 .page-header-bar h1 {
@@ -137,13 +174,21 @@ body {
   gap: 12px;
 }
 
-.student-photo {
+.student-avatar {
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  object-fit: cover;
+  background: linear-gradient(135deg, #162044, #2b58a8);
   border: 4px solid var(--white);
-  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.1);
+  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 2px;
+  flex-shrink: 0;
 }
 
 .student-id-badge {
@@ -449,6 +494,63 @@ body {
     gap: 20px;
   }
 }
+.activity-summary-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 24px 26px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.activity-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.activity-card-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin-bottom: 4px;
+}
+
+.activity-card-header p {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.activity-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.activity-stat-item {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 14px;
+  text-align: center;
+}
+
+.activity-stat-item span {
+  display: block;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin-bottom: 6px;
+}
+
+.activity-stat-item p {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .interests-card {
   background: var(--white);
   border: 1px solid var(--border);
