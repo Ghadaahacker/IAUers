@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let selectedCollege = "all";
   let selectedSort = "all";
   let allEvents = [];
+  let registeredEventIds = new Set();
 
   injectToast();
 
@@ -174,10 +175,20 @@ document.addEventListener("DOMContentLoaded", function () {
     currentUser = user;
 
     await loadStudentProfile(user.uid);
+    await loadRegisteredEvents(user.uid);
     await loadPublishedEventsForStudents();
     await loadPublishedAnnouncementsForStudents();
     await loadNotifications();
   });
+
+  async function loadRegisteredEvents(uid) {
+    registeredEventIds = new Set();
+    const snap = await getDocs(query(
+      collection(db, "eventRegistrations"),
+      where("studentId", "==", uid)
+    ));
+    snap.forEach(d => registeredEventIds.add(d.data().eventId));
+  }
 
   async function loadStudentProfile(uid) {
     const hour = new Date().getHours();
@@ -438,7 +449,10 @@ document.addEventListener("DOMContentLoaded", function () {
       modalEventCapacity.textContent = `${remainingSeats} seats available`;
     }
 
-    if (remainingSeats !== null && remainingSeats <= 0) {
+    if (registeredEventIds.has(event.id)) {
+      registerBtn.textContent = "Already Registered";
+      registerBtn.disabled = true;
+    } else if (remainingSeats !== null && remainingSeats <= 0) {
       registerBtn.textContent = "Sold Out";
       registerBtn.disabled = true;
     } else {
@@ -498,9 +512,11 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       selectedEvent.registeredCount = (selectedEvent.registeredCount || 0) + 1;
 
+      registeredEventIds.add(selectedEvent.id);
+
       showToast("You are registered successfully. Your ticket is now available in My Tickets.");
 
-      registerBtn.textContent = "Registered";
+      registerBtn.textContent = "Already Registered";
       registerBtn.disabled = true;
 
     } catch (error) {
