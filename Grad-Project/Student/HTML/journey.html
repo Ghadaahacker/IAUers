@@ -242,11 +242,11 @@
         </div>
 
         <label class="form-label">Priority</label>
-        <div id="taskPriorityOptions" class="priority-grid">
-          <button type="button" class="priority-option" data-priority="high">🔴 High</button>
-          <button type="button" class="priority-option selected" data-priority="medium">🟡 Medium</button>
-          <button type="button" class="priority-option" data-priority="low">🟢 Low</button>
-        </div>
+        <select id="taskPrioritySelect" class="form-input">
+          <option value="high">🔴 High</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
 
         <label class="form-label">Task Emoji <span class="optional-tag">Optional</span></label>
         <div class="emoji-grid" id="taskEmojiOptions">

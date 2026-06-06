@@ -227,6 +227,47 @@ body {
   line-height: 1.5;
 }
 
+.profile-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: default;
+}
+
+.linkedin-badge {
+  background: #eef3ff;
+  color: #2b58a8;
+  border: 1px solid #c8d8ef;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.linkedin-badge:hover { background: #2b58a8; color: white; }
+
+.open-work-badge {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.public-badge {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
 .profile-social {
   display: flex;
   gap: 10px;

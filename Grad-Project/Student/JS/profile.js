@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     gpa: "",
     credits: "",
     totalCredits: "",
-    certificates: 0
+    certificates: 0,
   };
 
   document.body.insertAdjacentHTML("beforeend", `
@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <label>Major</label>
             <input type="text" id="inputMajor" />
           </div>
+
         </div>
 
         <div class="modal-footer">
@@ -430,6 +431,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const progressFills = document.querySelectorAll(".progress-fill");
     if (progressFills[0]) progressFills[0].style.width = `${Math.min((gpa / 5) * 100, 100).toFixed(1)}%`;
     if (progressFills[1]) progressFills[1].style.width = `${Math.min((credits / totalCredits) * 100, 100).toFixed(1)}%`;
+
   }
 
   function renderSelectedInterests() {
@@ -501,26 +503,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("inputEmail").value.trim();
     const department = document.getElementById("inputDept").value.trim();
     const major = document.getElementById("inputMajor").value.trim();
-
     if (!name || !email) {
       showToast("Name and email are required.");
       return;
     }
 
-    profileData = {
-      ...profileData,
-      name,
-      email,
-      department,
-      major
-    };
+    profileData = { ...profileData, name, email, department, major };
 
     try {
       await updateDoc(doc(db, "users", currentUserId), {
-        name,
-        email,
-        department,
-        major
+        name, email, department, major
       });
 
       renderProfileCard();

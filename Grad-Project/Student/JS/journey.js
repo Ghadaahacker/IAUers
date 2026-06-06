@@ -303,7 +303,15 @@ document.addEventListener("DOMContentLoaded", function () {
       sortedTasks = tasks.filter(t => t.status !== "done");
     }
 
-    sortedTasks = sortedTasks.sort((a, b) => new Date(a.dueDateTime) - new Date(b.dueDateTime));
+    if (currentTaskFilter === "all") {
+      sortedTasks = sortedTasks.sort((a, b) => {
+        const aT = a.createdAt?.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt || 0).getTime();
+        const bT = b.createdAt?.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt || 0).getTime();
+        return aT - bT;
+      });
+    } else {
+      sortedTasks = sortedTasks.sort((a, b) => new Date(a.dueDateTime) - new Date(b.dueDateTime));
+    }
 
     if (!sortedTasks.length) {
       tasksList.innerHTML = `<div class="empty-state">No tasks in this category.</div>`;
@@ -481,13 +489,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  const taskPriorityOptionsBtns = document.querySelectorAll("#taskPriorityOptions .priority-option");
-  taskPriorityOptionsBtns.forEach(btn => {
-    btn.addEventListener("click", function () {
-      taskPriorityOptionsBtns.forEach(b => b.classList.remove("selected"));
-      this.classList.add("selected");
-      selectedTaskPriority = this.dataset.priority;
-    });
+  const taskPrioritySelect = document.getElementById("taskPrioritySelect");
+  taskPrioritySelect?.addEventListener("change", function () {
+    selectedTaskPriority = this.value;
   });
 
   document.querySelectorAll("#taskFilterTabs .task-filter-tab").forEach(tab => {
