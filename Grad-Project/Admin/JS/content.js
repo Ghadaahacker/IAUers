@@ -252,6 +252,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedFile = eventFileInput.files[0];
       if (selectedFile) {
         imageUrl = await compressAndConvertToBase64(selectedFile);
+      } else if (editingEventId) {
+        const existing = allEvents.find(e => e.id === editingEventId);
+        imageUrl = existing?.image || "";
       }
 
       await addDoc(collection(db, "bookingRequests"), {
@@ -744,12 +747,48 @@ document.addEventListener("DOMContentLoaded", () => {
             // Pending or rejected — doc lives directly in bookingRequests
             await deleteDoc(doc(db, "bookingRequests", event.id));
           } else {
-            // Published event — delete from events
+            // Published event — delete from events first
             await deleteDoc(doc(db, "events", event.id));
 
-            // Delete the exact linked bookingRequest using the stored ID
-            if (event.bookingRequestId) {
+            // 1. الطريقة الجديدة: ابحث في bookingRequests عن اللي عنده eventId = هذا الافنت
+            const byEventId = await getDocs(query(
+              collection(db, "bookingRequests"),
+              where("eventId", "==", event.id)
+            ));
+            for (const brDoc of byEventId.docs) {
+              await deleteDoc(doc(db, "bookingRequests", brDoc.id));
+            }
+
+            // 2. الطريقة القديمة: استخدم bookingRequestId المخزّن في الافنت
+            if (byEventId.empty && event.bookingRequestId) {
               await deleteDoc(doc(db, "bookingRequests", event.bookingRequestId));
+            }
+
+            // 3. Fallback أخير: ابحث بالعنوان والمنشئ
+            if (byEventId.empty && !event.bookingRequestId) {
+              const adminEmail = (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "").toLowerCase();
+              const brSnap = await getDocs(query(
+                collection(db, "bookingRequests"),
+                where("createdBy", "==", adminEmail)
+              ));
+              for (const brDoc of brSnap.docs) {
+                const d = brDoc.data();
+                if (
+                  (d.status === "Accepted" || d.status === "Pending" || d.status === "Pending Building Approval") &&
+                  (d.title || "").toLowerCase() === (event.title || "").toLowerCase()
+                ) {
+                  await deleteDoc(doc(db, "bookingRequests", brDoc.id));
+                }
+              }
+            }
+
+            // 4. احذف كل تسجيلات الطلاب المرتبطة بهذا الحدث
+            const regSnap = await getDocs(query(
+              collection(db, "eventRegistrations"),
+              where("eventId", "==", event.id)
+            ));
+            for (const regDoc of regSnap.docs) {
+              await deleteDoc(doc(db, "eventRegistrations", regDoc.id));
             }
           }
         } catch (err) {
