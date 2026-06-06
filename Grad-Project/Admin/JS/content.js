@@ -669,6 +669,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             ${event.status === "published" && event.type === "event"
               ? `
+                <button class="icon-btn registrations-btn" title="View Registrations" type="button">
+                  <span class="material-symbols-outlined">group</span>
+                </button>
                 <button class="icon-btn analytics-btn" title="Analytics" type="button">
                   <span class="material-symbols-outlined">bar_chart</span>
                 </button>
@@ -712,6 +715,11 @@ document.addEventListener("DOMContentLoaded", () => {
             openModal(eventModal);
           }
         });
+      }
+
+      const registrationsBtn = card.querySelector(".registrations-btn");
+      if (registrationsBtn) {
+        registrationsBtn.addEventListener("click", () => openRegistrationsModal(event));
       }
 
       const analyticsBtn = card.querySelector(".analytics-btn");
@@ -808,6 +816,93 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error loading events:", error);
     }
   }
+
+  // ── Registrations Modal ────────────────────────────────────────────────────
+  const regModal     = document.getElementById("registrationsModal");
+  const closeRegModal = document.getElementById("closeRegModal");
+
+  closeRegModal.addEventListener("click", () => regModal.style.display = "none");
+  regModal.addEventListener("click", e => { if (e.target === regModal) regModal.style.display = "none"; });
+
+  async function openRegistrationsModal(event) {
+    document.getElementById("regModalTitle").textContent = `Registrations — ${event.title || "Event"}`;
+    document.getElementById("regTotalBadge").textContent = "Loading...";
+    document.getElementById("regModalList").innerHTML = "";
+    regModal.style.display = "flex";
+
+    try {
+      const snap = await getDocs(query(
+        collection(db, "eventRegistrations"),
+        where("eventId", "==", event.id)
+      ));
+
+      const regs = [];
+      snap.forEach(d => regs.push({ id: d.id, ...d.data() }));
+
+      document.getElementById("regTotalBadge").textContent =
+        `${regs.length} ${regs.length === 1 ? "registration" : "registrations"}`;
+
+      const list = document.getElementById("regModalList");
+
+      if (!regs.length) {
+        list.innerHTML = `
+          <div style="text-align:center;padding:48px 0;color:#5f6e80;font-size:15px;">
+            No registrations yet.
+          </div>`;
+        return;
+      }
+
+      // جيب أسماء الطلاب اللي ما عندهم studentName من users collection
+      const missingIds = regs
+        .filter(r => !r.studentName && r.studentId)
+        .map(r => r.studentId);
+
+      const userNameMap = {};
+      if (missingIds.length) {
+        const usersSnap = await getDocs(collection(db, "users"));
+        usersSnap.forEach(d => {
+          if (missingIds.includes(d.id)) {
+            userNameMap[d.id] = d.data().name || "";
+          }
+        });
+      }
+
+      list.innerHTML = regs.map((r, i) => {
+        const name = r.studentName || userNameMap[r.studentId] || r.studentEmail?.split("@")[0] || "Unknown";
+        const date = r.createdAt?.toDate
+          ? r.createdAt.toDate().toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
+          : "—";
+        const initial = name.charAt(0).toUpperCase();
+        return `
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;
+            border-bottom:1px solid #f0f4f8;${i % 2 === 0 ? "background:#fff;" : "background:#fafbfc;"}">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1d1e34,#3a5a96);
+              color:#fff;display:flex;align-items:center;justify-content:center;
+              font-size:14px;font-weight:700;flex-shrink:0;">${initial}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:700;color:#1d1e34;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${name}
+              </div>
+              <div style="font-size:13px;color:#5f6e80;">${r.studentEmail || "—"}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
+                background:${r.status === "approved" || r.status === "confirmed" ? "#dcefe2" : "#f4e0c8"};
+                color:${r.status === "approved" || r.status === "confirmed" ? "#2a6b3c" : "#7a4200"};">
+                ${(r.status || "approved").toUpperCase()}
+              </span>
+              <div style="font-size:12px;color:#98a3b2;margin-top:4px;">${date}</div>
+            </div>
+          </div>`;
+      }).join("");
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById("regModalList").innerHTML =
+        `<div style="text-align:center;padding:40px;color:#c84a2f;">Failed to load registrations.</div>`;
+    }
+  }
+
 
   if (sortFilter) {
     sortFilter.addEventListener("change", () => {
