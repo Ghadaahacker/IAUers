@@ -667,7 +667,7 @@ document.addEventListener("DOMContentLoaded", () => {
               `
               : ""
             }
-            ${event.status !== "Rejected"
+            ${event.status === "published" && event.type === "event"
               ? `
                 <button class="icon-btn analytics-btn" title="Analytics" type="button">
                   <span class="material-symbols-outlined">bar_chart</span>
@@ -711,6 +711,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             openModal(eventModal);
           }
+        });
+      }
+
+      const analyticsBtn = card.querySelector(".analytics-btn");
+      if (analyticsBtn) {
+        analyticsBtn.addEventListener("click", () => {
+          const params = new URLSearchParams({
+            eventId: event.id,
+            title: event.title || "",
+            date: event.dateTime || "",
+            location: event.location || event.hall || ""
+          });
+          window.location.href = `../HTML/event-analytics.html?${params.toString()}`;
         });
       }
 
