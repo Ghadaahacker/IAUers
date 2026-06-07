@@ -367,7 +367,7 @@ acceptBtn.addEventListener("click", async () => {
       rejectionReason: ""
     });
 
-    const eventRef = await addDoc(collection(db, "events"), {
+    await addDoc(collection(db, "events"), {
       title: selectedBooking.title || "",
       description: selectedBooking.description || "",
       dateTime: selectedBooking.dateTime || "",
@@ -382,10 +382,6 @@ acceptBtn.addEventListener("click", async () => {
       createdBy: selectedBooking.createdBy || "Admin",
       bookingRequestId: selectedBookingId,
       createdAt: serverTimestamp()
-    });
-
-    await updateDoc(doc(db, "bookingRequests", selectedBookingId), {
-      eventId: eventRef.id
     });
 
     await addDoc(collection(db, "activityLogs"), {

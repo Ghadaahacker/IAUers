@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let selectedCollege = "all";
   let selectedSort = "all";
   let allEvents = [];
-  let registeredEventIds = new Set();
 
   injectToast();
 
@@ -175,11 +174,25 @@ document.addEventListener("DOMContentLoaded", function () {
     currentUser = user;
 
     await loadStudentProfile(user.uid);
-    await loadRegisteredEvents(user.uid);
     await loadPublishedEventsForStudents();
     await loadPublishedAnnouncementsForStudents();
     await loadNotifications();
+
+    setInterval(updateGreetingText, 60 * 1000);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) updateGreetingText();
+    });
   });
+
+  function updateGreetingText() {
+    if (!greetingText || !currentStudentName) return;
+    const h = new Date().getHours();
+    const greeting = h >= 5 && h < 12 ? "Good morning"
+      : h >= 12 && h < 18 ? "Good afternoon"
+      : "Good evening";
+    const emoji = h >= 5 && h < 12 ? "☀️" : h >= 12 && h < 18 ? "✨" : "🌙";
+    greetingText.textContent = `${greeting}, ${currentStudentName} ${emoji}`;
+  }
 
   async function loadStudentProfile(uid) {
     try {
@@ -424,10 +437,7 @@ document.addEventListener("DOMContentLoaded", function () {
       modalEventCapacity.textContent = `${remainingSeats} seats available`;
     }
 
-    if (registeredEventIds.has(event.id)) {
-      registerBtn.textContent = "Already Registered";
-      registerBtn.disabled = true;
-    } else if (remainingSeats !== null && remainingSeats <= 0) {
+    if (remainingSeats !== null && remainingSeats <= 0) {
       registerBtn.textContent = "Sold Out";
       registerBtn.disabled = true;
     } else {
@@ -493,11 +503,9 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       selectedEvent.registeredCount = (selectedEvent.registeredCount || 0) + 1;
 
-      registeredEventIds.add(selectedEvent.id);
-
       showToast("You are registered successfully. Your ticket is now available in My Tickets.");
 
-      registerBtn.textContent = "Already Registered";
+      registerBtn.textContent = "Registered";
       registerBtn.disabled = true;
 
     } catch (error) {

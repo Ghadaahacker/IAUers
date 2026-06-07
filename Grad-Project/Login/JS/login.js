@@ -88,19 +88,7 @@ sessionStorage.setItem("userId", user.uid);
   } catch (error) {
 
     console.error(error);
-
-    const code = error.code || "";
-    if (code === "auth/user-not-found" || code === "auth/invalid-credential") {
-      errorMessage.textContent = "No account found with this email.";
-    } else if (code === "auth/wrong-password") {
-      errorMessage.textContent = "Incorrect password. Please try again.";
-    } else if (code === "auth/too-many-requests") {
-      errorMessage.textContent = "Account temporarily locked due to too many attempts. Try again later.";
-    } else if (code === "auth/user-disabled") {
-      errorMessage.textContent = "This account has been disabled. Contact support.";
-    } else {
-      errorMessage.textContent = "Login failed: " + (error.message || code);
-    }
+    errorMessage.textContent = "Invalid email or password.";
 
   }
 });
