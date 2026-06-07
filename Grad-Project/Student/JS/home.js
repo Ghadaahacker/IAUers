@@ -33,6 +33,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalEventCapacity = document.getElementById("modalEventCapacity");
   const registerBtn = document.querySelector(".register-btn");
 
+  modalEventImage.addEventListener("click", () => {
+    if (!modalEventImage.src || modalEventImage.style.cursor !== "zoom-in") return;
+    if (lightboxImg) lightboxImg.src = modalEventImage.src;
+    imgLightbox?.classList.remove("hidden");
+  });
+
   let currentUser = null;
   let currentStudentInterests = [];
   let currentStudentName = "Student";
@@ -432,6 +438,7 @@ document.addEventListener("DOMContentLoaded", function () {
     selectedEvent = event;
 
     modalEventImage.src = event.image || event.imageUrl || "../../images/campus.jpg";
+    modalEventImage.style.cursor = (event.image || event.imageUrl) ? "zoom-in" : "default";
     modalEventTitle.textContent = event.title || "Untitled Event";
     modalEventDescription.textContent = event.description || "No description available.";
     modalEventDate.textContent = formatDateTime(event.dateTime);
