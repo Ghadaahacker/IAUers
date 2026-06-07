@@ -595,32 +595,6 @@ body {
   color: #5dd08a;
 }
 
-.ann-search-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 10px 16px;
-  max-width: 360px;
-  color: var(--muted);
-  margin-bottom: 14px;
-  transition: border-color 0.2s;
-}
-
-.ann-search-wrap:focus-within { border-color: #9eb7de; }
-
-.ann-search-input {
-  border: none;
-  outline: none;
-  font-size: 14px;
-  width: 100%;
-  color: var(--text);
-  background: transparent;
-  font-family: inherit;
-}
-
 .events-slider.expanded {
   flex-wrap: wrap;
   overflow-x: visible;

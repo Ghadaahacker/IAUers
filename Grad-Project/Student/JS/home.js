@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let selectedCollege = "all";
   let selectedSort = "all";
   let allEvents = [];
+  let registeredEventIds = new Set();
 
   injectToast();
 
@@ -174,45 +175,56 @@ document.addEventListener("DOMContentLoaded", function () {
     currentUser = user;
 
     await loadStudentProfile(user.uid);
+    await loadRegisteredEvents(user.uid);
     await loadPublishedEventsForStudents();
     await loadPublishedAnnouncementsForStudents();
     await loadNotifications();
-
-    setInterval(updateGreetingText, 60 * 1000);
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) updateGreetingText();
-    });
   });
 
-  function updateGreetingText() {
-    if (!greetingText || !currentStudentName) return;
-    const h = new Date().getHours();
-    const greeting = h >= 5 && h < 12 ? "Good morning"
-      : h >= 12 && h < 18 ? "Good afternoon"
-      : "Good evening";
-    const emoji = h >= 5 && h < 12 ? "☀️" : h >= 12 && h < 18 ? "✨" : "🌙";
-    greetingText.textContent = `${greeting}, ${currentStudentName} ${emoji}`;
+  async function loadRegisteredEvents(uid) {
+    registeredEventIds = new Set();
+    const snap = await getDocs(query(
+      collection(db, "eventRegistrations"),
+      where("studentId", "==", uid)
+    ));
+    snap.forEach(d => registeredEventIds.add(d.data().eventId));
   }
 
   async function loadStudentProfile(uid) {
+    const hour = new Date().getHours();
+
+    let greeting = "";
+
+    if (hour >= 5 && hour < 12) {
+      greeting = "Good morning";
+    } else if (hour >= 12 && hour < 18) {
+      greeting = "Good afternoon";
+    } else {
+      greeting = "Good evening";
+    }
+
     try {
-      const userRef  = doc(db, "users", uid);
+      const userRef = doc(db, "users", uid);
       const userSnap = await getDoc(userRef);
 
+      let studentName = "Student";
       currentStudentInterests = [];
 
       if (userSnap.exists()) {
         const userData = userSnap.data();
-        currentStudentName    = userData.name || "Student";
+
+        studentName = userData.name || "Student";
+        currentStudentName = studentName;
         currentStudentInterests = Array.isArray(userData.interests)
-          ? userData.interests : [];
+          ? userData.interests
+          : [];
       }
 
-      updateGreetingText();
+      const emoji = hour >= 5 && hour < 12 ? "☀️" : hour >= 12 && hour < 18 ? "✨" : "🌙";
+      greetingText.textContent = `${greeting}, ${studentName} ${emoji}`;
     } catch (error) {
       console.error("Error loading student profile:", error);
-      currentStudentName = "Student";
-      updateGreetingText();
+      greetingText.textContent = `${greeting}, Student`;
       currentStudentInterests = [];
     }
   }
@@ -228,20 +240,13 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const q = query(
         collection(db, "events"),
-        where("status", "==", "published")
+        where("status", "==", "published"),
+        where("type", "==", "event")
       );
 
       const snapshot = await getDocs(q);
 
-      const events = [];
-      snapshot.forEach((eventDoc) => {
-        const data = eventDoc.data();
-        if (data.type === "event") {
-          events.push({ id: eventDoc.id, ...data, isRecommended: isRecommendedEvent(data) });
-        }
-      });
-
-      if (!events.length) {
+      if (snapshot.empty) {
         studentEventsList.innerHTML = `
           <div class="empty-card">
             <h3>No events available right now.</h3>
@@ -250,6 +255,18 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         return;
       }
+
+      const events = [];
+
+      snapshot.forEach((eventDoc) => {
+        const event = eventDoc.data();
+
+        events.push({
+          id: eventDoc.id,
+          ...event,
+          isRecommended: isRecommendedEvent(event)
+        });
+      });
 
       events.sort((a, b) => {
         if (a.isRecommended && !b.isRecommended) return -1;
@@ -432,19 +449,16 @@ document.addEventListener("DOMContentLoaded", function () {
       modalEventCapacity.textContent = `${remainingSeats} seats available`;
     }
 
-    if (remainingSeats !== null && remainingSeats <= 0) {
+    if (registeredEventIds.has(event.id)) {
+      registerBtn.textContent = "Already Registered";
+      registerBtn.disabled = true;
+    } else if (remainingSeats !== null && remainingSeats <= 0) {
       registerBtn.textContent = "Sold Out";
       registerBtn.disabled = true;
     } else {
       registerBtn.textContent = "Register";
       registerBtn.disabled = false;
     }
-
-    modalEventImage.style.cursor = "zoom-in";
-    modalEventImage.onclick = function () {
-      if (lightboxImg) lightboxImg.src = modalEventImage.src;
-      imgLightbox?.classList.remove("hidden");
-    };
 
     eventDetailsModal.style.display = "flex";
   }
@@ -498,9 +512,11 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       selectedEvent.registeredCount = (selectedEvent.registeredCount || 0) + 1;
 
+      registeredEventIds.add(selectedEvent.id);
+
       showToast("You are registered successfully. Your ticket is now available in My Tickets.");
 
-      registerBtn.textContent = "Registered";
+      registerBtn.textContent = "Already Registered";
       registerBtn.disabled = true;
 
     } catch (error) {
@@ -521,51 +537,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  function formatDueLabel(due, now) {
-    const diff  = due - now;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (hours < 24) return `in ${hours}h`;
-    if (days === 1) return "tomorrow";
-    return `in ${days} days`;
-  }
-
   async function loadNotifications() {
     if (!notifList) return;
     try {
-      const now = new Date();
-      const in3d = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-      const in2d = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
-
-      const [tasksSnap, eventsSnap] = await Promise.all([
-        getDocs(query(collection(db, "tasks"),              where("studentId", "==", currentUser.uid))),
-        getDocs(query(collection(db, "eventRegistrations"), where("studentId", "==", currentUser.uid)))
-      ]);
-
+      const q = query(
+        collection(db, "events"),
+        where("status", "==", "published"),
+        where("type", "==", "announcement")
+      );
+      const snap = await getDocs(q);
       const items = [];
-
-      tasksSnap.forEach(d => {
-        const t   = d.data();
-        if (t.status === "done") return;
-        const due = new Date(t.dueDateTime || 0);
-        if (due >= now && due <= in3d) {
-          items.push({ type: "task", title: t.title || "Task", due, priority: t.priority || "medium" });
-        }
-      });
-
-      eventsSnap.forEach(d => {
-        const r    = d.data();
-        const date = new Date(r.eventDateTime || 0);
-        if (date >= now && date <= in2d) {
-          items.push({ type: "event", title: r.eventTitle || "Event", due: date, location: r.eventLocation || "IAU Campus" });
-        }
-      });
-
-      items.sort((a, b) => a.due - b.due);
+      snap.forEach(d => items.push({ id: d.id, ...d.data() }));
 
       if (!items.length) {
-        notifList.innerHTML = `<div class="notif-empty">You're all caught up!</div>`;
-        notifBadge?.classList.add("hidden");
+        notifList.innerHTML = `<div class="notif-empty">No notifications yet.</div>`;
         return;
       }
 
@@ -573,47 +558,20 @@ document.addEventListener("DOMContentLoaded", function () {
       if (notifBadge) notifBadge.textContent = items.length;
 
       notifList.innerHTML = "";
-      items.forEach(item => {
+      items.slice(0, 8).forEach(item => {
         const el = document.createElement("div");
         el.className = "notif-item";
-
-        const dotColor = item.type === "event" ? "#3b82f6"
-          : item.priority === "high"   ? "#ef4444"
-          : item.priority === "low"    ? "#22c55e"
-          : "#f59e0b";
-
-        const icon = item.type === "event" ? "📅"
-          : item.priority === "high"   ? "🔴"
-          : item.priority === "low"    ? "🟢"
-          : "🟡";
-
-        const label = formatDueLabel(item.due, now);
-        const sub   = item.type === "event"
-          ? `${label} · ${item.location}`
-          : `Due ${label}`;
-
         el.innerHTML = `
-          <div class="notif-dot" style="background:${dotColor};"></div>
+          <div class="notif-dot"></div>
           <div>
-            <div class="notif-item-title">${icon} ${item.title}</div>
-            <div class="notif-item-sub">${sub}</div>
+            <div class="notif-item-title">${item.title || "Announcement"}</div>
+            <div class="notif-item-sub">${(item.description || "").slice(0, 60)}${(item.description || "").length > 60 ? "…" : ""}</div>
           </div>`;
         notifList.appendChild(el);
       });
     } catch (e) {
       console.error("Error loading notifications:", e);
     }
-  }
-
-  const annSearchInput = document.getElementById("announcementSearch");
-  if (annSearchInput) {
-    annSearchInput.addEventListener("input", function () {
-      const q = this.value.toLowerCase();
-      document.querySelectorAll("#announcementsList .announcement-card").forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(q) ? "" : "none";
-      });
-    });
   }
 
   function renderFilteredEvents() {

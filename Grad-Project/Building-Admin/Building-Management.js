@@ -16,6 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const currentUserRole = sessionStorage.getItem("userRole");
+const currentUserEmail = sessionStorage.getItem("userEmail");
 
 if (currentUserRole !== "buildingManager") {
   window.location.href = "../Login/HTML/login.html";

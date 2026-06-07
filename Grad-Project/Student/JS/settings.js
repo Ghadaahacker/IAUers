@@ -65,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (notifTasks)         notifTasks.checked         = notif.tasks         === true;
         if (notifAnnouncements) notifAnnouncements.checked = notif.announcements !== false;
 
-
       } else {
         await setDoc(userRef, { notifications: {} }, { merge: true });
       }
