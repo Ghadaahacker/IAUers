@@ -61,6 +61,7 @@ const profileEmail = document.getElementById("profile-email");
 let bookings = [];
 let currentFilter = "All";
 let selectedBookingId = null;
+let deletedBrIds = new Set(); // booking IDs whose events were deleted by admin
 
 function normalizeStatus(status) {
   if (status === "Pending Building Approval") return "Pending";
@@ -103,10 +104,12 @@ function renderDetails(booking) {
 function renderRequests() {
   requestList.innerHTML = "";
 
+  const visible = bookings.filter(b => !deletedBrIds.has(b.id));
+
   const filteredBookings =
     currentFilter === "All"
-      ? bookings
-      : bookings.filter(booking => normalizeStatus(booking.status) === currentFilter);
+      ? visible
+      : visible.filter(booking => normalizeStatus(booking.status) === currentFilter);
 
   if (filteredBookings.length === 0) {
     requestList.innerHTML = `
@@ -148,7 +151,7 @@ function renderRequests() {
     requestList.appendChild(card);
   });
 
-  const selectedBooking = bookings.find(b => b.id === selectedBookingId);
+  const selectedBooking = visible.find(b => b.id === selectedBookingId);
 
   if (!selectedBooking && filteredBookings.length > 0) {
     selectedBookingId = filteredBookings[0].id;
@@ -492,6 +495,24 @@ onAuthStateChanged(auth, (user) => {
   profileEmail.textContent = realEmail;
   profileName.textContent = realEmail.split("@")[0];
 
+  // ── 1: watch events — detect deletions in real-time ──────────────────────────
+  onSnapshot(
+    query(collection(db, "events"), where("status", "==", "published")),
+    (evSnap) => {
+      evSnap.docChanges().forEach(change => {
+        const brId = change.doc.data().bookingRequestId;
+        if (!brId) return;
+        if (change.type === "removed") {
+          deletedBrIds.add(brId);       // event deleted → hide booking
+        } else if (change.type === "added") {
+          deletedBrIds.delete(brId);    // event added/restored → show booking
+        }
+      });
+      renderRequests();
+    }
+  );
+
+  // ── 2: watch bookingRequests ──────────────────────────────────────────────────
   const q = query(
     collection(db, "bookingRequests"),
     where("assignedToEmail", "==", realEmail)
@@ -499,22 +520,14 @@ onAuthStateChanged(auth, (user) => {
 
   onSnapshot(q, (snapshot) => {
     bookings = [];
-  
+
     snapshot.forEach((docSnap) => {
-  
       const data = docSnap.data();
-  
       if (data.status !== "Deleted") {
-  
-        bookings.push({
-          id: docSnap.id,
-          ...data
-        });
-  
+        bookings.push({ id: docSnap.id, ...data });
       }
-  
     });
-  
+
     updateStats();
 
     if (bookings.length > 0) {

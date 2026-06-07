@@ -759,26 +759,12 @@ document.addEventListener("DOMContentLoaded", () => {
               await deleteDoc(doc(db, "eventRegistrations", regDoc.id));
             }
 
-            // Mark the linked bookingRequest as Deleted so BM's onSnapshot hides it
-            const deletedPayload = { status: "Deleted", deletedAt: serverTimestamp() };
-
+            // Mark the linked bookingRequest as Deleted (BM's onSnapshot hides it)
             if (event.bookingRequestId) {
-              await updateDoc(doc(db, "bookingRequests", event.bookingRequestId), deletedPayload);
-            }
-
-            // Fallback: search all Accepted requests matching title + dateTime
-            const brSnap = await getDocs(query(
-              collection(db, "bookingRequests"),
-              where("status", "==", "Accepted")
-            ));
-            for (const brDoc of brSnap.docs) {
-              const d = brDoc.data();
-              if (
-                (d.title || "").toLowerCase() === (event.title || "").toLowerCase() &&
-                (d.dateTime || "") === (event.dateTime || "")
-              ) {
-                await updateDoc(doc(db, "bookingRequests", brDoc.id), deletedPayload);
-              }
+              await updateDoc(doc(db, "bookingRequests", event.bookingRequestId), {
+                status: "Deleted",
+                deletedAt: serverTimestamp()
+              });
             }
           }
         } catch (err) {
