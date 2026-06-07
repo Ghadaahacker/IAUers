@@ -252,6 +252,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedFile = eventFileInput.files[0];
       if (selectedFile) {
         imageUrl = await compressAndConvertToBase64(selectedFile);
+      } else if (editingEventId) {
+        const existing = allEvents.find(e => e.id === editingEventId);
+        imageUrl = existing?.image || "";
       }
 
       await addDoc(collection(db, "bookingRequests"), {
@@ -667,8 +670,11 @@ document.addEventListener("DOMContentLoaded", () => {
               `
               : ""
             }
-            ${event.status !== "Rejected"
+            ${event.status === "published" && event.type === "event"
               ? `
+                <button class="icon-btn registrations-btn" title="View Registrations" type="button">
+                  <span class="material-symbols-outlined">group</span>
+                </button>
                 <button class="icon-btn analytics-btn" title="Analytics" type="button">
                   <span class="material-symbols-outlined">bar_chart</span>
                 </button>
@@ -714,6 +720,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
+      const registrationsBtn = card.querySelector(".registrations-btn");
+      if (registrationsBtn) {
+        registrationsBtn.addEventListener("click", () => openRegistrationsModal(event));
+      }
+
+      const analyticsBtn = card.querySelector(".analytics-btn");
+      if (analyticsBtn) {
+        analyticsBtn.addEventListener("click", () => {
+          const params = new URLSearchParams({
+            eventId: event.id,
+            title: event.title || "",
+            date: event.dateTime || "",
+            location: event.location || event.hall || ""
+          });
+          window.location.href = `../HTML/event-analytics.html?${params.toString()}`;
+        });
+      }
+
       deleteBtn.addEventListener("click", async () => {
         const confirmDelete = confirm("Delete this content?");
         if (!confirmDelete) return;
@@ -723,12 +747,48 @@ document.addEventListener("DOMContentLoaded", () => {
             // Pending or rejected — doc lives directly in bookingRequests
             await deleteDoc(doc(db, "bookingRequests", event.id));
           } else {
-            // Published event — delete from events
+            // Published event — delete from events first
             await deleteDoc(doc(db, "events", event.id));
 
-            // Delete the exact linked bookingRequest using the stored ID
-            if (event.bookingRequestId) {
+            // 1. الطريقة الجديدة: ابحث في bookingRequests عن اللي عنده eventId = هذا الافنت
+            const byEventId = await getDocs(query(
+              collection(db, "bookingRequests"),
+              where("eventId", "==", event.id)
+            ));
+            for (const brDoc of byEventId.docs) {
+              await deleteDoc(doc(db, "bookingRequests", brDoc.id));
+            }
+
+            // 2. الطريقة القديمة: استخدم bookingRequestId المخزّن في الافنت
+            if (byEventId.empty && event.bookingRequestId) {
               await deleteDoc(doc(db, "bookingRequests", event.bookingRequestId));
+            }
+
+            // 3. Fallback أخير: ابحث بالعنوان والمنشئ
+            if (byEventId.empty && !event.bookingRequestId) {
+              const adminEmail = (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "").toLowerCase();
+              const brSnap = await getDocs(query(
+                collection(db, "bookingRequests"),
+                where("createdBy", "==", adminEmail)
+              ));
+              for (const brDoc of brSnap.docs) {
+                const d = brDoc.data();
+                if (
+                  (d.status === "Accepted" || d.status === "Pending" || d.status === "Pending Building Approval") &&
+                  (d.title || "").toLowerCase() === (event.title || "").toLowerCase()
+                ) {
+                  await deleteDoc(doc(db, "bookingRequests", brDoc.id));
+                }
+              }
+            }
+
+            // 4. احذف كل تسجيلات الطلاب المرتبطة بهذا الحدث
+            const regSnap = await getDocs(query(
+              collection(db, "eventRegistrations"),
+              where("eventId", "==", event.id)
+            ));
+            for (const regDoc of regSnap.docs) {
+              await deleteDoc(doc(db, "eventRegistrations", regDoc.id));
             }
           }
         } catch (err) {
@@ -795,6 +855,93 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error loading events:", error);
     }
   }
+
+  // ── Registrations Modal ────────────────────────────────────────────────────
+  const regModal     = document.getElementById("registrationsModal");
+  const closeRegModal = document.getElementById("closeRegModal");
+
+  closeRegModal.addEventListener("click", () => regModal.style.display = "none");
+  regModal.addEventListener("click", e => { if (e.target === regModal) regModal.style.display = "none"; });
+
+  async function openRegistrationsModal(event) {
+    document.getElementById("regModalTitle").textContent = `Registrations — ${event.title || "Event"}`;
+    document.getElementById("regTotalBadge").textContent = "Loading...";
+    document.getElementById("regModalList").innerHTML = "";
+    regModal.style.display = "flex";
+
+    try {
+      const snap = await getDocs(query(
+        collection(db, "eventRegistrations"),
+        where("eventId", "==", event.id)
+      ));
+
+      const regs = [];
+      snap.forEach(d => regs.push({ id: d.id, ...d.data() }));
+
+      document.getElementById("regTotalBadge").textContent =
+        `${regs.length} ${regs.length === 1 ? "registration" : "registrations"}`;
+
+      const list = document.getElementById("regModalList");
+
+      if (!regs.length) {
+        list.innerHTML = `
+          <div style="text-align:center;padding:48px 0;color:#5f6e80;font-size:15px;">
+            No registrations yet.
+          </div>`;
+        return;
+      }
+
+      // جيب أسماء الطلاب اللي ما عندهم studentName من users collection
+      const missingIds = regs
+        .filter(r => !r.studentName && r.studentId)
+        .map(r => r.studentId);
+
+      const userNameMap = {};
+      if (missingIds.length) {
+        const usersSnap = await getDocs(collection(db, "users"));
+        usersSnap.forEach(d => {
+          if (missingIds.includes(d.id)) {
+            userNameMap[d.id] = d.data().name || "";
+          }
+        });
+      }
+
+      list.innerHTML = regs.map((r, i) => {
+        const name = r.studentName || userNameMap[r.studentId] || r.studentEmail?.split("@")[0] || "Unknown";
+        const date = r.createdAt?.toDate
+          ? r.createdAt.toDate().toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
+          : "—";
+        const initial = name.charAt(0).toUpperCase();
+        return `
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;
+            border-bottom:1px solid #f0f4f8;${i % 2 === 0 ? "background:#fff;" : "background:#fafbfc;"}">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1d1e34,#3a5a96);
+              color:#fff;display:flex;align-items:center;justify-content:center;
+              font-size:14px;font-weight:700;flex-shrink:0;">${initial}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:700;color:#1d1e34;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${name}
+              </div>
+              <div style="font-size:13px;color:#5f6e80;">${r.studentEmail || "—"}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
+                background:${r.status === "approved" || r.status === "confirmed" ? "#dcefe2" : "#f4e0c8"};
+                color:${r.status === "approved" || r.status === "confirmed" ? "#2a6b3c" : "#7a4200"};">
+                ${(r.status || "approved").toUpperCase()}
+              </span>
+              <div style="font-size:12px;color:#98a3b2;margin-top:4px;">${date}</div>
+            </div>
+          </div>`;
+      }).join("");
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById("regModalList").innerHTML =
+        `<div style="text-align:center;padding:40px;color:#c84a2f;">Failed to load registrations.</div>`;
+    }
+  }
+
 
   if (sortFilter) {
     sortFilter.addEventListener("change", () => {

@@ -56,14 +56,8 @@
 
             <div>
               <p>Avg Satisfaction</p>
-              <h3>4.3/5</h3>
-              <div class="stars">
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-regular fa-star"></i>
-              </div>
+              <h3 id="statAvgRating">—</h3>
+              <div class="stars" id="starsRow"></div>
             </div>
           </div>
 
@@ -73,8 +67,8 @@
             </div>
 
             <div>
-              <p>Total Responses</p>
-              <h3>142</h3>
+              <p>Total Registrations</p>
+              <h3 id="statTotalReg">—</h3>
             </div>
           </div>
 
@@ -84,8 +78,8 @@
             </div>
 
             <div>
-              <p>Attendance Rate</p>
-              <h3>83.4%</h3>
+              <p>Confirmed Tickets</p>
+              <h3 id="statConfirmed">—</h3>
             </div>
           </div>
         </section>
@@ -203,6 +197,6 @@
   </div>
 
   <script src="../../Shared/JS/admin-sidebar.js"></script>
-  <script src="../JS/event-analytics.js"></script>
+  <script type="module" src="../JS/event-analytics.js"></script>
 </body>
 </html>
