@@ -54,15 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") imgLightbox?.classList.add("hidden"); });
 
-  if (modalEventImage) {
-    modalEventImage.style.cursor = "zoom-in";
-    modalEventImage.addEventListener("click", () => {
-      if (!modalEventImage.src) return;
-      lightboxImg.src = modalEventImage.src;
-      imgLightbox.classList.remove("hidden");
-    });
-  }
-
   // Notification panel
   const notifBtn      = document.getElementById("notifBtn");
   const notifPanel    = document.getElementById("notifPanel");

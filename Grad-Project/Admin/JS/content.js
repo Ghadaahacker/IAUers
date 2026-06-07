@@ -224,11 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (new Date(eventDateTimeInput.value) <= new Date()) {
-      showToast("Event date and time must be in the future.", "error");
-      return;
-    }
-
     if (!buildingHallSelect.value) {
       showToast("Please select a building / hall.", "error");
       return;
@@ -309,11 +304,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!eventDateTimeInput.value) {
       showToast("Please select date and time.", "error");
-      return;
-    }
-
-    if (new Date(eventDateTimeInput.value) <= new Date()) {
-      showToast("Event date and time must be in the future.", "error");
       return;
     }
 
