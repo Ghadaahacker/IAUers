@@ -153,6 +153,9 @@ function renderRequests() {
   if (!selectedBooking && filteredBookings.length > 0) {
     selectedBookingId = filteredBookings[0].id;
     renderDetails(filteredBookings[0]);
+  } else if (!selectedBooking) {
+    selectedBookingId = null;
+    renderDetails(null);
   }
 }
 
@@ -367,7 +370,7 @@ acceptBtn.addEventListener("click", async () => {
       rejectionReason: ""
     });
 
-    const eventRef = await addDoc(collection(db, "events"), {
+    await addDoc(collection(db, "events"), {
       title: selectedBooking.title || "",
       description: selectedBooking.description || "",
       dateTime: selectedBooking.dateTime || "",
@@ -382,10 +385,6 @@ acceptBtn.addEventListener("click", async () => {
       createdBy: selectedBooking.createdBy || "Admin",
       bookingRequestId: selectedBookingId,
       createdAt: serverTimestamp()
-    });
-
-    await updateDoc(doc(db, "bookingRequests", selectedBookingId), {
-      eventId: eventRef.id
     });
 
     await addDoc(collection(db, "activityLogs"), {
@@ -497,7 +496,6 @@ onAuthStateChanged(auth, (user) => {
     collection(db, "bookingRequests"),
     where("assignedToEmail", "==", realEmail)
   );
-
 
   onSnapshot(q, (snapshot) => {
     bookings = [];

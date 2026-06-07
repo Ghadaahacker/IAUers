@@ -224,11 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (new Date(eventDateTimeInput.value) <= new Date()) {
-      showToast("Event date and time must be in the future.", "error");
-      return;
-    }
-
     if (!buildingHallSelect.value) {
       showToast("Please select a building / hall.", "error");
       return;
@@ -309,11 +304,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!eventDateTimeInput.value) {
       showToast("Please select date and time.", "error");
-      return;
-    }
-
-    if (new Date(eventDateTimeInput.value) <= new Date()) {
-      showToast("Event date and time must be in the future.", "error");
       return;
     }
 
@@ -757,48 +747,38 @@ document.addEventListener("DOMContentLoaded", () => {
             // Pending or rejected — doc lives directly in bookingRequests
             await deleteDoc(doc(db, "bookingRequests", event.id));
           } else {
-            // Published event — delete from events first
+            // Published event — delete from events
             await deleteDoc(doc(db, "events", event.id));
 
-            // 1. الطريقة الجديدة: ابحث في bookingRequests عن اللي عنده eventId = هذا الافنت
-            const byEventId = await getDocs(query(
-              collection(db, "bookingRequests"),
-              where("eventId", "==", event.id)
-            ));
-            for (const brDoc of byEventId.docs) {
-              await deleteDoc(doc(db, "bookingRequests", brDoc.id));
-            }
-
-            // 2. الطريقة القديمة: استخدم bookingRequestId المخزّن في الافنت
-            if (byEventId.empty && event.bookingRequestId) {
-              await deleteDoc(doc(db, "bookingRequests", event.bookingRequestId));
-            }
-
-            // 3. Fallback أخير: ابحث بالعنوان والمنشئ
-            if (byEventId.empty && !event.bookingRequestId) {
-              const adminEmail = (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "").toLowerCase();
-              const brSnap = await getDocs(query(
-                collection(db, "bookingRequests"),
-                where("createdBy", "==", adminEmail)
-              ));
-              for (const brDoc of brSnap.docs) {
-                const d = brDoc.data();
-                if (
-                  (d.status === "Accepted" || d.status === "Pending" || d.status === "Pending Building Approval") &&
-                  (d.title || "").toLowerCase() === (event.title || "").toLowerCase()
-                ) {
-                  await deleteDoc(doc(db, "bookingRequests", brDoc.id));
-                }
-              }
-            }
-
-            // 4. احذف كل تسجيلات الطلاب المرتبطة بهذا الحدث
+            // Delete all student registrations for this event
             const regSnap = await getDocs(query(
               collection(db, "eventRegistrations"),
               where("eventId", "==", event.id)
             ));
             for (const regDoc of regSnap.docs) {
               await deleteDoc(doc(db, "eventRegistrations", regDoc.id));
+            }
+
+            // Mark the linked bookingRequest as Deleted so BM's onSnapshot hides it
+            const deletedPayload = { status: "Deleted", deletedAt: serverTimestamp() };
+
+            if (event.bookingRequestId) {
+              await updateDoc(doc(db, "bookingRequests", event.bookingRequestId), deletedPayload);
+            }
+
+            // Fallback: search all Accepted requests matching title + dateTime
+            const brSnap = await getDocs(query(
+              collection(db, "bookingRequests"),
+              where("status", "==", "Accepted")
+            ));
+            for (const brDoc of brSnap.docs) {
+              const d = brDoc.data();
+              if (
+                (d.title || "").toLowerCase() === (event.title || "").toLowerCase() &&
+                (d.dateTime || "") === (event.dateTime || "")
+              ) {
+                await updateDoc(doc(db, "bookingRequests", brDoc.id), deletedPayload);
+              }
             }
           }
         } catch (err) {
