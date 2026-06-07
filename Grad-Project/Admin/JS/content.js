@@ -86,7 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Prevent selecting a past date — set min to current date and time
   const nowLocal = new Date();
   nowLocal.setSeconds(0, 0);
-  eventDateTimeInput.min = nowLocal.toISOString().slice(0, 16);
+  nowLocal.setMinutes(nowLocal.getMinutes() + 1);
+  const pad = n => String(n).padStart(2, "0");
+  eventDateTimeInput.min = `${nowLocal.getFullYear()}-${pad(nowLocal.getMonth()+1)}-${pad(nowLocal.getDate())}T${pad(nowLocal.getHours())}:${pad(nowLocal.getMinutes())}`;
   const eventFileInput = document.getElementById("eventFileInput");
   const fileNameText = document.getElementById("fileNameText");
 
@@ -224,6 +226,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (new Date(eventDateTimeInput.value) <= new Date()) {
+      showToast("Event date and time must be in the future.", "error");
+      return;
+    }
+
     if (!buildingHallSelect.value) {
       showToast("Please select a building / hall.", "error");
       return;
@@ -304,6 +311,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!eventDateTimeInput.value) {
       showToast("Please select date and time.", "error");
+      return;
+    }
+
+    if (new Date(eventDateTimeInput.value) <= new Date()) {
+      showToast("Event date and time must be in the future.", "error");
       return;
     }
 
