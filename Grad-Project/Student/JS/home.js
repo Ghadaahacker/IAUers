@@ -228,13 +228,20 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const q = query(
         collection(db, "events"),
-        where("status", "==", "published"),
-        where("type", "==", "event")
+        where("status", "==", "published")
       );
 
       const snapshot = await getDocs(q);
 
-      if (snapshot.empty) {
+      const events = [];
+      snapshot.forEach((eventDoc) => {
+        const data = eventDoc.data();
+        if (data.type === "event") {
+          events.push({ id: eventDoc.id, ...data, isRecommended: isRecommendedEvent(data) });
+        }
+      });
+
+      if (!events.length) {
         studentEventsList.innerHTML = `
           <div class="empty-card">
             <h3>No events available right now.</h3>
@@ -243,18 +250,6 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         return;
       }
-
-      const events = [];
-
-      snapshot.forEach((eventDoc) => {
-        const event = eventDoc.data();
-
-        events.push({
-          id: eventDoc.id,
-          ...event,
-          isRecommended: isRecommendedEvent(event)
-        });
-      });
 
       events.sort((a, b) => {
         if (a.isRecommended && !b.isRecommended) return -1;

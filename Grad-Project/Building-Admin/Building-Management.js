@@ -16,7 +16,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const currentUserRole = sessionStorage.getItem("userRole");
-const currentUserEmail = sessionStorage.getItem("userEmail");
 
 if (currentUserRole !== "buildingManager") {
   window.location.href = "../Login/HTML/login.html";
@@ -367,7 +366,7 @@ acceptBtn.addEventListener("click", async () => {
       rejectionReason: ""
     });
 
-    await addDoc(collection(db, "events"), {
+    const eventRef = await addDoc(collection(db, "events"), {
       title: selectedBooking.title || "",
       description: selectedBooking.description || "",
       dateTime: selectedBooking.dateTime || "",
@@ -382,6 +381,10 @@ acceptBtn.addEventListener("click", async () => {
       createdBy: selectedBooking.createdBy || "Admin",
       bookingRequestId: selectedBookingId,
       createdAt: serverTimestamp()
+    });
+
+    await updateDoc(doc(db, "bookingRequests", selectedBookingId), {
+      eventId: eventRef.id
     });
 
     await addDoc(collection(db, "activityLogs"), {

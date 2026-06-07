@@ -252,6 +252,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedFile = eventFileInput.files[0];
       if (selectedFile) {
         imageUrl = await compressAndConvertToBase64(selectedFile);
+      } else if (editingEventId) {
+        const existing = allEvents.find(e => e.id === editingEventId);
+        imageUrl = existing?.image || "";
       }
 
       await addDoc(collection(db, "bookingRequests"), {
@@ -726,9 +729,50 @@ document.addEventListener("DOMContentLoaded", () => {
             // Published event — delete from events
             await deleteDoc(doc(db, "events", event.id));
 
-            // Delete the exact linked bookingRequest using the stored ID
-            if (event.bookingRequestId) {
+            // Delete linked bookingRequest — ثلاث طرق للتأكد
+            const deletedBrIds = new Set();
+
+            // 1. بـ eventId (أحداث جديدة)
+            const byEventId = await getDocs(query(
+              collection(db, "bookingRequests"),
+              where("eventId", "==", event.id)
+            ));
+            for (const brDoc of byEventId.docs) {
+              await deleteDoc(doc(db, "bookingRequests", brDoc.id));
+              deletedBrIds.add(brDoc.id);
+            }
+
+            // 2. بـ bookingRequestId المخزّن في الحدث (أحداث قديمة)
+            if (event.bookingRequestId && !deletedBrIds.has(event.bookingRequestId)) {
               await deleteDoc(doc(db, "bookingRequests", event.bookingRequestId));
+              deletedBrIds.add(event.bookingRequestId);
+            }
+
+            // 3. fallback: ابحث بالعنوان والمنشئ
+            if (deletedBrIds.size === 0) {
+              const adminEmail = (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "").toLowerCase();
+              const brSnap = await getDocs(query(
+                collection(db, "bookingRequests"),
+                where("createdBy", "==", adminEmail)
+              ));
+              for (const brDoc of brSnap.docs) {
+                const d = brDoc.data();
+                if (
+                  (d.status === "Accepted" || d.status === "Pending" || d.status === "Pending Building Approval") &&
+                  (d.title || "").toLowerCase() === (event.title || "").toLowerCase()
+                ) {
+                  await deleteDoc(doc(db, "bookingRequests", brDoc.id));
+                }
+              }
+            }
+
+            // Delete all student registrations for this event
+            const regSnap = await getDocs(query(
+              collection(db, "eventRegistrations"),
+              where("eventId", "==", event.id)
+            ));
+            for (const regDoc of regSnap.docs) {
+              await deleteDoc(doc(db, "eventRegistrations", regDoc.id));
             }
           }
         } catch (err) {
