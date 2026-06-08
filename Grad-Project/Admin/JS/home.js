@@ -64,36 +64,3 @@ async function loadDashboardStats() {
 }
 
 loadDashboardStats();
-const recentActivityList = document.getElementById("recentActivityList");
-
-function loadRecentActivity() {
-  const q = query(
-    collection(db, "activityLogs"),
-    where("adminEmail", "==", adminEmail),
-    orderBy("createdAt", "desc"),
-    limit(5)
-  );
-
-  onSnapshot(q, (snapshot) => {
-    recentActivityList.innerHTML = "";
-
-    snapshot.forEach((docSnap) => {
-      const activity = docSnap.data();
-
-      const item = document.createElement("div");
-      item.className = "activity-item";
-
-      item.innerHTML = `
-        <span class="activity-dot light"></span>
-        <div>
-          <p>${activity.message}</p>
-          <small>Latest update</small>
-        </div>
-      `;
-
-      recentActivityList.appendChild(item);
-    });
-  });
-}
-
-loadRecentActivity();
