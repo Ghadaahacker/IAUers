@@ -311,9 +311,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function createEventCard(event) {
     const card = document.createElement("article");
-    card.className = event.isRecommended
-      ? "event-card recommended-event-card"
-      : "event-card";
+    const isPast = event.dateTime && new Date(event.dateTime) < new Date();
+    let classes = "event-card";
+    if (event.isRecommended && !isPast) classes += " recommended-event-card";
+    if (isPast) classes += " ended-event";
+    card.className = classes;
 
     const remainingSeats = getRemainingSeats(event);
 
@@ -325,13 +327,15 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       <div class="event-card-badges">
-        ${
-          event.isRecommended
-            ? `<span class="recommended-badge"><i class="fa-solid fa-star"></i> Recommended for you</span>`
-            : ""
+        ${isPast
+          ? `<span class="ended-badge"><i class="fa-solid fa-clock-rotate-left"></i> Ended</span>`
+          : ""
         }
-
-        ${renderSeatsBadge(remainingSeats)}
+        ${!isPast && event.isRecommended
+          ? `<span class="recommended-badge"><i class="fa-solid fa-star"></i> Recommended for you</span>`
+          : ""
+        }
+        ${!isPast ? renderSeatsBadge(remainingSeats) : ""}
       </div>
 
       <h3 class="event-title">${event.title || "Untitled Event"}</h3>
@@ -414,17 +418,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const card = document.createElement("div");
         card.className = "announcement-card";
+        if (announcement.link) card.classList.add("announcement-card-clickable");
 
         card.innerHTML = `
-          <div class="announcement-top">Announcement</div>
+          <div class="announcement-icon-row">
+            <div class="announcement-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <span class="announcement-tag">Announcement</span>
+          </div>
           <h3>${announcement.title || "Untitled Announcement"}</h3>
           <p>${announcement.description || "No description available."}</p>
-          ${
-            announcement.link
-              ? `<a href="${announcement.link}" target="_blank">Open Link</a>`
-              : ""
+          ${announcement.link
+            ? `<div class="announcement-link-row"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Link</div>`
+            : ""
           }
         `;
+
+        if (announcement.link) {
+          card.addEventListener("click", () => window.open(announcement.link, "_blank"));
+        }
 
         announcementsList.appendChild(card);
       });
@@ -456,15 +467,23 @@ document.addEventListener("DOMContentLoaded", function () {
       modalEventCapacity.textContent = `${remainingSeats} seats available`;
     }
 
-    if (registeredEventIds.has(event.id)) {
+    const isPastEvent = event.dateTime && new Date(event.dateTime) < new Date();
+    if (isPastEvent) {
+      registerBtn.textContent = "Event Ended";
+      registerBtn.disabled = true;
+      registerBtn.className = "register-btn btn-ended";
+    } else if (registeredEventIds.has(event.id)) {
       registerBtn.textContent = "Already Registered";
       registerBtn.disabled = true;
+      registerBtn.className = "register-btn";
     } else if (remainingSeats !== null && remainingSeats <= 0) {
       registerBtn.textContent = "Sold Out";
       registerBtn.disabled = true;
+      registerBtn.className = "register-btn";
     } else {
       registerBtn.textContent = "Register";
       registerBtn.disabled = false;
+      registerBtn.className = "register-btn";
     }
 
     eventDetailsModal.style.display = "flex";
@@ -545,21 +564,31 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   async function loadNotifications() {
-    if (!notifList) return;
+    if (!notifList || !currentUser) return;
     try {
       const q = query(
-        collection(db, "events"),
-        where("status", "==", "published"),
-        where("type", "==", "announcement")
+        collection(db, "eventRegistrations"),
+        where("studentId", "==", currentUser.uid)
       );
       const snap = await getDocs(q);
+      const now = new Date();
+      const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
       const items = [];
-      snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+      snap.forEach(d => {
+        const reg = d.data();
+        const eventDate = new Date(reg.eventDateTime || 0);
+        if (eventDate >= now && eventDate <= sevenDaysLater) {
+          items.push({ id: d.id, ...reg });
+        }
+      });
 
       if (!items.length) {
-        notifList.innerHTML = `<div class="notif-empty">No notifications yet.</div>`;
+        notifList.innerHTML = `<div class="notif-empty">No upcoming events.</div>`;
+        notifBadge?.classList.add("hidden");
         return;
       }
+
+      items.sort((a, b) => new Date(a.eventDateTime) - new Date(b.eventDateTime));
 
       notifBadge?.classList.remove("hidden");
       if (notifBadge) notifBadge.textContent = items.length;
@@ -568,11 +597,16 @@ document.addEventListener("DOMContentLoaded", function () {
       items.slice(0, 8).forEach(item => {
         const el = document.createElement("div");
         el.className = "notif-item";
+        const eventDate = new Date(item.eventDateTime);
+        const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const eventDay  = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+        const daysLeft  = Math.round((eventDay - todayDate) / (1000 * 60 * 60 * 24));
+        const timeLabel = daysLeft === 0 ? "Today!" : daysLeft === 1 ? "Tomorrow" : `In ${daysLeft} days`;
         el.innerHTML = `
           <div class="notif-dot"></div>
           <div>
-            <div class="notif-item-title">${item.title || "Announcement"}</div>
-            <div class="notif-item-sub">${(item.description || "").slice(0, 60)}${(item.description || "").length > 60 ? "…" : ""}</div>
+            <div class="notif-item-title">${item.eventTitle || "Event"}</div>
+            <div class="notif-item-sub">${timeLabel} · ${item.eventLocation || "IAU Campus"}</div>
           </div>`;
         notifList.appendChild(el);
       });
@@ -631,7 +665,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    filtered.forEach(event => {
+    const now = new Date();
+    const upcoming = filtered.filter(e => !e.dateTime || new Date(e.dateTime) >= now);
+    const ended = filtered.filter(e => e.dateTime && new Date(e.dateTime) < now);
+    [...upcoming, ...ended].forEach(event => {
       studentEventsList.appendChild(createEventCard(event));
     });
   }

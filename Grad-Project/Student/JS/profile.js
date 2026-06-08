@@ -120,6 +120,39 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     </div>
 
+    <div id="addCertModal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-certificate"></i> Add Certification</h3>
+          <button id="closeAddCertBtn" class="modal-close">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Certificate Name</label>
+            <input type="text" id="inputCertName" placeholder="e.g. AWS Cloud Practitioner" />
+          </div>
+
+          <div class="modal-field">
+            <label>Issuing Organization</label>
+            <input type="text" id="inputCertOrg" placeholder="e.g. Amazon Web Services" />
+          </div>
+
+          <div class="modal-field">
+            <label>Year</label>
+            <input type="number" id="inputCertYear" placeholder="e.g. 2024" min="2000" max="2099" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="cancelAddCertBtn" class="modal-btn cancel-btn">Cancel</button>
+          <button id="saveAddCertBtn" class="modal-btn save-btn">
+            <i class="fa-solid fa-check"></i> Add Certification
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div id="toast" class="toast hidden">
       <i class="fa-solid fa-circle-check"></i>
       <span id="toastMsg"></span>
@@ -464,6 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderProfileCard();
     renderSelectedInterests();
+    renderCertifications();
   }
 
   onAuthStateChanged(auth, async (user) => {
@@ -574,6 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
       closeModal("editModal");
       closeModal("recordModal");
       closeModal("logoutModal");
+      closeModal("addCertModal");
     }
   });
 
@@ -640,4 +675,94 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // ── Certifications ──
+
+  function renderCertifications() {
+    const list = document.getElementById("certificationsList");
+    if (!list) return;
+
+    const certs = profileData.certifications || [];
+
+    if (!certs.length) {
+      list.innerHTML = `<p class="certs-empty">No certifications added yet.</p>`;
+
+      const statNumbers = document.querySelectorAll(".stat-card h2");
+      if (statNumbers[2]) statNumbers[2].textContent = "0";
+      return;
+    }
+
+    list.innerHTML = "";
+    certs.forEach((cert, index) => {
+      const item = document.createElement("div");
+      item.className = "cert-item";
+      item.innerHTML = `
+        <div class="cert-icon"><i class="fa-solid fa-certificate"></i></div>
+        <div class="cert-info">
+          <span class="cert-name">${cert.name}</span>
+          <span class="cert-meta">${cert.organization}${cert.year ? " · " + cert.year : ""}</span>
+        </div>
+        <button class="cert-delete-btn" data-index="${index}" type="button" title="Delete">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      `;
+      list.appendChild(item);
+    });
+
+    list.querySelectorAll(".cert-delete-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const idx = parseInt(btn.dataset.index);
+        profileData.certifications.splice(idx, 1);
+        await saveCertifications();
+        renderCertifications();
+        showToast("Certification removed.");
+      });
+    });
+
+    const statNumbers = document.querySelectorAll(".stat-card h2");
+    if (statNumbers[2]) statNumbers[2].textContent = certs.length;
+  }
+
+  async function saveCertifications() {
+    if (!currentUserId) return;
+    await updateDoc(doc(db, "users", currentUserId), {
+      certifications: profileData.certifications || []
+    });
+  }
+
+  const addCertBtn = document.getElementById("addCertBtn");
+  if (addCertBtn) {
+    addCertBtn.addEventListener("click", () => openModal("addCertModal"));
+  }
+
+  document.getElementById("closeAddCertBtn").addEventListener("click", () => closeModal("addCertModal"));
+  document.getElementById("cancelAddCertBtn").addEventListener("click", () => closeModal("addCertModal"));
+
+  document.getElementById("saveAddCertBtn").addEventListener("click", async () => {
+    const name = document.getElementById("inputCertName").value.trim();
+    const organization = document.getElementById("inputCertOrg").value.trim();
+    const year = document.getElementById("inputCertYear").value.trim();
+
+    if (!name || !organization) {
+      showToast("Name and organization are required.");
+      return;
+    }
+
+    if (!profileData.certifications) profileData.certifications = [];
+    profileData.certifications.push({ name, organization, year });
+
+    try {
+      await saveCertifications();
+      renderCertifications();
+      closeModal("addCertModal");
+      document.getElementById("inputCertName").value = "";
+      document.getElementById("inputCertOrg").value = "";
+      document.getElementById("inputCertYear").value = "";
+      showToast("Certification added.");
+    } catch (error) {
+      console.error("Error saving certification:", error);
+      showToast("Failed to save certification.");
+    }
+  });
+
 });

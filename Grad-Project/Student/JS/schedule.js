@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let allItems = [];
   let currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
   let selectedDate = formatDateKey(today);
-  let currentView = "month";
+  let currentView = "week";
   let selectedItemId = null;
 
   onAuthStateChanged(auth, async (user) => {
@@ -392,7 +392,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     visibleItems.forEach(item => {
       const block = document.createElement("div");
-      block.className = `timeline-item ${item.colorClass}`;
+      const itemIsPast = item.date < formatDateKey(today);
+      const isOverdueTask = itemIsPast && item.type === "task";
+      const isPastEvent = itemIsPast && item.type === "event";
+
+      let extraClass = "";
+      if (isOverdueTask) extraClass = " overdue-task-item";
+      else if (isPastEvent) extraClass = " past-event-item";
+
+      block.className = `timeline-item ${item.colorClass}${extraClass}`;
+
+      const overdueLabel = isOverdueTask
+        ? `<span class="overdue-label"><i class="fa-solid fa-circle-exclamation"></i> Overdue</span>`
+        : "";
 
       block.innerHTML = `
         <div class="timeline-time">
@@ -402,6 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="timeline-title">
           ${item.title}
         </div>
+        ${overdueLabel}
       `;
 
       block.addEventListener("click", function () {

@@ -44,18 +44,18 @@
           </div>
 
           <div class="summary-card">
-            <div class="summary-icon icon-pending">
-              <i class="fa-regular fa-clock"></i>
+            <div class="summary-icon icon-past">
+              <i class="fa-solid fa-clock-rotate-left"></i>
             </div>
             <div class="summary-content">
-              <h2 id="pendingCount">0</h2>
-              <p>Pending</p>
+              <h2 id="pastCount">0</h2>
+              <p>Past Events</p>
             </div>
           </div>
         </section>
 
         <section class="content-section">
-          <div class="section-head">
+          <div class="section-head section-head-confirmed">
             <h2>Confirmed Tickets</h2>
             <span id="confirmedListCount">0 tickets</span>
           </div>
@@ -64,12 +64,12 @@
         </section>
 
         <section class="content-section">
-          <div class="section-head">
-            <h2>Pending Requests</h2>
-            <span id="pendingListCount">0 requests</span>
+          <div class="section-head section-head-past">
+            <h2>Past Events</h2>
+            <span id="pastListCount">0 events</span>
           </div>
 
-          <div id="pendingTicketsList" class="ticket-list"></div>
+          <div id="pastTicketsList" class="ticket-list"></div>
         </section>
       </section>
     </main>
@@ -107,10 +107,6 @@
             <span id="modalEventLocation"></span>
           </div>
 
-          <div class="info-row">
-            <i class="fa-solid fa-layer-group"></i>
-            <span id="modalEventCategory"></span>
-          </div>
         </div>
 
         <div class="qr-section">

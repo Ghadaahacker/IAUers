@@ -265,9 +265,8 @@ body {
   box-shadow: var(--shadow-soft);
   padding: 18px 20px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  gap: 0;
 }
 
 .task-left {
@@ -652,6 +651,140 @@ body {
 .task-card.task-done .task-title {
   text-decoration: line-through;
   color: var(--muted);
+}
+
+/* ── Overdue / Due Soon States ── */
+.task-card.task-overdue {
+  border-left: 3px solid #ef4444;
+}
+
+.task-card.task-due-soon {
+  border-left: 3px solid #f59e0b;
+}
+
+.task-urgency-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.overdue-badge {
+  background: #fdeaea;
+  color: #b42318;
+}
+
+.due-soon-badge {
+  background: #fff3d8;
+  color: #9a6400;
+}
+
+/* ── Task Card Expand ── */
+.task-main-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.task-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.task-expand-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: background 0.15s, transform 0.2s;
+}
+
+.task-expand-btn:hover {
+  background: #f0f4fb;
+}
+
+.task-expand-btn i {
+  transition: transform 0.25s ease;
+}
+
+.task-details-panel {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #edf1f8;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-details-panel.hidden {
+  display: none;
+}
+
+.task-details-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+}
+
+.task-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.task-detail-row i {
+  width: 14px;
+  text-align: center;
+  color: var(--primary);
+  opacity: 0.7;
+}
+
+.task-notes-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f8faff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #43516c;
+  line-height: 1.6;
+}
+
+.task-notes-block i {
+  color: var(--primary);
+  opacity: 0.6;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.task-notes-block p {
+  margin: 0;
+}
+
+.task-notes-empty {
+  color: #aab4c4;
+  font-style: italic;
+}
+
+.form-textarea {
+  height: auto;
+  min-height: 80px;
+  padding: 10px 14px;
+  resize: vertical;
+  line-height: 1.5;
 }
 
 /* ── Done Toggle Button ── */

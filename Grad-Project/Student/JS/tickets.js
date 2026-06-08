@@ -15,12 +15,12 @@ import {
 
 document.addEventListener("DOMContentLoaded", function () {
   const confirmedCount = document.getElementById("confirmedCount");
-  const pendingCount = document.getElementById("pendingCount");
+  const pastCount = document.getElementById("pastCount");
   const confirmedListCount = document.getElementById("confirmedListCount");
-  const pendingListCount = document.getElementById("pendingListCount");
+  const pastListCount = document.getElementById("pastListCount");
 
   const confirmedTicketsList = document.getElementById("confirmedTicketsList");
-  const pendingTicketsList = document.getElementById("pendingTicketsList");
+  const pastTicketsList = document.getElementById("pastTicketsList");
 
   const ticketModal = document.getElementById("ticketModal");
   const modalOverlay = document.getElementById("modalOverlay");
@@ -89,18 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function normalizeTicket(id, data) {
-    const rawStatus = (data.status || "approved").toLowerCase();
-
-    let status = "confirmed";
-
-    if (
-      rawStatus.includes("pending") ||
-      rawStatus.includes("waiting") ||
-      rawStatus.includes("request")
-    ) {
-      status = "pending";
-    }
-
     return {
       ticketId: data.ticketId || `TKT-${id.slice(0, 6).toUpperCase()}`,
       registrationId: id,
@@ -114,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eventLocation:
         data.eventLocation || data.location || data.venue || "IAU Campus",
       category: data.category || data.eventCategory || "University Event",
-      status
+      status: "confirmed"
     };
   }
 
@@ -166,17 +154,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function openTicketModal(ticket, showQr = false) {
-    modalStatusTag.textContent =
-      ticket.status === "confirmed" ? "Confirmed" : "Pending";
-
-    modalStatusTag.className = `modal-status-tag ${ticket.status}`;
+    const isPast = isEventPast(ticket.eventDate);
+    modalStatusTag.textContent = isPast ? "Past" : ticket.status === "confirmed" ? "Confirmed" : "Pending";
+    modalStatusTag.className = `modal-status-tag ${isPast ? "past" : ticket.status}`;
 
     modalEventTitle.textContent = ticket.eventTitle;
     modalTicketId.textContent = ticket.ticketId;
     modalEventDate.textContent = formatDate(ticket.eventDate);
     modalEventTime.textContent = ticket.eventTime || "Time not available";
     modalEventLocation.textContent = ticket.eventLocation || "Location not available";
-    modalEventCategory.textContent = ticket.category || "University Event";
 
     qrCodeContainer.innerHTML = "";
 
@@ -381,26 +367,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ── Ticket Card ───────────────────────────────────────────────────────────────
 
-  function createTicketCard(ticket) {
+  function createTicketCard(ticket, isPastCard = false) {
     const card = document.createElement("div");
     card.className = "ticket-card";
+    if (isPastCard) card.classList.add("ticket-card-past");
 
-    const isConfirmed = ticket.status === "confirmed";
-    const eventPast = isEventPast(ticket.eventDate);
     const alreadyRated = ratedEventIds.has(ticket.eventId);
 
-    // Rate button: only for confirmed tickets whose event has already passed
-    let rateBtn = "";
-    if (isConfirmed && eventPast) {
-      rateBtn = alreadyRated
-        ? `<button class="ticket-btn secondary" type="button" disabled
-             style="cursor:default; opacity:0.7;">
+    const rateBtn = isPastCard
+      ? alreadyRated
+        ? `<button class="ticket-btn secondary" type="button" disabled style="cursor:default;opacity:0.7;">
              <i class="fa-solid fa-star" style="color:#f4b400;"></i> Rated
            </button>`
         : `<button class="ticket-btn secondary rate-event-btn" type="button">
              <i class="fa-regular fa-star"></i> Rate Event
-           </button>`;
-    }
+           </button>`
+      : "";
+
+    const statusLabel = isPastCard ? "Past" : "Confirmed";
+    const statusClass = isPastCard ? "past" : "confirmed";
+
+    const headActionBtn = !isPastCard
+      ? `<button class="ticket-btn primary show-qr-btn" type="button"><i class="fa-solid fa-qrcode"></i> Show QR</button>`
+      : rateBtn;
 
     card.innerHTML = `
       <div class="ticket-card-head">
@@ -408,10 +397,10 @@ document.addEventListener("DOMContentLoaded", function () {
           <i class="fa-solid fa-ticket"></i>
           <span>${ticket.ticketId}</span>
         </div>
-
-        <span class="status-badge ${ticket.status}">
-          ${isConfirmed ? "Confirmed" : "Pending"}
-        </span>
+        <div class="head-right">
+          <span class="status-badge ${statusClass}">${statusLabel}</span>
+          ${headActionBtn}
+        </div>
       </div>
 
       <div class="ticket-card-body">
@@ -435,19 +424,9 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
 
         <div class="ticket-footer">
-          <span class="ticket-category">${ticket.category || "University Event"}</span>
-
-          <div class="ticket-actions">
-            <button class="ticket-btn secondary view-details-btn" type="button">
-              View Details
-            </button>
-
-            ${isConfirmed
-              ? `<button class="ticket-btn primary show-qr-btn" type="button">Show QR</button>`
-              : ""}
-
-            ${rateBtn}
-          </div>
+          <button class="ticket-btn secondary view-details-btn" type="button">
+            View Details
+          </button>
         </div>
       </div>
     `;
@@ -471,20 +450,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function showLoading() {
     confirmedTicketsList.innerHTML = `<div class="empty-state">Loading tickets...</div>`;
-    pendingTicketsList.innerHTML = `<div class="empty-state">Loading requests...</div>`;
+    pastTicketsList.innerHTML = `<div class="empty-state">Loading past events...</div>`;
     confirmedCount.textContent = "--";
-    pendingCount.textContent = "--";
+    pastCount.textContent = "--";
     confirmedListCount.textContent = "Loading";
-    pendingListCount.textContent = "Loading";
+    pastListCount.textContent = "Loading";
   }
 
   function showError() {
     confirmedTicketsList.innerHTML = `<div class="empty-state">Could not load tickets.</div>`;
-    pendingTicketsList.innerHTML = `<div class="empty-state">Could not load requests.</div>`;
+    pastTicketsList.innerHTML = `<div class="empty-state">Could not load past events.</div>`;
     confirmedCount.textContent = "0";
-    pendingCount.textContent = "0";
+    pastCount.textContent = "0";
     confirmedListCount.textContent = "0 tickets";
-    pendingListCount.textContent = "0 requests";
+    pastListCount.textContent = "0 events";
   }
 
   function renderEmptyState(container, message) {
@@ -492,34 +471,38 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderTickets() {
-    const confirmedTickets = tickets.filter((ticket) => ticket.status === "confirmed");
-    const pendingTickets = tickets.filter((ticket) => ticket.status === "pending");
+    const upcomingTickets = tickets
+      .filter(t => !isEventPast(t.eventDate))
+      .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
+    const pastTickets = tickets
+      .filter(t => isEventPast(t.eventDate))
+      .sort((a, b) => new Date(b.eventDate) - new Date(a.eventDate));
 
-    confirmedCount.textContent = confirmedTickets.length;
-    pendingCount.textContent = pendingTickets.length;
+    confirmedCount.textContent = upcomingTickets.length;
+    pastCount.textContent = pastTickets.length;
 
     confirmedListCount.textContent =
-      `${confirmedTickets.length} ${confirmedTickets.length === 1 ? "ticket" : "tickets"}`;
+      `${upcomingTickets.length} ${upcomingTickets.length === 1 ? "ticket" : "tickets"}`;
 
-    pendingListCount.textContent =
-      `${pendingTickets.length} ${pendingTickets.length === 1 ? "request" : "requests"}`;
+    pastListCount.textContent =
+      `${pastTickets.length} ${pastTickets.length === 1 ? "event" : "events"}`;
 
     confirmedTicketsList.innerHTML = "";
-    pendingTicketsList.innerHTML = "";
+    pastTicketsList.innerHTML = "";
 
-    if (!confirmedTickets.length) {
-      renderEmptyState(confirmedTicketsList, "No confirmed tickets yet.");
+    if (!upcomingTickets.length) {
+      renderEmptyState(confirmedTicketsList, "No upcoming events registered.");
     } else {
-      confirmedTickets.forEach((ticket) => {
-        confirmedTicketsList.appendChild(createTicketCard(ticket));
+      upcomingTickets.forEach(ticket => {
+        confirmedTicketsList.appendChild(createTicketCard(ticket, false));
       });
     }
 
-    if (!pendingTickets.length) {
-      renderEmptyState(pendingTicketsList, "No pending requests.");
+    if (!pastTickets.length) {
+      renderEmptyState(pastTicketsList, "No past events yet.");
     } else {
-      pendingTickets.forEach((ticket) => {
-        pendingTicketsList.appendChild(createTicketCard(ticket));
+      pastTickets.forEach(ticket => {
+        pastTicketsList.appendChild(createTicketCard(ticket, true));
       });
     }
   }

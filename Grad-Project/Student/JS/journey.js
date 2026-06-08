@@ -40,6 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const taskTitleInput = document.getElementById("taskTitle");
   const taskDateInput = document.getElementById("taskDate");
   const taskTimeInput = document.getElementById("taskTime");
+  const taskNotesInput = document.getElementById("taskNotes");
+  const editTaskNotesInput = document.getElementById("editTaskNotes");
 
   const instructorNameInput = document.getElementById("instructorName");
   const classRoomInput = document.getElementById("classRoom");
@@ -74,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let editingTaskId = null;
   let selectedEditCourseColor = "#3b82f6";
   let selectedEditTaskType = "Quiz";
+  let selectedEditTaskPriority = "medium";
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -91,6 +94,20 @@ document.addEventListener("DOMContentLoaded", function () {
     updateCourseSubmitState();
     updateTaskSubmitState();
   });
+
+  function getCountdownText(dueDateTime, isDone) {
+    if (isDone) return "Completed";
+    if (!dueDateTime) return "No due date";
+    const now = new Date();
+    const due = new Date(dueDateTime);
+    if (isNaN(due.getTime())) return "No due date";
+    const diffMs = due - now;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? "s" : ""}`;
+    if (diffDays === 0) return "Due today";
+    if (diffDays === 1) return "Due tomorrow";
+    return `${diffDays} days remaining`;
+  }
 
   function formatTaskDate(dateString) {
     const date = new Date(dateString);
@@ -314,7 +331,15 @@ document.addEventListener("DOMContentLoaded", function () {
       const card = document.createElement("div");
       card.className = "task-card";
       const isDone = task.status === "done";
+      const now = new Date();
+      const dueDate = new Date(task.dueDateTime || 0);
+      const hoursLeft = (dueDate - now) / (1000 * 60 * 60);
+      const isOverdue = !isDone && dueDate < now;
+      const isDueSoon = !isDone && hoursLeft >= 0 && hoursLeft <= 48;
+
       if (isDone) card.classList.add("task-done");
+      else if (isOverdue) card.classList.add("task-overdue");
+      else if (isDueSoon) card.classList.add("task-due-soon");
 
       const _taskBadgeStyle = task.emoji
         ? 'background:' + (task.courseColor || '#3b82f6') + '22;box-shadow:0 2px 10px ' + (task.courseColor || '#3b82f6') + '33;'
@@ -332,65 +357,107 @@ document.addEventListener("DOMContentLoaded", function () {
            </span>`
         : "";
 
+      const urgencyBadge = isOverdue
+        ? `<span class="task-urgency-badge overdue-badge"><i class="fa-solid fa-circle-exclamation"></i> Overdue</span>`
+        : isDueSoon
+          ? `<span class="task-urgency-badge due-soon-badge"><i class="fa-solid fa-clock"></i> Due Soon</span>`
+          : "";
+
       card.innerHTML = `
-        <div class="task-left">
-          <div class="task-icon-badge" style="${_taskBadgeStyle}">
-            ${_taskBadgeContent}
+        <div class="task-main-row">
+          <div class="task-left">
+            <div class="task-icon-badge" style="${_taskBadgeStyle}">
+              ${_taskBadgeContent}
+            </div>
+
+            <div>
+              <div class="task-header-row">
+                <span class="task-course-chip" style="background:${task.courseColor || "#3b82f6"}">
+                  ${task.courseCode || "COURSE"}
+                </span>
+                <span class="task-type-chip">${task.type}</span>
+                ${priorityBadge}
+              </div>
+
+              <div class="task-title">${task.title}</div>
+
+              <div class="task-meta">
+                <span>
+                  <i class="fa-regular fa-calendar"></i>
+                  ${formatTaskDate(task.dueDateTime)}
+                </span>
+                <span>
+                  <i class="fa-regular fa-clock"></i>
+                  ${formatTaskTime(task.time)}
+                </span>
+                ${urgencyBadge}
+              </div>
+            </div>
           </div>
 
-          <div>
-            <div class="task-header-row">
-              <span class="task-course-chip" style="background:${task.courseColor || "#3b82f6"}">
-                ${task.courseCode || "COURSE"}
-              </span>
-              <span class="task-type-chip">${task.type}</span>
-              ${priorityBadge}
+          <div class="task-right">
+            <div class="card-actions">
+              <button class="task-done-btn ${isDone ? "done" : ""}" type="button" aria-label="Mark Done">
+                <i class="fa-solid fa-check"></i>
+              </button>
+              <button class="task-edit-btn" type="button" aria-label="Edit Task">
+                <i class="fa-regular fa-pen-to-square"></i>
+              </button>
+              <button class="delete-btn" type="button" aria-label="Delete Task">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
             </div>
-
-            <div class="task-title">${task.title}</div>
-
-            <div class="task-meta">
-              <span>
-                <i class="fa-regular fa-calendar"></i>
-                ${formatTaskDate(task.dueDateTime)}
-              </span>
-              <span>
-                <i class="fa-regular fa-clock"></i>
-                ${formatTaskTime(task.time)}
-              </span>
-            </div>
+            <button class="task-expand-btn" type="button" aria-label="Toggle details">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
           </div>
         </div>
 
-        <div class="card-actions">
-          <button class="task-done-btn ${isDone ? "done" : ""}" type="button" aria-label="Mark Done">
-            <i class="fa-solid fa-check"></i>
-          </button>
-          <button class="task-edit-btn" type="button" aria-label="Edit Task">
-            <i class="fa-regular fa-pen-to-square"></i>
-          </button>
-          <button class="delete-btn" type="button" aria-label="Delete Task">
-            <i class="fa-regular fa-trash-can"></i>
-          </button>
+        <div class="task-details-panel hidden">
+          <div class="task-details-grid">
+            <div class="task-detail-row">
+              <i class="fa-solid fa-book-open"></i>
+              <span>${task.courseName || "No course"}</span>
+            </div>
+            <div class="task-detail-row">
+              <i class="fa-regular fa-hourglass-half"></i>
+              <span>${getCountdownText(task.dueDateTime, isDone)}</span>
+            </div>
+          </div>
+          <div class="task-notes-block">
+            <i class="fa-regular fa-note-sticky"></i>
+            <p>${task.notes ? task.notes : "<span class='task-notes-empty'>No notes added.</span>"}</p>
+          </div>
         </div>
       `;
 
-      card.querySelector(".task-done-btn").addEventListener("click", async function () {
+      card.querySelector(".task-done-btn").addEventListener("click", async function (e) {
+        e.stopPropagation();
         const newStatus = task.status === "done" ? "pending" : "done";
         await updateDoc(doc(db, "tasks", task.id), { status: newStatus });
         await renderTasks();
         await renderStats();
       });
 
-      card.querySelector(".task-edit-btn").addEventListener("click", async function () {
+      card.querySelector(".task-edit-btn").addEventListener("click", async function (e) {
+        e.stopPropagation();
         await openEditTaskModal(task);
       });
 
-      const deleteBtn = card.querySelector(".delete-btn");
-      deleteBtn.addEventListener("click", async function () {
+      card.querySelector(".delete-btn").addEventListener("click", async function (e) {
+        e.stopPropagation();
         await deleteDoc(doc(db, "tasks", task.id));
         await renderTasks();
         await renderStats();
+      });
+
+      card.querySelector(".task-expand-btn").addEventListener("click", function (e) {
+        e.stopPropagation();
+        const panel = card.querySelector(".task-details-panel");
+        const icon  = this.querySelector("i");
+        const isOpen = !panel.classList.contains("hidden");
+        panel.classList.toggle("hidden", isOpen);
+        icon.style.transform = isOpen ? "" : "rotate(180deg)";
       });
 
       tasksList.appendChild(card);
@@ -540,6 +607,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  const editTaskPriorityOptionsBtns = document.querySelectorAll("#editTaskPriorityOptions .priority-option");
+  editTaskPriorityOptionsBtns.forEach(btn => {
+    btn.addEventListener("click", function () {
+      editTaskPriorityOptionsBtns.forEach(b => b.classList.remove("selected"));
+      this.classList.add("selected");
+      selectedEditTaskPriority = this.dataset.priority;
+    });
+  });
+
   courseNameInput.addEventListener("input", updateCourseSubmitState);
   courseCodeInput.addEventListener("input", updateCourseSubmitState);
 
@@ -633,6 +709,7 @@ document.addEventListener("DOMContentLoaded", function () {
   async function openEditTaskModal(task) {
     editingTaskId = task.id;
     selectedEditTaskType = task.type || "Quiz";
+    selectedEditTaskPriority = task.priority || "medium";
 
     await populateEditCourseSelect();
     editTaskCourseSelect.value = task.courseId || "";
@@ -641,10 +718,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const datePart = (task.dueDateTime || "").split("T")[0];
     editTaskDateInput.value = datePart || "";
     editTaskTimeInput.value = task.time || "";
+    if (editTaskNotesInput) editTaskNotesInput.value = task.notes || "";
 
     editTaskTypeOptionsBtns.forEach(o => {
       o.classList.remove("selected");
       if (o.dataset.type === selectedEditTaskType) o.classList.add("selected");
+    });
+
+    editTaskPriorityOptionsBtns.forEach(o => {
+      o.classList.remove("selected");
+      if (o.dataset.priority === selectedEditTaskPriority) o.classList.add("selected");
     });
 
     openModal(editTaskModal);
@@ -665,6 +748,8 @@ document.addEventListener("DOMContentLoaded", function () {
     await updateDoc(doc(db, "tasks", editingTaskId), {
       title,
       type: selectedEditTaskType,
+      priority: selectedEditTaskPriority,
+      notes: editTaskNotesInput?.value.trim() || "",
       dueDateTime,
       time,
       courseId: selectedCourse?.id || "",
@@ -727,6 +812,7 @@ document.addEventListener("DOMContentLoaded", function () {
       studentEmail: currentUser.email,
       emoji: selectedTaskEmoji,
       priority: selectedTaskPriority,
+      notes: taskNotesInput?.value.trim() || "",
       courseId: selectedCourse.id,
       courseName: selectedCourse.courseName,
       courseCode: selectedCourse.courseCode,

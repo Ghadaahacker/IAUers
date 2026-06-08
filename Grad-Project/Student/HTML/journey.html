@@ -248,6 +248,9 @@
           <button type="button" class="priority-option" data-priority="low">🟢 Low</button>
         </div>
 
+        <label class="form-label" for="taskNotes">Notes <span class="optional-tag">Optional</span></label>
+        <textarea id="taskNotes" class="form-input form-textarea" placeholder="e.g., Focus on chapters 3–5, bring calculator..."></textarea>
+
         <label class="form-label">Task Emoji <span class="optional-tag">Optional</span></label>
         <div class="emoji-grid" id="taskEmojiOptions">
           <button type="button" class="emoji-opt" data-emoji="📝">📝</button>
@@ -343,6 +346,16 @@
             <input id="editTaskTime" class="form-input" type="time" required />
           </div>
         </div>
+
+        <label class="form-label">Priority</label>
+        <div id="editTaskPriorityOptions" class="priority-grid">
+          <button type="button" class="priority-option" data-priority="high">🔴 High</button>
+          <button type="button" class="priority-option" data-priority="medium">🟡 Medium</button>
+          <button type="button" class="priority-option" data-priority="low">🟢 Low</button>
+        </div>
+
+        <label class="form-label" for="editTaskNotes">Notes <span class="optional-tag">Optional</span></label>
+        <textarea id="editTaskNotes" class="form-input form-textarea" placeholder="e.g., Focus on chapters 3–5, bring calculator..."></textarea>
 
         <button class="submit-btn enabled" type="submit">Save Changes</button>
       </form>

@@ -638,3 +638,125 @@ body {
 .save-interests-btn:hover {
   transform: translateY(-1px);
 }
+
+/* ── Certifications ── */
+.certifications-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 24px 26px;
+  box-shadow: var(--shadow-soft);
+}
+
+.certifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.certifications-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin-bottom: 8px;
+}
+
+.certifications-header p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.add-cert-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: linear-gradient(90deg, #203a8a 0%, #2b58a8 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: 0.2s ease;
+}
+
+.add-cert-btn:hover {
+  transform: translateY(-1px);
+}
+
+.certifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.certs-empty {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.cert-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f8fafc;
+  border: 1px solid #e7edf6;
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.cert-icon {
+  width: 42px;
+  height: 42px;
+  background: var(--light-blue);
+  color: #426db4;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.cert-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cert-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy-dark);
+}
+
+.cert-meta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.cert-delete-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: #fdeaea;
+  color: #b42318;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: 0.2s ease;
+}
+
+.cert-delete-btn:hover {
+  background: #f8c4c4;
+}

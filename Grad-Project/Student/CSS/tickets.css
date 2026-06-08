@@ -141,9 +141,9 @@ body {
   color: #0f8f3c;
 }
 
-.icon-pending {
-  background: #fff4e1;
-  color: #b97800;
+.icon-past {
+  background: #e5e7eb;
+  color: #6b7280;
 }
 
 .summary-content h2 {
@@ -167,17 +167,62 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 14px 20px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.section-head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 18px,
+    rgba(0,0,0,0.03) 18px,
+    rgba(0,0,0,0.03) 19px
+  );
+  pointer-events: none;
 }
 
 .section-head h2 {
   font-size: 20px;
   font-weight: 800;
-  color: var(--navy-dark);
+  position: relative;
 }
 
 .section-head span {
   font-size: 14px;
-  color: var(--muted);
+  font-weight: 600;
+  position: relative;
+}
+
+.section-head-confirmed {
+  background: rgba(36, 93, 242, 0.08);
+  border: 1px solid rgba(36, 93, 242, 0.15);
+}
+
+.section-head-confirmed h2 {
+  color: #1a3a7a;
+}
+
+.section-head-confirmed span {
+  color: #4b70b8;
+}
+
+.section-head-past {
+  background: rgba(107, 114, 128, 0.08);
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.section-head-past h2 {
+  color: #374151;
+}
+
+.section-head-past span {
+  color: #6b7280;
 }
 
 .ticket-list {
@@ -213,6 +258,12 @@ body {
   font-size: 15px;
 }
 
+.head-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .status-badge {
   padding: 8px 14px;
   border-radius: 999px;
@@ -225,9 +276,32 @@ body {
   color: var(--success-text);
 }
 
-.status-badge.pending {
-  background: var(--pending-bg);
-  color: var(--pending-text);
+.status-badge.past {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.ticket-card-past {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.ticket-card-past .ticket-card-head {
+  background: #6b7280;
+  border-bottom-color: #4b5563;
+}
+
+.ticket-card-past .ticket-card-head .ticket-id {
+  color: #f3f4f6;
+}
+
+.ticket-card-past .ticket-card-head .ticket-id i {
+  color: #e5e7eb;
+}
+
+.ticket-card-past .ticket-category {
+  background: #e5e7eb;
+  color: #4b5563;
 }
 
 .ticket-card-body {
@@ -376,9 +450,9 @@ body {
   color: var(--success-text);
 }
 
-.modal-status-tag.pending {
-  background: var(--pending-bg);
-  color: var(--pending-text);
+.modal-status-tag.past {
+  background: #e5e7eb;
+  color: #6b7280;
 }
 
 .modal-header h3 {
