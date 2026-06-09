@@ -43,9 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const departmentSelect = document.getElementById("department");
   const avatarInitial = document.getElementById("avatarInitial");
 
-  const notifEventReg = document.getElementById("notifEventRegistration");
-  const notifVenueReq = document.getElementById("notifVenueRequest");
-
   const userId = sessionStorage.getItem("userId");
   let originalData = {};
 
@@ -75,10 +72,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const initial = (userData.name || "?").trim().charAt(0).toUpperCase();
     if (avatarInitial) avatarInitial.textContent = initial;
 
-    // Load notification preferences (default to true if not set)
-    const notifs = userData.notifications || {};
-    notifEventReg.checked = notifs.eventRegistration !== false;
-    notifVenueReq.checked = notifs.venueRequest !== false;
   }
 
   saveProfileBtn.addEventListener("click", async () => {
@@ -106,24 +99,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     emailInput.value = originalData.email || "";
     departmentSelect.value = originalData.department || "Student Affairs";
   });
-
-  // Persist notification toggles on change
-  async function saveNotificationPrefs() {
-    try {
-      await updateDoc(userRef, {
-        notifications: {
-          eventRegistration: notifEventReg.checked,
-          venueRequest: notifVenueReq.checked
-        }
-      });
-      showToast("Notification preferences saved.");
-    } catch {
-      showToast("Failed to save preferences.", "error");
-    }
-  }
-
-  notifEventReg.addEventListener("change", saveNotificationPrefs);
-  notifVenueReq.addEventListener("change", saveNotificationPrefs);
 
   sendMessageBtn.addEventListener("click", () => {
     const subject = document.getElementById("supportSubject").value.trim();

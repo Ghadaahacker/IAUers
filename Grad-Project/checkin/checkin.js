@@ -90,9 +90,9 @@ async function init() {
 
           // PIN — check session cache first so volunteer only enters once per session
           if (eventData.checkinPin) {
-            const cached = sessionStorage.getItem(`pin_${reg.eventId}`);
+            const cached = localStorage.getItem(`pin_${reg.eventId}`);
             if (cached === String(eventData.checkinPin)) {
-              // Already verified this session — skip PIN entry
+              // Already verified — skip PIN entry
               eventPin = null;
             } else {
               eventPin = String(eventData.checkinPin);
@@ -194,9 +194,9 @@ async function init() {
           checkedInAt: serverTimestamp()
         });
 
-        // Cache PIN so volunteer doesn't re-enter it for next scan
+        // Cache PIN so volunteer doesn't re-enter it for subsequent scans
         if (eventPin !== null && reg.eventId) {
-          sessionStorage.setItem(`pin_${reg.eventId}`, eventPin);
+          localStorage.setItem(`pin_${reg.eventId}`, eventPin);
         }
 
         $("successMsg").textContent = `${studentName} has been checked in for ${reg.eventTitle || "the event"}.`;

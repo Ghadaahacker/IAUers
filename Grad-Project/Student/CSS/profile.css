@@ -261,7 +261,7 @@ body {
 /* ── Stats Grid ── */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
@@ -459,7 +459,7 @@ body {
   }
 
   .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .page-header-bar {
@@ -756,6 +756,19 @@ body {
   flex-shrink: 0;
   transition: 0.2s ease;
 }
+
+.research-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2b58a8;
+  text-decoration: none;
+  margin-top: 2px;
+}
+
+.research-link:hover { text-decoration: underline; }
 
 .cert-delete-btn:hover {
   background: #f8c4c4;

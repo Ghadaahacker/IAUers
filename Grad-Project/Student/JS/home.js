@@ -576,6 +576,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const items = [];
       snap.forEach(d => {
         const reg = d.data();
+        if (reg.status === "cancelled") return;
         const eventDate = new Date(reg.eventDateTime || 0);
         if (eventDate >= now && eventDate <= sevenDaysLater) {
           items.push({ id: d.id, ...reg });

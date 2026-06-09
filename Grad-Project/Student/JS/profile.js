@@ -140,7 +140,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
           <div class="modal-field">
             <label>Year</label>
-            <input type="number" id="inputCertYear" placeholder="e.g. 2024" min="2000" max="2099" />
+            <input type="number" id="inputCertYear" placeholder="e.g. 2024" min="2000" max="${new Date().getFullYear()}" />
+          </div>
+
+          <div class="modal-field">
+            <label>Certificate Photo <span style="font-weight:400;color:#aaa;">(Optional)</span></label>
+            <label class="cert-img-upload-label" for="inputCertImage">
+              <i class="fa-solid fa-image"></i>
+              <span id="certImageName">Choose image…</span>
+            </label>
+            <input type="file" id="inputCertImage" accept="image/*" style="display:none;" />
           </div>
         </div>
 
@@ -150,6 +159,54 @@ document.addEventListener("DOMContentLoaded", () => {
             <i class="fa-solid fa-check"></i> Add Certification
           </button>
         </div>
+      </div>
+    </div>
+
+    <div id="addResearchModal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-flask"></i> Add Research</h3>
+          <button id="closeAddResearchBtn" class="modal-close">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Research Title</label>
+            <input type="text" id="inputResearchTitle" placeholder="e.g. Deep Learning in Healthcare" />
+          </div>
+
+          <div class="modal-field">
+            <label>Journal / Conference</label>
+            <input type="text" id="inputResearchVenue" placeholder="e.g. IEEE EMBC 2024" />
+          </div>
+
+          <div class="modal-field">
+            <label>Year</label>
+            <input type="number" id="inputResearchYear" placeholder="e.g. 2024" min="2000" max="${new Date().getFullYear()}" />
+          </div>
+
+          <div class="modal-field">
+            <label>Link <span style="font-weight:400;color:#aaa;">(Optional)</span></label>
+            <input type="url" id="inputResearchLink" placeholder="https://doi.org/..." />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="cancelAddResearchBtn" class="modal-btn cancel-btn">Cancel</button>
+          <button id="saveAddResearchBtn" class="modal-btn save-btn">
+            <i class="fa-solid fa-check"></i> Add Research
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="certImgViewer" class="modal-overlay hidden" style="z-index:1200;">
+      <div style="position:relative;max-width:90vw;max-height:90vh;">
+        <img id="certImgFull" src="" style="max-width:90vw;max-height:85vh;border-radius:16px;display:block;" />
+        <button onclick="document.getElementById('certImgViewer').classList.add('hidden')"
+          style="position:absolute;top:-14px;right:-14px;width:34px;height:34px;border:none;
+          background:#fff;border-radius:50%;font-size:18px;cursor:pointer;
+          box-shadow:0 2px 10px rgba(0,0,0,0.2);">✕</button>
       </div>
     </div>
 
@@ -369,6 +426,38 @@ document.addEventListener("DOMContentLoaded", () => {
       .toast i {
         color: #5dd08a;
       }
+
+      .cert-img-upload-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 46px;
+        border: 1.5px dashed #d8dee8;
+        border-radius: 12px;
+        padding: 0 14px;
+        font-size: 14px;
+        color: #65728d;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+      }
+
+      .cert-img-upload-label:hover {
+        border-color: #253a84;
+        background: #f4f7ff;
+      }
+
+      .cert-img-thumb {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        object-fit: cover;
+        cursor: pointer;
+        flex-shrink: 0;
+        border: 2px solid #e0e7f0;
+        transition: opacity 0.15s;
+      }
+
+      .cert-img-thumb:hover { opacity: 0.8; }
     </style>
   `);
 
@@ -408,11 +497,19 @@ document.addEventListener("DOMContentLoaded", () => {
     return { text: "Academic Probation", cls: "record-badge-warn" };
   }
 
-  function showToast(message) {
+  function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
     const toastMsg = document.getElementById("toastMsg");
+    const icon = toast.querySelector("i");
 
     toastMsg.textContent = message;
+    toast.style.background = type === "error" ? "#b42318" : "#162044";
+    if (icon) {
+      icon.className = type === "error"
+        ? "fa-solid fa-circle-xmark"
+        : "fa-solid fa-circle-check";
+      icon.style.color = type === "error" ? "#fca5a5" : "#5dd08a";
+    }
     toast.classList.remove("hidden");
 
     clearTimeout(showToast.timer);
@@ -452,10 +549,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const statNumbers = document.querySelectorAll(".stat-card h2");
     if (statNumbers[0]) statNumbers[0].textContent = profileData.gpa || "0.00";
     if (statNumbers[1]) statNumbers[1].textContent = profileData.credits || "0";
-    if (statNumbers[2]) statNumbers[2].textContent = profileData.certificates ?? 0;
 
-    const statLabels = document.querySelectorAll(".stat-card p");
-    if (statLabels[2]) statLabels[2].textContent = "My Certificates";
+    const certCountEl = document.getElementById("certCount");
+    if (certCountEl) certCountEl.textContent = (profileData.certifications || []).length;
+
+    const researchCountEl = document.getElementById("researchCount");
+    if (researchCountEl) researchCountEl.textContent = (profileData.research || []).length;
 
     const gpa = parseFloat(profileData.gpa) || 0;
     const credits = parseInt(profileData.credits) || 0;
@@ -498,6 +597,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderProfileCard();
     renderSelectedInterests();
     renderCertifications();
+    renderResearch();
   }
 
   onAuthStateChanged(auth, async (user) => {
@@ -678,17 +778,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ── Certifications ──
 
+  function compressCertImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX = 1000;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else       { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.75));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   function renderCertifications() {
     const list = document.getElementById("certificationsList");
     if (!list) return;
 
     const certs = profileData.certifications || [];
 
+    const certCountEl = document.getElementById("certCount");
+    if (certCountEl) certCountEl.textContent = certs.length;
+
     if (!certs.length) {
       list.innerHTML = `<p class="certs-empty">No certifications added yet.</p>`;
-
-      const statNumbers = document.querySelectorAll(".stat-card h2");
-      if (statNumbers[2]) statNumbers[2].textContent = "0";
       return;
     }
 
@@ -697,7 +822,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const item = document.createElement("div");
       item.className = "cert-item";
       item.innerHTML = `
-        <div class="cert-icon"><i class="fa-solid fa-certificate"></i></div>
+        ${cert.image
+          ? `<img src="${cert.image}" class="cert-img-thumb" title="View certificate" />`
+          : `<div class="cert-icon"><i class="fa-solid fa-certificate"></i></div>`
+        }
         <div class="cert-info">
           <span class="cert-name">${cert.name}</span>
           <span class="cert-meta">${cert.organization}${cert.year ? " · " + cert.year : ""}</span>
@@ -706,6 +834,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <i class="fa-solid fa-trash"></i>
         </button>
       `;
+
+      if (cert.image) {
+        item.querySelector(".cert-img-thumb").addEventListener("click", () => {
+          document.getElementById("certImgFull").src = cert.image;
+          document.getElementById("certImgViewer").classList.remove("hidden");
+        });
+      }
+
       list.appendChild(item);
     });
 
@@ -718,9 +854,6 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Certification removed.");
       });
     });
-
-    const statNumbers = document.querySelectorAll(".stat-card h2");
-    if (statNumbers[2]) statNumbers[2].textContent = certs.length;
   }
 
   async function saveCertifications() {
@@ -735,21 +868,148 @@ document.addEventListener("DOMContentLoaded", () => {
     addCertBtn.addEventListener("click", () => openModal("addCertModal"));
   }
 
-  document.getElementById("closeAddCertBtn").addEventListener("click", () => closeModal("addCertModal"));
+  document.getElementById("closeAddCertBtn").addEventListener("click",   () => closeModal("addCertModal"));
   document.getElementById("cancelAddCertBtn").addEventListener("click", () => closeModal("addCertModal"));
 
+  // ── Research ──────────────────────────────────────────────────────────────────
+
+  function renderResearch() {
+    const list = document.getElementById("researchList");
+    if (!list) return;
+
+    const papers = profileData.research || [];
+
+    const researchCountEl = document.getElementById("researchCount");
+    if (researchCountEl) researchCountEl.textContent = papers.length;
+
+    if (!papers.length) {
+      list.innerHTML = `<p class="certs-empty">No research added yet.</p>`;
+      return;
+    }
+
+    list.innerHTML = "";
+    papers.forEach((paper, index) => {
+      const item = document.createElement("div");
+      item.className = "cert-item";
+      item.innerHTML = `
+        <div class="cert-icon" style="background:#eef3ff;color:#2b58a8;">
+          <i class="fa-solid fa-flask"></i>
+        </div>
+        <div class="cert-info">
+          <span class="cert-name">${paper.title}</span>
+          <span class="cert-meta">${paper.venue}${paper.year ? " · " + paper.year : ""}</span>
+          ${paper.link
+            ? `<a href="${paper.link}" target="_blank" rel="noopener" class="research-link">
+                 <i class="fa-solid fa-arrow-up-right-from-square"></i> View Paper
+               </a>`
+            : ""}
+        </div>
+        <button class="cert-delete-btn research-delete-btn" data-index="${index}" type="button" title="Delete">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      `;
+      list.appendChild(item);
+    });
+
+    list.querySelectorAll(".research-delete-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const idx = parseInt(btn.dataset.index);
+        profileData.research.splice(idx, 1);
+        await saveResearch();
+        renderResearch();
+        showToast("Research removed.");
+      });
+    });
+  }
+
+  async function saveResearch() {
+    if (!currentUserId) return;
+    await updateDoc(doc(db, "users", currentUserId), {
+      research: profileData.research || []
+    });
+  }
+
+  const addResearchBtn = document.getElementById("addResearchBtn");
+  if (addResearchBtn) addResearchBtn.addEventListener("click", () => openModal("addResearchModal"));
+
+  document.getElementById("closeAddResearchBtn").addEventListener("click",   () => closeModal("addResearchModal"));
+  document.getElementById("cancelAddResearchBtn").addEventListener("click", () => closeModal("addResearchModal"));
+
+  document.getElementById("saveAddResearchBtn").addEventListener("click", async () => {
+    const title = document.getElementById("inputResearchTitle").value.trim();
+    const venue = document.getElementById("inputResearchVenue").value.trim();
+    const year  = document.getElementById("inputResearchYear").value.trim();
+    const link  = document.getElementById("inputResearchLink").value.trim();
+
+    if (!title || !venue) {
+      showToast("Title and journal/conference are required.");
+      return;
+    }
+
+    if (year && parseInt(year) > new Date().getFullYear()) {
+      showToast(`Year cannot be later than ${new Date().getFullYear()}.`, "error");
+      return;
+    }
+
+    if (!profileData.research) profileData.research = [];
+    profileData.research.push({ title, venue, year, ...(link ? { link } : {}) });
+
+    const saveBtn = document.getElementById("saveAddResearchBtn");
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving…`;
+
+    try {
+      await saveResearch();
+      renderResearch();
+      closeModal("addResearchModal");
+      document.getElementById("inputResearchTitle").value = "";
+      document.getElementById("inputResearchVenue").value = "";
+      document.getElementById("inputResearchYear").value  = "";
+      document.getElementById("inputResearchLink").value  = "";
+      showToast("Research added.");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to save research.");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = `<i class="fa-solid fa-check"></i> Add Research`;
+    }
+  });
+
+  // ── Certificate image upload ───────────────────────────────────────────────
+
+  document.getElementById("inputCertImage").addEventListener("change", function () {
+    const file = this.files[0];
+    document.getElementById("certImageName").textContent = file ? file.name : "Choose image…";
+  });
+
   document.getElementById("saveAddCertBtn").addEventListener("click", async () => {
-    const name = document.getElementById("inputCertName").value.trim();
+    const name         = document.getElementById("inputCertName").value.trim();
     const organization = document.getElementById("inputCertOrg").value.trim();
-    const year = document.getElementById("inputCertYear").value.trim();
+    const year         = document.getElementById("inputCertYear").value.trim();
+    const fileInput    = document.getElementById("inputCertImage");
 
     if (!name || !organization) {
       showToast("Name and organization are required.");
       return;
     }
 
+    if (year && parseInt(year) > new Date().getFullYear()) {
+      showToast(`Year cannot be later than ${new Date().getFullYear()}.`, "error");
+      return;
+    }
+
+    const saveBtn = document.getElementById("saveAddCertBtn");
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving…`;
+
+    let image = null;
+    if (fileInput.files[0]) {
+      try { image = await compressCertImage(fileInput.files[0]); } catch (_) {}
+    }
+
     if (!profileData.certifications) profileData.certifications = [];
-    profileData.certifications.push({ name, organization, year });
+    profileData.certifications.push({ name, organization, year, ...(image ? { image } : {}) });
 
     try {
       await saveCertifications();
@@ -758,10 +1018,15 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("inputCertName").value = "";
       document.getElementById("inputCertOrg").value = "";
       document.getElementById("inputCertYear").value = "";
+      fileInput.value = "";
+      document.getElementById("certImageName").textContent = "Choose image…";
       showToast("Certification added.");
     } catch (error) {
       console.error("Error saving certification:", error);
       showToast("Failed to save certification.");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = `<i class="fa-solid fa-check"></i> Add Certification`;
     }
   });
 

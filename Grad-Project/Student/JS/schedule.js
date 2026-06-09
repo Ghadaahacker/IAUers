@@ -103,6 +103,8 @@ document.addEventListener("DOMContentLoaded", function () {
   tasksSnapshot.forEach((docSnap) => {
     const task = docSnap.data();
 
+    if (task.status === "done") return;
+
     const taskDate = getDateOnly(task.dueDateTime);
     const taskTime = getTimeOnly(task.dueDateTime);
 
@@ -343,20 +345,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderDaySummary() {
     const dateObj = parseDateKey(selectedDate);
-    const items = getItemsByDate(selectedDate);
 
     selectedDayNumber.textContent = String(dateObj.getDate()).padStart(2, "0");
     selectedDayText.textContent = formatDayName(selectedDate);
     selectedDayMeta.textContent = formatLongDate(selectedDate);
 
-    if (!items.length) {
-      dayStatusText.textContent = "No registered events or academic items are scheduled for this selected day.";
+    if (currentView === "day") {
+      const items = getItemsByDate(selectedDate);
+      if (!items.length) {
+        dayStatusText.textContent = "No registered events or academic items are scheduled for this day.";
+      } else {
+        const eventCount = items.filter(i => i.type === "event").length;
+        const taskCount  = items.filter(i => i.type === "task").length;
+        dayStatusText.textContent =
+          `You have ${eventCount} event${eventCount !== 1 ? "s" : ""} and ${taskCount} task${taskCount !== 1 ? "s" : ""} today.`;
+      }
     } else {
-      const eventCount = items.filter(item => item.type === "event").length;
-      const taskCount = items.filter(item => item.type === "task").length;
-
-      dayStatusText.textContent =
-        `You have ${eventCount} event${eventCount !== 1 ? "s" : ""} and ${taskCount} task${taskCount !== 1 ? "s" : ""} in this selected day.`;
+      const visibleDates = getVisibleDates();
+      const items = visibleDates.flatMap(d => getItemsByDate(d));
+      const label = currentView === "week" ? "this week" : "this month";
+      if (!items.length) {
+        dayStatusText.textContent = `No registered events or academic items are scheduled for ${label}.`;
+      } else {
+        const eventCount = items.filter(i => i.type === "event").length;
+        const taskCount  = items.filter(i => i.type === "task").length;
+        dayStatusText.textContent =
+          `You have ${eventCount} event${eventCount !== 1 ? "s" : ""} and ${taskCount} task${taskCount !== 1 ? "s" : ""} ${label}.`;
+      }
     }
   }
 
@@ -574,6 +589,7 @@ document.addEventListener("DOMContentLoaded", function () {
       currentView = this.dataset.view;
 
       renderTimeline();
+      renderDaySummary();
     });
   });
 });
