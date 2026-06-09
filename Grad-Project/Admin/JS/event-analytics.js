@@ -12,8 +12,10 @@ if (currentUserRole !== "admin") {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  try {
   const params   = new URLSearchParams(window.location.search);
   const eventId  = params.get("eventId");
+  console.log("📊 Analytics eventId:", eventId);
   const rawDate  = params.get("date") || "";
   const location = params.get("location") || "";
 
@@ -65,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   fbSnap.forEach(d => {
     const data   = d.data();
-    const rating = data.rating;
+    const rating = data.satisfaction ?? data.rating;
     if (rating >= 1 && rating <= 5) {
       ratingCounts[rating - 1]++;
       ratingSum += rating;
@@ -101,27 +103,37 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ── Satisfaction Distribution chart ──────────────────────────────────────────
   const ctx1 = document.getElementById("satisfactionChart");
   if (ctx1) {
-    new Chart(ctx1, {
-      type: "bar",
-      data: {
-        labels: ["1 ★", "2 ★", "3 ★", "4 ★", "5 ★"],
-        datasets: [{
-          label: "Responses",
-          data: ratingCounts,
-          backgroundColor: "#4b84e6",
-          borderRadius: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: "Count" } },
-          x: { title: { display: true, text: "Rating" } }
+    if (totalFb === 0) {
+      ctx1.style.display = "none";
+      const msg = document.createElement("p");
+      msg.textContent = "No ratings submitted yet.";
+      msg.style.cssText = "text-align:center;color:#5f6e80;padding:60px 0;font-size:15px;";
+      ctx1.parentElement.appendChild(msg);
+    } else {
+      const parentW = ctx1.parentElement.clientWidth || 600;
+      ctx1.width  = parentW;
+      ctx1.height = 360;
+      new Chart(ctx1, {
+        type: "bar",
+        data: {
+          labels: ["1 ★", "2 ★", "3 ★", "4 ★", "5 ★"],
+          datasets: [{
+            label: "Responses",
+            data: ratingCounts,
+            backgroundColor: "#4b84e6",
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: "Count" } },
+            x: { title: { display: true, text: "Rating" } }
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   // ── Would Attend chart ────────────────────────────────────────────────────────
@@ -154,6 +166,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // ── Demographics — hide if no extra data ─────────────────────────────────────
   const demSection = document.querySelector(".demographics-section");
   if (demSection) demSection.style.display = "none";
+
+  } catch (err) {
+    console.error("❌ Analytics error:", err);
+  }
 });
 
 function showEmpty() {

@@ -161,9 +161,14 @@
     margin-bottom: 18px;
   }
   
+  .bar-wrapper {
+    position: relative;
+    height: 360px;
+  }
+
   #satisfactionChart {
     width: 100% !important;
-    height: 380px !important;
+    height: 100% !important;
   }
   
   .recommendation-card .pie-wrapper {
