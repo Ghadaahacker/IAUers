@@ -175,6 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fileNameText.textContent = "No file selected";
     fileNameText.style.color = "";
     resetEventInterests();
+    const pinEl = document.getElementById("checkinPinInput");
+    if (pinEl) pinEl.value = "";
   }
 
   function resetAnnouncementForm() {
@@ -278,7 +280,8 @@ document.addEventListener("DOMContentLoaded", () => {
         image: imageUrl,
         draftId: editingEventId || "",
         createdBy: (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "unknown-admin").toLowerCase(),
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        checkinPin: document.getElementById("checkinPinInput")?.value.trim() || null
       });
 
       if (editingEventId) {
@@ -356,7 +359,8 @@ document.addEventListener("DOMContentLoaded", () => {
         status: "draft",
         createdBy: (sessionStorage.getItem("userEmail") || auth.currentUser?.email || "unknown-admin").toLowerCase(),
         updatedAt: serverTimestamp(),
-        image: imageUrl
+        image: imageUrl,
+        checkinPin: document.getElementById("checkinPinInput")?.value.trim() || null
       };
 
       if (editingEventId) {
@@ -718,6 +722,8 @@ document.addEventListener("DOMContentLoaded", () => {
             eventDateTimeInput.value = event.dateTime || "";
             buildingHallSelect.value = event.hall || "";
             setEventInterests(event.interests || []);
+            const pinEl = document.getElementById("checkinPinInput");
+            if (pinEl) pinEl.value = event.checkinPin || "";
 
             if (event.image) {
               fileNameText.textContent = "Current image saved";
@@ -762,13 +768,16 @@ document.addEventListener("DOMContentLoaded", () => {
             // Published event — delete from events
             await deleteDoc(doc(db, "events", event.id));
 
-            // Delete all student registrations for this event
+            // Mark all student registrations as cancelled
             const regSnap = await getDocs(query(
               collection(db, "eventRegistrations"),
               where("eventId", "==", event.id)
             ));
             for (const regDoc of regSnap.docs) {
-              await deleteDoc(doc(db, "eventRegistrations", regDoc.id));
+              await updateDoc(doc(db, "eventRegistrations", regDoc.id), {
+                status: "cancelled",
+                cancelledAt: serverTimestamp()
+              });
             }
 
             // Mark the linked bookingRequest as Deleted (BM's onSnapshot hides it)
@@ -866,8 +875,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const regs = [];
       snap.forEach(d => regs.push({ id: d.id, ...d.data() }));
 
+      const checkedInCount = regs.filter(r => r.checkedIn).length;
       document.getElementById("regTotalBadge").textContent =
-        `${regs.length} ${regs.length === 1 ? "registration" : "registrations"}`;
+        `${regs.length} ${regs.length === 1 ? "registration" : "registrations"}` +
+        (checkedInCount > 0 ? ` · ${checkedInCount} checked in` : "");
 
       const list = document.getElementById("regModalList");
 
@@ -900,6 +911,12 @@ document.addEventListener("DOMContentLoaded", () => {
           ? r.createdAt.toDate().toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
           : "—";
         const initial = name.charAt(0).toUpperCase();
+
+        const checkedIn = !!r.checkedIn;
+        const checkinTime = r.checkedInAt?.toDate
+          ? r.checkedInAt.toDate().toLocaleString("en-GB", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })
+          : null;
+
         return `
           <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;
             border-bottom:1px solid #f0f4f8;${i % 2 === 0 ? "background:#fff;" : "background:#fafbfc;"}">
@@ -912,13 +929,17 @@ document.addEventListener("DOMContentLoaded", () => {
               </div>
               <div style="font-size:13px;color:#5f6e80;">${r.studentEmail || "—"}</div>
             </div>
-            <div style="text-align:right;flex-shrink:0;">
-              <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
-                background:${r.status === "approved" || r.status === "confirmed" ? "#dcefe2" : "#f4e0c8"};
-                color:${r.status === "approved" || r.status === "confirmed" ? "#2a6b3c" : "#7a4200"};">
-                ${(r.status || "approved").toUpperCase()}
-              </span>
-              <div style="font-size:12px;color:#98a3b2;margin-top:4px;">${date}</div>
+            <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              ${checkedIn
+                ? `<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
+                    background:#dcf5e7;color:#1a7a3c;display:flex;align-items:center;gap:5px;">
+                    <i class="fa-solid fa-circle-check" style="font-size:10px;"></i> ATTENDED
+                   </span>
+                   ${checkinTime ? `<div style="font-size:11px;color:#98a3b2;">${checkinTime}</div>` : ""}`
+                : `<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
+                    background:#f0f4f8;color:#65728d;">REGISTERED</span>`
+              }
+              <div style="font-size:12px;color:#c0c8d4;">Reg: ${date}</div>
             </div>
           </div>`;
       }).join("");

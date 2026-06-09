@@ -1,0 +1,261 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "Inter", sans-serif;
+  background: #f0f4ff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.page {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #162044;
+}
+
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #245df2;
+}
+
+.state {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.state.hidden { display: none; }
+
+/* Loading */
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #dce6ff;
+  border-top-color: #245df2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Ticket card */
+.ticket-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(22, 32, 68, 0.10);
+}
+
+.ticket-header {
+  background: #162044;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.ticket-header i { color: #7ca4ff; font-size: 18px; }
+
+.ticket-body { padding: 22px; }
+
+.student-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #245df2, #1a3a7a);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.student-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #162044;
+}
+
+.student-email {
+  font-size: 13px;
+  color: #65728d;
+  margin-top: 2px;
+}
+
+.divider {
+  height: 1px;
+  background: #edf1f8;
+  margin-bottom: 16px;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #43516c;
+  margin-bottom: 10px;
+}
+
+.info-row i { width: 16px; text-align: center; color: #245df2; opacity: 0.7; }
+
+.rating-row { margin-top: 4px; }
+
+/* Already checked in */
+.already-badge {
+  width: 100%;
+  background: #fff3d8;
+  color: #9a6400;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.already-badge.hidden { display: none; }
+
+/* Confirm button */
+.confirm-btn {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #162044, #245df2);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: opacity 0.2s;
+}
+
+.confirm-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Success */
+.success-icon {
+  font-size: 72px;
+  color: #22c55e;
+}
+
+.success-icon i, .error-icon i { display: block; }
+
+h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #162044;
+  text-align: center;
+}
+
+p {
+  font-size: 15px;
+  color: #65728d;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.scan-another-btn {
+  margin-top: 6px;
+  height: 48px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 14px;
+  background: #eef3ff;
+  color: #245df2;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* PIN section */
+.pin-section {
+  width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 22px;
+  box-shadow: 0 4px 16px rgba(22,32,68,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pin-section.hidden { display: none; }
+
+.pin-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #162044;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pin-label i { color: #245df2; }
+
+.pin-input {
+  width: 100%;
+  height: 52px;
+  border: 2px solid #d4dcee;
+  border-radius: 12px;
+  padding: 0 18px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  color: #162044;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.pin-input:focus { border-color: #245df2; }
+
+.pin-error {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pin-error.hidden { display: none; }
+
+/* Error */
+.error-icon { font-size: 72px; color: #ef4444; }

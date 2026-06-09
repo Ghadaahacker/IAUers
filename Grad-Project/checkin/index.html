@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAU'ers — Check In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="checkin.css" />
+</head>
+<body>
+  <div class="page">
+
+    <div class="brand">
+      <span class="brand-dot"></span>
+      IAU'ers
+    </div>
+
+    <!-- Loading -->
+    <div id="stateLoading" class="state">
+      <div class="spinner"></div>
+      <p>Looking up ticket…</p>
+    </div>
+
+    <!-- Valid ticket -->
+    <div id="stateValid" class="state hidden">
+      <div class="ticket-card">
+        <div class="ticket-header">
+          <i class="fa-solid fa-ticket"></i>
+          <span id="ticketId">TKT-000000</span>
+        </div>
+        <div class="ticket-body">
+          <div class="student-row">
+            <div class="avatar" id="avatarInitials">--</div>
+            <div>
+              <div class="student-name" id="studentName">Student Name</div>
+              <div class="student-email" id="studentEmail"></div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="info-row"><i class="fa-solid fa-calendar-days"></i><span id="eventTitle">Event</span></div>
+          <div class="info-row"><i class="fa-regular fa-calendar"></i><span id="eventDate">Date</span></div>
+          <div class="info-row"><i class="fa-solid fa-location-dot"></i><span id="eventLocation">Location</span></div>
+          <div class="info-row rating-row hidden" id="ratingRow">
+            <i class="fa-solid fa-star" style="color:#f4b400;"></i>
+            <span id="ratingText"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="alreadyCheckedIn" class="already-badge hidden">
+        <i class="fa-solid fa-circle-check"></i>
+        Already checked in — <span id="checkedInTime"></span>
+      </div>
+
+      <!-- PIN section — only shown when event has a check-in PIN -->
+      <div id="pinSection" class="pin-section hidden">
+        <label class="pin-label">
+          <i class="fa-solid fa-lock"></i>
+          Enter check-in PIN
+        </label>
+        <input id="pinInput" type="number" class="pin-input" placeholder="••••" maxlength="4" />
+        <p id="pinError" class="pin-error hidden">
+          <i class="fa-solid fa-circle-xmark"></i> Incorrect PIN. Try again.
+        </p>
+      </div>
+
+      <button id="confirmBtn" class="confirm-btn" type="button">
+        <i class="fa-solid fa-circle-check"></i>
+        Confirm Check-in
+      </button>
+    </div>
+
+    <!-- Success -->
+    <div id="stateSuccess" class="state hidden">
+      <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+      <h2>Checked In!</h2>
+      <p id="successMsg">Student has been successfully checked in.</p>
+      <button class="scan-another-btn" onclick="window.location.href='/checkin/'">
+        <i class="fa-solid fa-qrcode"></i> Scan Another
+      </button>
+    </div>
+
+    <!-- Error -->
+    <div id="stateError" class="state hidden">
+      <div class="error-icon" id="errorIcon"><i class="fa-solid fa-circle-xmark"></i></div>
+      <h2 id="errorTitle">Invalid Ticket</h2>
+      <p id="errorMsg">This ticket could not be found.</p>
+    </div>
+
+    <!-- No reg param -->
+    <div id="stateNoParam" class="state hidden">
+      <div class="error-icon"><i class="fa-solid fa-qrcode"></i></div>
+      <h2>No Ticket Scanned</h2>
+      <p>Scan a student's QR code from their My Tickets page to check them in.</p>
+    </div>
+
+  </div>
+
+  <script type="module" src="checkin.js"></script>
+</body>
+</html>

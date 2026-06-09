@@ -387,7 +387,8 @@ acceptBtn.addEventListener("click", async () => {
       status: "published",
       createdBy: selectedBooking.createdBy || "Admin",
       bookingRequestId: selectedBookingId,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
+      checkinPin: selectedBooking.checkinPin || null
     });
 
     await addDoc(collection(db, "activityLogs"), {

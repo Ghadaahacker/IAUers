@@ -6,7 +6,9 @@ import {
   addDoc,
   query,
   where,
-  serverTimestamp
+  serverTimestamp,
+  doc,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 import {
@@ -102,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eventLocation:
         data.eventLocation || data.location || data.venue || "IAU Campus",
       category: data.category || data.eventCategory || "University Event",
-      status: "confirmed"
+      status: data.status || "confirmed"
     };
   }
 
@@ -142,15 +144,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function generateQrPayload(ticket) {
-    return JSON.stringify({
-      ticketId: ticket.ticketId,
-      registrationId: ticket.registrationId,
-      studentId: ticket.studentId,
-      eventId: ticket.eventId,
-      eventTitle: ticket.eventTitle,
-      status: ticket.status
-    });
+  function generateQrUrl(ticket) {
+    return `https://iauers.web.app/checkin/?reg=${ticket.registrationId}`;
   }
 
   function openTicketModal(ticket, showQr = false) {
@@ -169,8 +164,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (showQr) {
       qrSection.style.display = "block";
 
-      const qrPayload = encodeURIComponent(generateQrPayload(ticket));
-      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrPayload}`;
+      const qrUrl = encodeURIComponent(generateQrUrl(ticket));
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrUrl}`;
 
       qrCodeContainer.innerHTML = `
         <img
@@ -369,27 +364,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function createTicketCard(ticket, isPastCard = false) {
     const card = document.createElement("div");
+    const isCancelled = ticket.status === "cancelled";
+
     card.className = "ticket-card";
-    if (isPastCard) card.classList.add("ticket-card-past");
+    if (isPastCard)   card.classList.add("ticket-card-past");
+    if (isCancelled)  card.classList.add("ticket-card-cancelled");
 
     const alreadyRated = ratedEventIds.has(ticket.eventId);
 
-    const rateBtn = isPastCard
-      ? alreadyRated
+    let statusLabel, statusClass, headActionBtn;
+
+    if (isCancelled) {
+      statusLabel    = "Cancelled";
+      statusClass    = "cancelled";
+      headActionBtn  = `<button class="ticket-btn dismiss-btn" type="button" title="Remove ticket">
+                          <i class="fa-solid fa-trash"></i> Dismiss
+                        </button>`;
+    } else if (isPastCard) {
+      statusLabel   = "Past";
+      statusClass   = "past";
+      headActionBtn = alreadyRated
         ? `<button class="ticket-btn secondary" type="button" disabled style="cursor:default;opacity:0.7;">
              <i class="fa-solid fa-star" style="color:#f4b400;"></i> Rated
            </button>`
         : `<button class="ticket-btn secondary rate-event-btn" type="button">
              <i class="fa-regular fa-star"></i> Rate Event
-           </button>`
-      : "";
-
-    const statusLabel = isPastCard ? "Past" : "Confirmed";
-    const statusClass = isPastCard ? "past" : "confirmed";
-
-    const headActionBtn = !isPastCard
-      ? `<button class="ticket-btn primary show-qr-btn" type="button"><i class="fa-solid fa-qrcode"></i> Show QR</button>`
-      : rateBtn;
+           </button>`;
+    } else {
+      statusLabel   = "Confirmed";
+      statusClass   = "confirmed";
+      headActionBtn = `<button class="ticket-btn primary show-qr-btn" type="button">
+                         <i class="fa-solid fa-qrcode"></i> Show QR
+                       </button>`;
+    }
 
     card.innerHTML = `
       <div class="ticket-card-head">
@@ -404,7 +411,8 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
 
       <div class="ticket-card-body">
-        <h3>${ticket.eventTitle}</h3>
+        ${isCancelled ? `<div class="cancelled-notice"><i class="fa-solid fa-circle-exclamation"></i> This event has been cancelled by the organizer.</div>` : ""}
+        <h3 style="${isCancelled ? "opacity:0.5;text-decoration:line-through;" : ""}">${ticket.eventTitle}</h3>
 
         <div class="meta-stack">
           <div class="meta-row">
@@ -423,17 +431,20 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
         </div>
 
+        ${!isCancelled ? `
         <div class="ticket-footer">
           <button class="ticket-btn secondary view-details-btn" type="button">
             View Details
           </button>
-        </div>
+        </div>` : ""}
       </div>
     `;
 
-    card.querySelector(".view-details-btn").addEventListener("click", () => {
-      openTicketModal(ticket, false);
-    });
+    if (!isCancelled) {
+      card.querySelector(".view-details-btn").addEventListener("click", () => {
+        openTicketModal(ticket, false);
+      });
+    }
 
     const showQrBtn = card.querySelector(".show-qr-btn");
     if (showQrBtn) {
@@ -443,6 +454,29 @@ document.addEventListener("DOMContentLoaded", function () {
     const rateEventBtn = card.querySelector(".rate-event-btn");
     if (rateEventBtn) {
       rateEventBtn.addEventListener("click", () => openRatingModal(ticket));
+    }
+
+    const dismissBtn = card.querySelector(".dismiss-btn");
+    if (dismissBtn) {
+      dismissBtn.addEventListener("click", async () => {
+        dismissBtn.disabled = true;
+        dismissBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+        try {
+          await deleteDoc(doc(db, "eventRegistrations", ticket.registrationId));
+          card.style.transition = "opacity 0.3s, transform 0.3s";
+          card.style.opacity = "0";
+          card.style.transform = "translateX(20px)";
+          setTimeout(() => {
+            card.remove();
+            tickets = tickets.filter(t => t.registrationId !== ticket.registrationId);
+            renderTickets();
+          }, 300);
+        } catch (err) {
+          console.error(err);
+          dismissBtn.disabled = false;
+          dismissBtn.innerHTML = `<i class="fa-solid fa-trash"></i> Dismiss`;
+        }
+      });
     }
 
     return card;
